@@ -11,10 +11,8 @@ using UnityEngine.InputSystem;
 /// 제한 시간 안에 <see cref="bathTrigger"/> 영역에 도달하면 공중제비를 돌고 '유레카!' 텍스트가 팝인되는
 /// 연출 후 성공 처리되며, 도달하지 못하면 실패.
 /// </summary>
-public class ArchimedesBathMiniGame : MiniGame
+public class ArchimedesBathMiniGame : TimedMiniGame
 {
-    [Serializable] public class TimerEvent : UnityEvent<float> { }
-
     [Header("아르키메데스")]
     [SerializeField] private SpriteRenderer archimedesRenderer;
     [SerializeField] private Sprite archimedesFrame0;
@@ -25,8 +23,6 @@ public class ArchimedesBathMiniGame : MiniGame
     [SerializeField] private Collider2D bathTrigger;
 
     [Header("규칙")]
-    [Tooltip("제한 시간(초)")]
-    [SerializeField] private float timeLimit = 6f;
     [Tooltip("D 키를 한 번 누를 때마다 이동하는 거리(월드 유닛). 시작 위치부터 목욕탕 트리거까지의 거리를 감안해 '미친듯이 연타'해야 겨우 도달하도록 작게 잡는다")]
     [SerializeField] private float stepDistance = 0.1f;
 
@@ -43,20 +39,14 @@ public class ArchimedesBathMiniGame : MiniGame
     [SerializeField] private CanvasGroup eurekaCanvasGroup;
     [Tooltip("텍스트가 스케일+알파로 팝인하는 데 걸리는 시간")]
     [SerializeField] private float eurekaAppearDuration = 0.35f;
-    [Tooltip("팝인이 끝난 뒤 게임 종료까지 텍스트를 유지하는 시간")]
-    [SerializeField] private float eurekaHoldDuration = 0.8f;
     [Tooltip("팝인 시작 시점의 스케일 배율")]
     [SerializeField] private float eurekaStartScale = 0.3f;
 
     [Header("이벤트")]
-    [Tooltip("0에서 1로 차오르는 게이지 값. Image.fillAmount 에 그대로 연결하면 된다")]
-    public TimerEvent onTimerChanged;
     public UnityEvent onClear;
     public UnityEvent onFail;
 
     private Vector3 startPosition;
-    private float elapsed;
-    private bool resultLocked;
     private bool useFrame0 = true;
     private Coroutine eurekaRoutine;
 
@@ -68,34 +58,21 @@ public class ArchimedesBathMiniGame : MiniGame
 
     private void Start()
     {
-        onTimerChanged.Invoke(0f);
         SetEurekaVisible(false);
     }
 
-    private void Update()
+    protected override void OnTimedUpdate()
     {
-        if (!IsPlaying || resultLocked)
-            return;
-
-        elapsed += Time.deltaTime;
-        onTimerChanged.Invoke(timeLimit > 0f ? Mathf.Clamp01(elapsed / timeLimit) : 1f);
-
-        if (elapsed >= timeLimit)
-        {
-            Fail();
-            return;
-        }
-
         if (Keyboard.current != null && Keyboard.current.dKey.wasPressedThisFrame)
             StepForward();
     }
 
-    protected override void OnPlay()
+    protected override void OnTimedPlay()
     {
         ResetInternal();
     }
 
-    protected override void OnStopAndReset()
+    protected override void OnTimedStopAndReset()
     {
         if (eurekaRoutine != null)
         {
@@ -108,8 +85,6 @@ public class ArchimedesBathMiniGame : MiniGame
 
     private void ResetInternal()
     {
-        elapsed = 0f;
-        resultLocked = false;
         useFrame0 = true;
 
         if (archimedesRenderer != null)
@@ -120,7 +95,6 @@ public class ArchimedesBathMiniGame : MiniGame
         }
 
         SetEurekaVisible(false);
-        onTimerChanged.Invoke(0f);
     }
 
     private void StepForward()
@@ -139,28 +113,24 @@ public class ArchimedesBathMiniGame : MiniGame
 
     private void Clear()
     {
-        resultLocked = true;
+        SucceedWhenTimeUp();
         eurekaRoutine = StartCoroutine(EurekaRoutine());
     }
 
-    private void Fail()
+    protected override void OnTimeUp()
     {
-        resultLocked = true;
         onFail.Invoke();
-        ReportFinished(false);
+        base.OnTimeUp();
     }
 
-    /// <summary>목욕탕 도달 연출: 공중제비 → '유레카!' 텍스트 팝인 → 유지 후 게임 종료.</summary>
+    /// <summary>목욕탕 도달 연출: 공중제비 → '유레카!' 텍스트 팝인. 이후엔 그대로 유지된 채 제한 시간이 다 찰 때까지 기다린다.</summary>
     private IEnumerator EurekaRoutine()
     {
         yield return StartCoroutine(SomersaultRoutine());
         yield return StartCoroutine(EurekaTextRoutine());
 
-        yield return new WaitForSeconds(eurekaHoldDuration);
-
         eurekaRoutine = null;
         onClear.Invoke();
-        ReportFinished(true);
     }
 
     private IEnumerator SomersaultRoutine()

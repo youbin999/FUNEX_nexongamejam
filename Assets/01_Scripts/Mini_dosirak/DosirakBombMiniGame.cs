@@ -10,10 +10,8 @@ using UnityEngine.InputSystem;
 /// 도시락을 드래그하다가 위로 빠르게 스냅해서 던지면(속도 임계값 이상) 성공 연출(폭발 + 배경 클리어 페이드)이 재생된다.
 /// 제한 시간 안에 던지지 못하면 실패. 프리팹으로 만들어 <see cref="MiniGamePlayer"/> 가 재생한다.
 /// </summary>
-public class DosirakBombMiniGame : MiniGame
+public class DosirakBombMiniGame : TimedMiniGame
 {
-    [Serializable] public class TimerEvent : UnityEvent<float> { }
-
     [Header("카메라 / 입력")]
     [Tooltip("비워두면 Camera.main 을 쓴다")]
     [SerializeField] private Camera targetCamera;
@@ -31,8 +29,6 @@ public class DosirakBombMiniGame : MiniGame
     [SerializeField] private SpriteRenderer explosionRenderer;
 
     [Header("규칙")]
-    [Tooltip("제한 시간(초)")]
-    [SerializeField] private float timeLimit = 5f;
     [Tooltip("이 속도(월드 유닛/초, 위 방향) 이상으로 놓아야 제대로 던진 것으로 인정한다")]
     [SerializeField] private float throwUpwardSpeedThreshold = 6f;
 
@@ -48,12 +44,8 @@ public class DosirakBombMiniGame : MiniGame
     [SerializeField] private float explosionFadeDuration = 0.4f;
     [SerializeField] private float backgroundFadeDuration = 0.6f;
     [SerializeField] private float snapBackDuration = 0.25f;
-    [Tooltip("성공이 확정된 뒤, 타이머가 이 값(초) 만큼 남을 때까지 대기했다가 게임을 종료한다")]
-    [SerializeField] private float successEndBuffer = 0.1f;
 
     [Header("이벤트")]
-    [Tooltip("0에서 1로 차오르는 게이지 값. Image.fillAmount 에 그대로 연결하면 된다")]
-    public TimerEvent onTimerChanged;
     public UnityEvent onClear;
     public UnityEvent onFail;
 
@@ -65,11 +57,8 @@ public class DosirakBombMiniGame : MiniGame
     private Color dosirakStartColor;
     private Vector3 explosionStartScale;
 
-    private float elapsed;
     private bool inputEnabled;
     private bool dragging;
-    private bool resultLocked;
-    private bool pendingSuccess;
     private Vector2 lastWorldPos;
     private Vector2 dragVelocity;
     private Coroutine sequenceRoutine;
@@ -95,43 +84,20 @@ public class DosirakBombMiniGame : MiniGame
 
     private void Start()
     {
-        onTimerChanged.Invoke(0f);
         SetExplosionVisible(false);
     }
 
-    private void Update()
+    protected override void OnTimedUpdate()
     {
-        if (!IsPlaying)
-            return;
-
-        elapsed = Mathf.Min(elapsed + Time.deltaTime, timeLimit);
-        onTimerChanged.Invoke(timeLimit > 0f ? elapsed / timeLimit : 1f);
-
-        if (pendingSuccess)
-        {
-            if (timeLimit - elapsed <= successEndBuffer)
-                ReportFinished(true);
-            return;
-        }
-
-        if (resultLocked)
-            return;
-
-        if (elapsed >= timeLimit)
-        {
-            Fail();
-            return;
-        }
-
         HandleDragInput();
     }
 
-    protected override void OnPlay()
+    protected override void OnTimedPlay()
     {
         ResetInternal();
     }
 
-    protected override void OnStopAndReset()
+    protected override void OnTimedStopAndReset()
     {
         if (sequenceRoutine != null)
         {
@@ -144,14 +110,9 @@ public class DosirakBombMiniGame : MiniGame
 
     private void ResetInternal()
     {
-        elapsed = 0f;
         dragging = false;
-        resultLocked = false;
-        pendingSuccess = false;
         inputEnabled = true;
         dragVelocity = Vector2.zero;
-
-        onTimerChanged.Invoke(0f);
 
         if (dosirakRenderer != null)
         {
@@ -170,13 +131,12 @@ public class DosirakBombMiniGame : MiniGame
             SetSpriteAlpha(backgroundRenderer, 1f);
     }
 
-    private void Fail()
+    protected override void OnTimeUp()
     {
-        resultLocked = true;
         dragging = false;
         inputEnabled = false;
         onFail.Invoke();
-        ReportFinished(false);
+        base.OnTimeUp();
     }
 
     private void HandleDragInput()
@@ -216,7 +176,7 @@ public class DosirakBombMiniGame : MiniGame
             bool goodThrow = dragVelocity.y >= throwUpwardSpeedThreshold;
             if (goodThrow)
             {
-                resultLocked = true;
+                SucceedWhenTimeUp();
                 sequenceRoutine = StartCoroutine(SuccessRoutine());
             }
             else
@@ -232,7 +192,6 @@ public class DosirakBombMiniGame : MiniGame
         yield return StartCoroutine(ExplosionRoutine());
 
         onClear.Invoke();
-        pendingSuccess = true;
     }
 
     private IEnumerator ThrowAwayRoutine()
@@ -349,7 +308,7 @@ public class DosirakBombMiniGame : MiniGame
             t.localScale = dosirakStartScale;
         }
 
-        if (!resultLocked)
+        if (!ResultLocked)
             inputEnabled = true;
 
         sequenceRoutine = null;
