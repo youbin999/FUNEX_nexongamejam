@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -6,22 +5,13 @@ using UnityEngine.InputSystem;
 /// <summary>
 /// 찾아서 켜! 미니게임.
 /// 화면이 캄캄한 상태에서 마우스 자리만 희미하게 밝아진다.
-/// 더듬어서 벽에 숨겨진 스위치를 찾아 누르면 클리어, 제한 시간 안에 못 찾으면 실패.
+/// 더듬어서 벽에 숨겨진 스위치를 찾아 누르면 성공, 제한 시간 안에 못 찾으면 실패.
+/// 성공해도 바로 끝나지 않는다. 입력만 잠긴 채 제한 시간이 다 찰 때까지
+/// 방이 밝아지고 에디슨이 튀어나오는 연출을 보여준 뒤 통지된다 (<see cref="TimedMiniGame"/> 규칙).
 /// 프리팹으로 만들어 <see cref="MiniGamePlayer"/> 가 재생한다.
 /// </summary>
-public class LightMiniGame : MiniGame
+public class LightMiniGame : TimedMiniGame
 {
-    // 인스펙터에 확실히 노출되도록 제네릭 UnityEvent 는 구체 타입으로 선언한다.
-    [Serializable] public class RatioEvent : UnityEvent<float> { }
-
-    private enum State
-    {
-        Idle,
-        Playing,
-        Cleared,
-        Failed,
-    }
-
     [Header("빛")]
     [Tooltip("마우스를 따라다니는 빛")]
     [SerializeField] private PointerLight pointerLight;
@@ -30,21 +20,14 @@ public class LightMiniGame : MiniGame
     [SerializeField] private bool lightFollowsOnlyWhileHeld = false;
 
     [Header("스위치")]
-    [Tooltip("찾아야 하는 두꺼비집/스위치의 콜라이더. 여기를 누르면 클리어다")]
+    [Tooltip("찾아야 하는 두꺼비집/스위치의 콜라이더. 여기를 누르면 성공이다")]
     [SerializeField] private Collider2D switchCollider;
-
-    [Header("규칙")]
-    [Tooltip("제한 시간(초). 게임이 시작되면 조작과 상관없이 흐른다")]
-    [SerializeField] private float timeLimit = 5f;
 
     [Header("클릭 판정")]
     [Tooltip("비워두면 Camera.main 을 쓴다")]
     [SerializeField] private Camera targetCamera;
 
     [Header("이벤트")]
-    [Tooltip("0에서 1로 차오르는 타이머 게이지. Image.fillAmount 에 연결한다")]
-    public RatioEvent onTimerChanged;
-
     [Tooltip("엉뚱한 곳을 눌렀을 때. 툭 하는 소리나 화면 흔들림을 연결한다")]
     public UnityEvent onMissed;
 
@@ -56,83 +39,42 @@ public class LightMiniGame : MiniGame
 
     public UnityEvent onFail;
 
-    private float elapsed;
-    private State state = State.Idle;
-
-    /// <summary>0에서 1로 차오르는 타이머 값.</summary>
-    public float TimerRatio => timeLimit > 0f ? Mathf.Clamp01(elapsed / timeLimit) : 0f;
-
     private void Awake()
     {
         if (targetCamera == null)
             targetCamera = Camera.main;
-
-        onTimerChanged.Invoke(0f);
     }
 
-    private void Update()
+    /// <summary>게임을 시작한다. 타이머는 베이스가 이미 0으로 맞춰 둔 상태다.</summary>
+    protected override void OnTimedPlay()
     {
-        if (state != State.Playing)
-            return;
-
-        TickTimer();
-
-        // 이번 프레임에 시간이 다 됐으면 조작은 안 받는다.
-        if (state != State.Playing)
-            return;
-
-        HandlePointer();
-    }
-
-    /// <summary>게임을 시작한다. 상태를 초기화하고 Playing 으로 전환한다.</summary>
-    protected override void OnPlay()
-    {
-        ResetInternal();
-
         // 지난 판의 연출(밝아진 방, 켜진 전구, 나와 있는 에디슨)을 여기서 지운다.
         // 게임이 끝난 직후가 아니라 다음 판을 시작할 때 지워야 결과를 볼 수 있다.
         onReset.Invoke();
-        onTimerChanged.Invoke(0f);
 
         // 시작하자마자 빛이 화면을 가로질러 날아오지 않도록 현재 마우스 자리에 붙여 둔다.
         if (pointerLight != null && TryGetPointerWorld(out Vector2 worldPosition, out _, out _))
             pointerLight.SnapTo(worldPosition);
-
-        state = State.Playing;
     }
 
-    /// <summary>게임을 강제 중단하고 초기 상태(Idle)로 되돌린다.</summary>
-    protected override void OnStopAndReset()
+    /// <summary>게임을 강제 중단하고 초기 상태로 되돌린다.</summary>
+    protected override void OnTimedStopAndReset()
     {
-        ResetInternal();
-        state = State.Idle;
-    }
-
-    /// <summary>
-    /// 타이머와 빛을 처음으로 되돌린다.
-    /// 연출은 여기서 건드리지 않는다. 종료 직후에도 결과가 화면에 남아야 하기 때문이고,
-    /// 다음 판을 위한 초기화는 <see cref="OnPlay"/> 의 onReset 이 책임진다.
-    /// </summary>
-    private void ResetInternal()
-    {
-        elapsed = 0f;
-
         if (pointerLight != null)
             pointerLight.ResetPose();
     }
 
-    private void TickTimer()
+    /// <summary>스위치를 찾기 전까지만 불린다. 성공이 확정되면 베이스가 호출을 멈춘다.</summary>
+    protected override void OnTimedUpdate()
     {
-        elapsed += Time.deltaTime;
-        onTimerChanged.Invoke(TimerRatio);
+        HandlePointer();
+    }
 
-        if (elapsed < timeLimit)
-            return;
-
-        elapsed = timeLimit;
-        state = State.Failed;
+    /// <summary>제한 시간을 다 써서 실패로 확정될 때. 성공한 판에서는 불리지 않는다.</summary>
+    protected override void OnTimeUp()
+    {
         onFail.Invoke();
-        ReportFinished(false);
+        base.OnTimeUp();
     }
 
     private void HandlePointer()
@@ -152,9 +94,10 @@ public class LightMiniGame : MiniGame
 
         if (switchCollider != null && switchCollider.OverlapPoint(worldPosition))
         {
-            state = State.Cleared;
             onClear.Invoke();
-            ReportFinished(true);
+
+            // 여기서 끝내지 않는다. 입력만 잠기고, 제한 시간이 다 차면 베이스가 성공을 통지한다.
+            SucceedWhenTimeUp();
             return;
         }
 

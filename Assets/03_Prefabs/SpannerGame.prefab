@@ -93,116 +93,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4237443236538748433}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &3622201977067640800
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 9114489770001874655}
-  - component: {fileID: 3358397586697258091}
-  m_Layer: 0
-  m_Name: SpannerManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &9114489770001874655
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3622201977067640800}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 7947990104756543968}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3358397586697258091
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3622201977067640800}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8b2e47d1c05a4f3ea9d6104b7e35c281, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SpannerMiniGame
-  pivot: {fileID: 5784042407714050566}
-  clearTurns: 2
-  timeLimit: 5
-  turnDirection: 2
-  ratchet: 0
-  targetCamera: {fileID: 0}
-  requireGrab: 0
-  grabbableLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  deadRadius: 1.5
-  maxTurnSpeed: 1080
-  onTurn:
-    m_PersistentCalls:
-      m_Calls: []
-  onAngleChanged:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 3142366560481920022}
-        m_TargetAssemblyTypeName: ScrewRotator, Assembly-CSharp
-        m_MethodName: SetAngle
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onProgressChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  onTimerChanged:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 9013023560687191608}
-        m_TargetAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
-        m_MethodName: set_fillAmount
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onClear:
-    m_PersistentCalls:
-      m_Calls: []
-  onFail:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6730078991786927640}
-        m_TargetAssemblyTypeName: SteamBurst, Assembly-CSharp
-        m_MethodName: Burst
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!1 &3900621679127362707
 GameObject:
   m_ObjectHideFlags: 0
@@ -486,7 +376,7 @@ GameObject:
   - component: {fileID: 5739370304808903831}
   - component: {fileID: 8232867181842312643}
   m_Layer: 0
-  m_Name: Pann_0
+  m_Name: Pann
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -666,6 +556,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7947990104756543968}
+  - component: {fileID: 7396776103939382718}
   m_Layer: 0
   m_Name: SpannerGame
   m_TagString: Untagged
@@ -690,11 +581,89 @@ Transform:
   - {fileID: 5817880496525814813}
   - {fileID: 5784042407714050566}
   - {fileID: 4237443236538748433}
-  - {fileID: 9114489770001874655}
   - {fileID: 4581069808083885309}
   - {fileID: 6874545892423661540}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7396776103939382718
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6429506965470603000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b2e47d1c05a4f3ea9d6104b7e35c281, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpannerMiniGame
+  gameDescription: "\uC2A4\uD328\uB108\uB97C \uB3CC\uB824\uB77C!"
+  pivot: {fileID: 5784042407714050566}
+  clearTurns: 2
+  timeLimit: 5
+  turnDirection: 2
+  ratchet: 0
+  targetCamera: {fileID: 0}
+  requireGrab: 0
+  grabbableLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  deadRadius: 1.5
+  maxTurnSpeed: 1080
+  onTurn:
+    m_PersistentCalls:
+      m_Calls: []
+  onAngleChanged:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 3142366560481920022}
+        m_TargetAssemblyTypeName: ScrewRotator, Assembly-CSharp
+        m_MethodName: SetAngle
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onProgressChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  onTimerChanged:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 9013023560687191608}
+        m_TargetAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
+        m_MethodName: set_fillAmount
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onClear:
+    m_PersistentCalls:
+      m_Calls: []
+  onFail:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6730078991786927640}
+        m_TargetAssemblyTypeName: SteamBurst, Assembly-CSharp
+        m_MethodName: Burst
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &6437372084005635566
 GameObject:
   m_ObjectHideFlags: 0
@@ -912,7 +881,7 @@ GameObject:
   - component: {fileID: 5720507917963622979}
   - component: {fileID: 3142366560481920022}
   m_Layer: 0
-  m_Name: Spanner1 (1)_0
+  m_Name: 'Spanner1 '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
