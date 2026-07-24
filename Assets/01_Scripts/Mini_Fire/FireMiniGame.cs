@@ -7,9 +7,9 @@ using UnityEngine.InputSystem;
 /// 불 붙이기 미니게임.
 /// 스페이스바를 연타할 때마다 왼쪽 오브젝트가 오른쪽 오브젝트를 친다.
 /// 제한 시간 안에 정해진 횟수를 채우면 클리어, 못 채우면 실패.
-/// 빈 GameObject에 붙여서 쓴다.
+/// 프리팹으로 만들어 <see cref="MiniGamePlayer"/> 가 재생한다.
 /// </summary>
-public class FireMiniGame : MonoBehaviour
+public class FireMiniGame : MiniGame
 {
     // 인스펙터에 확실히 노출되도록 제네릭 UnityEvent 는 구체 타입으로 선언한다.
     [Serializable] public class HitEvent : UnityEvent<int> { }
@@ -17,6 +17,7 @@ public class FireMiniGame : MonoBehaviour
 
     private enum State
     {
+        Idle,
         Playing,
         Cleared,
         Failed,
@@ -51,7 +52,7 @@ public class FireMiniGame : MonoBehaviour
 
     private int hitCount;
     private float elapsed;
-    private State state = State.Playing;
+    private State state = State.Idle;
 
     // 폴링(wasPressedThisFrame)은 한 프레임에 두 번 눌러도 한 번으로 먹는다.
     // 연타 게임이라 입력 이벤트를 직접 받아서 하나도 놓치지 않게 한다.
@@ -70,11 +71,10 @@ public class FireMiniGame : MonoBehaviour
     {
         hitAction = new InputAction("Hit", InputActionType.Button, "<Keyboard>/space");
         hitAction.performed += OnHitPerformed;
-    }
 
-    private void OnEnable()
-    {
-        hitAction.Enable();
+        // 재생 전에는 게이지만 비워 둔다. 입력은 OnPlay 에서 열린다.
+        onProgressChanged.Invoke(0f);
+        onTimerChanged.Invoke(0f);
     }
 
     private void OnDisable()
@@ -86,12 +86,6 @@ public class FireMiniGame : MonoBehaviour
     {
         hitAction.performed -= OnHitPerformed;
         hitAction.Dispose();
-    }
-
-    private void Start()
-    {
-        onProgressChanged.Invoke(0f);
-        onTimerChanged.Invoke(0f);
     }
 
     private void Update()
@@ -129,18 +123,41 @@ public class FireMiniGame : MonoBehaviour
         {
             state = State.Cleared;
             onClear.Invoke();
+            ReportFinished(true);
         }
     }
 
-    /// <summary>횟수와 타이머, 자세를 처음으로 되돌린다.</summary>
-    public void ResetGame()
+    /// <summary>게임을 시작한다. 상태를 초기화하고 Playing 으로 전환한다.</summary>
+    protected override void OnPlay()
+    {
+        ResetInternal();
+
+        // 게이지는 재생을 시작하는 이 시점에만 0으로 되돌린다.
+        // 끝난 뒤에도 마지막 상태(다 찬 타이머, 커진 불)가 화면에 남아야 결과가 보인다.
+        onProgressChanged.Invoke(0f);
+        onTimerChanged.Invoke(0f);
+
+        state = State.Playing;
+        hitAction.Enable();
+    }
+
+    /// <summary>게임을 강제 중단하고 초기 상태(Idle)로 되돌린다.</summary>
+    protected override void OnStopAndReset()
+    {
+        hitAction.Disable();
+        ResetInternal();
+        state = State.Idle;
+    }
+
+    /// <summary>
+    /// 횟수와 타이머, 자세를 처음으로 되돌린다.
+    /// 게이지 이벤트는 여기서 쏘지 않는다. 종료 직후에도 결과 화면이 유지돼야 하기 때문이고,
+    /// 다음 판을 위한 초기화는 <see cref="OnPlay"/> 가 책임진다.
+    /// </summary>
+    private void ResetInternal()
     {
         hitCount = 0;
         elapsed = 0f;
-        state = State.Playing;
-
-        onProgressChanged.Invoke(0f);
-        onTimerChanged.Invoke(0f);
 
         if (striker != null)
             striker.ResetPose();
@@ -160,5 +177,6 @@ public class FireMiniGame : MonoBehaviour
         elapsed = timeLimit;
         state = State.Failed;
         onFail.Invoke();
+        ReportFinished(false);
     }
 }
