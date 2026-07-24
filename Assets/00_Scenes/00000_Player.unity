@@ -365,6 +365,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameFlowController
   player: {fileID: 700000003}
   games:
+  - prefab: {fileID: 3102439326765463788, guid: 4cd0269129acd204c9d63d2d4539c792, type: 3}
+    isCritical: 0
+    borderSprite: {fileID: 0}
+  - prefab: {fileID: 4657186777680439362, guid: 6e7c95e72c6956141abad54d4c53d242, type: 3}
+    isCritical: 0
+    borderSprite: {fileID: 0}
   - prefab: {fileID: 4700864808614509273, guid: d109eaaff3d885844a73d86db8d12dc2, type: 3}
     isCritical: 0
     borderSprite: {fileID: 0}
@@ -372,9 +378,6 @@ MonoBehaviour:
     isCritical: 0
     borderSprite: {fileID: 0}
   - prefab: {fileID: 562160154704496516, guid: c41684de35ac45ada326578c7c5a4e0a, type: 3}
-    isCritical: 0
-    borderSprite: {fileID: 0}
-  - prefab: {fileID: 4657186777680439362, guid: 6e7c95e72c6956141abad54d4c53d242, type: 3}
     isCritical: 0
     borderSprite: {fileID: 0}
   playOnStart: 1
@@ -432,7 +435,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
