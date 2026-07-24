@@ -17,18 +17,21 @@
 
 ```
 Assets/
-  00_Scenes/          씬. 00000_Player.unity 가 미니게임 재생 호스트 씬
+  00_Scenes/          씬. 00000_Player.unity 가 미니게임 재생 호스트 씬, 00_BigBang.unity 가 시작 씬
   01_Scripts/
     Core/             미니게임 프레임워크 (MiniGame, MiniGamePlayer, GameFlowController)
+    Mini_BigBang/     빅뱅 프롤로그 (W 홀드로 우주 팽창 + 영상 스크럽)
     Mini_Fire/        선사시대 불 붙이기
     Mini_sha/         비비기(Rub) 미니게임
     Mini_witch/       마녀 찾기 (4x4 그리드)
     Mini_dosirak/     도시락 폭탄 던지기
   02_Sprite/          미니게임별 스프라이트 (01_Fire, 02_Sha, 03_witchCatch, 04_dosirakBomb)
   03_Prefabs/         미니게임 프리팹 (RubGame, WitchFindGame, DosirakBomb)
+  04_Video/           영상 에셋 (빅뱅 영상 등)
 docs/
   기획.md              게임 기획서 (원본)
   MiniGame_Contract.md 미니게임 개발 계약 — 새 미니게임을 만들기 전 반드시 읽을 것
+  BigBang_MiniGame.md  빅뱅 미니게임 구현 문서 (영상 스크럽 방식, 씬/프리팹 구성)
 ```
 
 ## 핵심 아키텍처
