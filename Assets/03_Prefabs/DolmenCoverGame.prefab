@@ -129,8 +129,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31cc66d2f69e42d7b2bbc559e0cabf0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DolmenCoverMiniGame
-  gameDescription: "\uACE0\uC778\uB3CC\uC744 \uB36E\uC5B4\uB77C!\nWASD / \uBC29\uD5A5\uD0A4\uB85C
-    \uB36E\uAC1C\uB3CC\uC744 \uC870\uC2EC\uD788 \uC62C\uB824\uB77C."
+  gameDescription: "\uACE0\uC778\uB3CC\uC744 \uB36E\uC5B4\uB77C!"
   timeLimit: 8
   onTimerChanged:
     m_PersistentCalls:
