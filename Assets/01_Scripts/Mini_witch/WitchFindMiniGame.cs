@@ -10,10 +10,9 @@ using UnityEngine.InputSystem;
 /// 제한 시간 안에 마녀를 전부 표시하면 클리어, 일반 얼굴을 잘못 표시하거나 시간이 다 되면 실패.
 /// 프리팹으로 만들어 <see cref="MiniGamePlayer"/> 가 재생한다.
 /// </summary>
-public class WitchFindMiniGame : MiniGame
+public class WitchFindMiniGame : TimedMiniGame
 {
     // 인스펙터에 확실히 노출되도록 제네릭 UnityEvent 는 구체 타입으로 선언한다.
-    [Serializable] public class TimerEvent : UnityEvent<float> { }
     [Serializable] public class ProgressEvent : UnityEvent<int, int> { }
 
     private enum State
@@ -41,13 +40,7 @@ public class WitchFindMiniGame : MiniGame
     [SerializeField] private int minWitchCount = 1;
     [SerializeField] private int maxWitchCount = 2;
 
-    [Tooltip("제한 시간(초). 게임이 시작되면 입력과 상관없이 흐른다")]
-    [SerializeField] private float timeLimit = 5f;
-
     [Header("이벤트")]
-    [Tooltip("0에서 1로 차오르는 게이지 값. Image.fillAmount 에 그대로 연결하면 된다")]
-    public TimerEvent onTimerChanged;
-
     [Tooltip("(찾은 마녀 수, 이번 판 전체 마녀 수)")]
     public ProgressEvent onProgressChanged;
 
@@ -59,30 +52,15 @@ public class WitchFindMiniGame : MiniGame
     private int cursorX;
     private int cursorY;
     private int foundCount;
-    private float elapsed;
     private State state = State.Idle;
 
-    private void Start()
+    protected override void OnTimedUpdate()
     {
-        onTimerChanged.Invoke(0f);
-    }
-
-    private void Update()
-    {
-        if (state != State.Playing)
-            return;
-
-        TickTimer();
-
-        // 이번 프레임에 시간이 다 됐으면 입력은 안 받는다.
-        if (state != State.Playing)
-            return;
-
         HandleInput();
     }
 
     /// <summary>게임을 시작한다. 그리드를 새로 섞고 Playing 으로 전환한다.</summary>
-    protected override void OnPlay()
+    protected override void OnTimedPlay()
     {
         ResetInternal();
         SetupGrid();
@@ -90,23 +68,21 @@ public class WitchFindMiniGame : MiniGame
     }
 
     /// <summary>게임을 강제 중단하고 초기 상태(Idle)로 되돌린다.</summary>
-    protected override void OnStopAndReset()
+    protected override void OnTimedStopAndReset()
     {
         ResetInternal();
         state = State.Idle;
     }
 
-    /// <summary>커서, 타이머, 진행도, 칸 연출을 처음으로 되돌린다.</summary>
+    /// <summary>커서, 진행도, 칸 연출을 처음으로 되돌린다.</summary>
     private void ResetInternal()
     {
-        elapsed = 0f;
         cursorX = 0;
         cursorY = 0;
         foundCount = 0;
         witchIndices.Clear();
         marked = new bool[cells.Length];
 
-        onTimerChanged.Invoke(0f);
         onProgressChanged.Invoke(0, 0);
 
         for (int i = 0; i < cells.Length; i++)
@@ -224,30 +200,22 @@ public class WitchFindMiniGame : MiniGame
             {
                 state = State.Cleared;
                 onClear.Invoke();
-                ReportFinished(true);
+                SucceedWhenTimeUp();
             }
         }
         else
         {
             state = State.Failed;
             onFail.Invoke();
-            ReportFinished(false);
+            FailImmediately();
         }
     }
 
-    private void TickTimer()
+    /// <summary>제한 시간을 다 써서 실패로 확정될 때 호출된다.</summary>
+    protected override void OnTimeUp()
     {
-        elapsed += Time.deltaTime;
-        onTimerChanged.Invoke(TimerRatio);
-
-        if (elapsed < timeLimit)
-            return;
-
-        elapsed = timeLimit;
         state = State.Failed;
         onFail.Invoke();
-        ReportFinished(false);
+        base.OnTimeUp();
     }
-
-    private float TimerRatio => timeLimit > 0f ? Mathf.Clamp01(elapsed / timeLimit) : 0f;
 }

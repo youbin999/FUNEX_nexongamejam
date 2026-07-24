@@ -5,6 +5,17 @@
 `Assets/01_Scripts/Core/MiniGamePlayer.cs`. 실제 구현 예시는
 `Assets/01_Scripts/Mini_sha/RubMiniGame.cs` 참고.
 
+**제한 시간이 있는 미니게임이라면 `MiniGame` 을 직접 상속하지 말고
+`Assets/01_Scripts/Core/TimedMiniGame.cs` 를 상속한다.** 와리오웨어 원작처럼
+"성공은 확정돼도 즉시 끝나지 않고 제한 시간이 다 찰 때까지 기다렸다가 통지되며,
+실패(시간 초과 또는 잘못된 조작)는 남은 시간과 무관하게 즉시 통지된다"는 타이밍 규칙을
+프레임워크가 대신 처리해준다. 파생 클래스는 `OnTimedPlay()` / `OnTimedStopAndReset()` /
+`OnTimedUpdate()` 세 훅과, 성공 시 `SucceedWhenTimeUp()`, 조작 실수로 인한 즉시 실패 시
+`FailImmediately()` 호출만 신경 쓰면 된다. 시간 초과 시의 기본 동작은 `ReportFinished(false)`
+이며, 실패 연출이 필요하면 `OnTimeUp()` 을 재정의해서 연출 후 `base.OnTimeUp()` 을 호출한다.
+실제 구현 예시는 `Assets/01_Scripts/Mini_archimedes/ArchimedesBathMiniGame.cs`,
+`Assets/01_Scripts/Mini_dosirak/DosirakBombMiniGame.cs` 참고.
+
 ## 1. 반드시 지켜야 할 것
 
 ### 1.1 `MiniGame`을 상속한다
