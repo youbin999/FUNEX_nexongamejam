@@ -54,7 +54,7 @@ public class BigBangSceneFlow : MonoBehaviour
 
         if (success)
         {
-            SceneManager.LoadScene(mainSceneName);
+            SceneManager.LoadScene("00000_Title");
             return;
         }
 
