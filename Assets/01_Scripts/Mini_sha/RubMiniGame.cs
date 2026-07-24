@@ -8,9 +8,9 @@ using UnityEngine.InputSystem;
 /// 손 비비기 미니게임.
 /// 콜라이더를 클릭할 때마다 양손이 서로 반대로 위/아래로 움직인다.
 /// 제한 시간 안에 정해진 횟수를 채우면 클리어, 못 채우면 실패.
-/// 빈 GameObject에 붙여서 쓴다.
+/// 프리팹으로 만들어 <see cref="MiniGamePlayer"/> 가 재생한다.
 /// </summary>
-public class RubMiniGame : MonoBehaviour
+public class RubMiniGame : MiniGame
 {
     // 인스펙터에 확실히 노출되도록 제네릭 UnityEvent 는 구체 타입으로 선언한다.
     [Serializable] public class RubEvent : UnityEvent<int> { }
@@ -18,6 +18,7 @@ public class RubMiniGame : MonoBehaviour
 
     private enum State
     {
+        Idle,
         Playing,
         Cleared,
         Failed,
@@ -57,7 +58,7 @@ public class RubMiniGame : MonoBehaviour
     private int rubCount;
     private int direction = 1;
     private float elapsed;
-    private State state = State.Playing;
+    private State state = State.Idle;
 
     /// <summary>지금까지 비빈 횟수.</summary>
     public int RubCount => rubCount;
@@ -124,16 +125,30 @@ public class RubMiniGame : MonoBehaviour
         {
             state = State.Cleared;
             onClear.Invoke();
+            ReportFinished(true);
         }
     }
 
-    /// <summary>횟수와 타이머, 자세를 처음으로 되돌린다.</summary>
-    public void ResetGame()
+    /// <summary>게임을 시작한다. 상태를 초기화하고 Playing 으로 전환한다.</summary>
+    protected override void OnPlay()
+    {
+        ResetInternal();
+        state = State.Playing;
+    }
+
+    /// <summary>게임을 강제 중단하고 초기 상태(Idle)로 되돌린다.</summary>
+    protected override void OnStopAndReset()
+    {
+        ResetInternal();
+        state = State.Idle;
+    }
+
+    /// <summary>횟수와 타이머, 손 자세와 방향을 처음으로 되돌린다.</summary>
+    private void ResetInternal()
     {
         rubCount = 0;
         direction = 1;
         elapsed = 0f;
-        state = State.Playing;
 
         onTimerChanged.Invoke(0f);
 
@@ -155,6 +170,7 @@ public class RubMiniGame : MonoBehaviour
         elapsed = timeLimit;
         state = State.Failed;
         onFail.Invoke();
+        ReportFinished(false);
     }
 
     private bool TryGetPressPosition(out Vector2 screenPosition)
