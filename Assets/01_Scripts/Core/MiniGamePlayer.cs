@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 /// <summary>
 /// 미니게임 프리팹들을 프리로드해 두었다가 명령이 오면 재생하는 플레이어.
@@ -51,6 +52,30 @@ public class MiniGamePlayer : MonoBehaviour
     [Tooltip("등장 시작/퇴장 종료 시점의 스케일 값")]
     [SerializeField] private float descriptionStartScale = 0.8f;
 
+    [Header("화면 페이드")]
+    [Tooltip("풀스크린 페이드 오버레이. 비워두면 페이드 연출 없이 보더 트랜지션만 진행한다")]
+    [SerializeField] private CanvasGroup screenFadeCanvasGroup;
+
+    [Tooltip("게임 종료 후 화면이 덮이는 데 걸리는 시간(초)")]
+    [SerializeField] private float fadeOutDuration = 0.3f;
+
+    [Tooltip("다음 게임 시작 시 화면이 드러나는 데 걸리는 시간(초)")]
+    [SerializeField] private float fadeInDuration = 0.3f;
+
+    [Header("게임 보더 트랜지션")]
+    [Tooltip("GameBorder 의 RectTransform. 비워두면 보더 트랜지션 없이 페이드/대기만 진행한다.\n" +
+        "Awake 시점의 값을 '확대(평상시)' 기준값으로 캐시하고, 트랜지션 중에는 0,0,0,0 으로 축소했다가 되돌아온다")]
+    [SerializeField] private RectTransform gameBorderRect;
+
+    [Tooltip("시대(스테이지)별 테마 교체 대상 Image. PlayGame 호출 시 넘긴 borderSprite 로 교체된다")]
+    [SerializeField] private Image gameBorderImage;
+
+    [Tooltip("보더가 축소/재확대되는 데 걸리는 시간(초)")]
+    [SerializeField] private float borderTransitionDuration = 0.35f;
+
+    [Tooltip("보더가 축소된 채로 대기하는 시간(초) — 게임 사이 쉬어가는 타임")]
+    [SerializeField] private float transitionHoldDuration = 0.6f;
+
     // 프리팹 인덱스 -> 프리로드된 인스턴스.
     private readonly Dictionary<int, MiniGame> instances = new Dictionary<int, MiniGame>();
     private bool preloaded;
@@ -59,6 +84,21 @@ public class MiniGamePlayer : MonoBehaviour
     // activeInHierarchy 도 false 가 되므로, 프리팹 루트의 저장된 활성 상태와 무관하게
     // Awake/OnEnable 이 돌지 않는 것을 보장한다.
     private Transform preloadHolder;
+
+    // 직전 게임이 끝났지만 아직 정리(StopAndReset/비활성화)되지 않은 인스턴스.
+    // 화면 페이드아웃이 끝나기 전까지는 화면에 계속 보여야 하므로 정리를 미뤄둔다.
+    private MiniGame pendingCleanup;
+
+    // 현재 진행 중인 트랜지션(페이드/보더) 코루틴. StopCurrent() 로 중간에 취소할 수 있어야 한다.
+    private Coroutine transitionRoutine;
+
+    // GameBorder 의 "확대(평상시)" 기준값. Awake 시점에 씬에 세팅된 값을 그대로 캐시한다.
+    private Vector2 borderExpandedAnchoredPosition;
+    private Vector2 borderExpandedSizeDelta;
+
+    // GameBorder 의 "축소(테두리 노출)" 목표값. 사용자 스펙에 따라 0,0 으로 고정한다.
+    private static readonly Vector2 BorderFramedAnchoredPosition = Vector2.zero;
+    private static readonly Vector2 BorderFramedSizeDelta = Vector2.zero;
 
     /// <summary>현재 재생 중인 인스턴스. 없으면 null.</summary>
     public MiniGame Current { get; private set; }
@@ -71,6 +111,12 @@ public class MiniGamePlayer : MonoBehaviour
 
     private void Awake()
     {
+        if (gameBorderRect != null)
+        {
+            borderExpandedAnchoredPosition = gameBorderRect.anchoredPosition;
+            borderExpandedSizeDelta = gameBorderRect.sizeDelta;
+        }
+
         if (preloadOnAwake)
             Preload();
     }
@@ -144,7 +190,7 @@ public class MiniGamePlayer : MonoBehaviour
     /// 이미 재생 중이거나 인덱스 범위 밖이면 false.
     /// 프리로드가 안 돼 있으면 먼저 프리로드한다(지연 로드 허용).
     /// </summary>
-    public bool PlayGame(int index)
+    public bool PlayGame(int index, Sprite borderSprite = null)
     {
         if (IsPlaying)
             return false;
@@ -158,12 +204,104 @@ public class MiniGamePlayer : MonoBehaviour
         if (!instances.TryGetValue(index, out MiniGame instance) || instance == null)
             return false;
 
+        // 실제 활성화/재생은 트랜지션 코루틴 내부에서 처리한다. 여기서 Current 를
+        // 먼저 채워 두는 이유는 트랜지션이 끝나기 전까지도 IsPlaying 가드로
+        // 재진입(중복 PlayGame 호출)을 막기 위함이다.
         Current = instance;
+        transitionRoutine = StartCoroutine(TransitionThenPlayRoutine(instance, borderSprite));
+        return true;
+    }
+
+    /// <summary>
+    /// 게임 종료 → 화면 페이드아웃 → 보더 축소(테두리 노출) → 대기 → 보더 재확대 →
+    /// 화면 페이드인+설명 프롬프트 → 재생 순서로 진행하는 게임 사이 쉬어가는 타임 연출.
+    /// 각 단계는 관련 필드가 비어 있으면 건너뛴다.
+    /// </summary>
+    private IEnumerator TransitionThenPlayRoutine(MiniGame instance, Sprite borderSprite)
+    {
+        if (pendingCleanup != null)
+        {
+            MiniGame previous = pendingCleanup;
+            pendingCleanup = null;
+
+            yield return FadeScreen(0f, 1f, fadeOutDuration);
+            CleanupInstance(previous);
+        }
+        else if (screenFadeCanvasGroup != null)
+        {
+            // 이전 게임이 없는 최초 진입(빅뱅 등) — 페이드 애니메이션 없이 이미 덮인 상태로 시작한다.
+            screenFadeCanvasGroup.alpha = 1f;
+        }
+
+        if (borderSprite != null && gameBorderImage != null)
+            gameBorderImage.sprite = borderSprite;
+
+        yield return AnimateBorder(borderExpandedAnchoredPosition, borderExpandedSizeDelta,
+            BorderFramedAnchoredPosition, BorderFramedSizeDelta, borderTransitionDuration);
+
+        yield return new WaitForSeconds(transitionHoldDuration);
+
+        yield return AnimateBorder(BorderFramedAnchoredPosition, BorderFramedSizeDelta,
+            borderExpandedAnchoredPosition, borderExpandedSizeDelta, borderTransitionDuration);
+
         instance.transform.SetParent(transform, false);
         instance.gameObject.SetActive(true);
         instance.Finished += OnGameFinished;
-        StartCoroutine(ShowDescriptionThenPlayRoutine(instance));
-        return true;
+
+        StartCoroutine(FadeScreen(1f, 0f, fadeInDuration));
+        yield return ShowDescriptionThenPlayRoutine(instance);
+
+        transitionRoutine = null;
+    }
+
+    /// <summary>screenFadeCanvasGroup 의 alpha 를 보간한다. 비어 있으면 즉시 반환.</summary>
+    private IEnumerator FadeScreen(float from, float to, float duration)
+    {
+        if (screenFadeCanvasGroup == null)
+            yield break;
+
+        if (duration <= 0f)
+        {
+            screenFadeCanvasGroup.alpha = to;
+            yield break;
+        }
+
+        float t = 0f;
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+            screenFadeCanvasGroup.alpha = Mathf.Lerp(from, to, Mathf.Clamp01(t / duration));
+            yield return null;
+        }
+
+        screenFadeCanvasGroup.alpha = to;
+    }
+
+    /// <summary>gameBorderRect 의 anchoredPosition/sizeDelta 를 보간한다. 비어 있으면 즉시 반환.</summary>
+    private IEnumerator AnimateBorder(Vector2 fromPos, Vector2 fromSize, Vector2 toPos, Vector2 toSize, float duration)
+    {
+        if (gameBorderRect == null)
+            yield break;
+
+        if (duration <= 0f)
+        {
+            gameBorderRect.anchoredPosition = toPos;
+            gameBorderRect.sizeDelta = toSize;
+            yield break;
+        }
+
+        float t = 0f;
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+            float ratio = Mathf.Clamp01(t / duration);
+            gameBorderRect.anchoredPosition = Vector2.Lerp(fromPos, toPos, ratio);
+            gameBorderRect.sizeDelta = Vector2.Lerp(fromSize, toSize, ratio);
+            yield return null;
+        }
+
+        gameBorderRect.anchoredPosition = toPos;
+        gameBorderRect.sizeDelta = toSize;
     }
 
     /// <summary>
@@ -225,33 +363,44 @@ public class MiniGamePlayer : MonoBehaviour
     /// gamePrefabs 에 등록된 프리팹 에셋으로 게임을 재생한다. 내부적으로 인덱스를 찾아 PlayGame(int) 를 호출한다.
     /// 등록되지 않은 프리팹이면 false.
     /// </summary>
-    public bool PlayGame(MiniGame prefab)
+    public bool PlayGame(MiniGame prefab, Sprite borderSprite = null)
     {
         int index = gamePrefabs.IndexOf(prefab);
         if (index < 0)
             return false;
 
-        return PlayGame(index);
+        return PlayGame(index, borderSprite);
     }
 
     /// <summary>현재 게임을 강제로 중단·초기화하고 비활성화한다. (onGameFinished 는 발화하지 않는다)</summary>
     public void StopCurrent()
     {
+        if (transitionRoutine != null)
+        {
+            StopCoroutine(transitionRoutine);
+            transitionRoutine = null;
+        }
+
+        if (pendingCleanup != null)
+        {
+            CleanupInstance(pendingCleanup);
+            pendingCleanup = null;
+        }
+
         if (Current == null)
             return;
 
         MiniGame instance = Current;
         Current = null;
-
-        instance.Finished -= OnGameFinished;
-        instance.StopAndReset();
-        instance.gameObject.SetActive(false);
-        instance.transform.SetParent(preloadHolder, false);
+        CleanupInstance(instance);
     }
 
     /// <summary>
-    /// 게임 종료 통지 수신. Current 를 먼저 비운 뒤 onGameFinished 를 발화하고,
-    /// 그다음 인스턴스를 초기화·비활성화하고 구독을 해제한다("종료된 게임의 자동 초기화" 경로).
+    /// 게임 종료 통지 수신. Current 를 먼저 비운 뒤 onGameFinished 를 발화한다.
+    /// 인스턴스 정리는 즉시 하지 않고 pendingCleanup 에 보관한다 — 화면 페이드아웃이
+    /// 끝날 때까지 이전 게임 화면이 그대로 보여야 하기 때문이다(다음 PlayGame 의 트랜지션
+    /// 코루틴이 페이드아웃 완료 후 소비해서 정리한다). 리스너가 다음 게임을 재생하지
+    /// 않았다면(흐름 종료 등) 아래에서 즉시 정리해 인스턴스가 방치되지 않게 한다.
     /// </summary>
     private void OnGameFinished(MiniGame instance, bool success)
     {
@@ -260,8 +409,19 @@ public class MiniGamePlayer : MonoBehaviour
         if (Current == instance)
             Current = null;
 
+        pendingCleanup = instance;
         onGameFinished.Invoke(instance, success);
 
+        if (pendingCleanup == instance)
+        {
+            CleanupInstance(instance);
+            pendingCleanup = null;
+        }
+    }
+
+    /// <summary>인스턴스를 초기화·비활성화하고 구독을 해제한 뒤 프리로드 풀로 되돌린다.</summary>
+    private void CleanupInstance(MiniGame instance)
+    {
         instance.Finished -= OnGameFinished;
         instance.StopAndReset();
         instance.gameObject.SetActive(false);
