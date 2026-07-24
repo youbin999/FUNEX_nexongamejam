@@ -78,4 +78,5 @@ public class MyMiniGame : MiniGame
 - [ ] `Awake`/`Start`에서 게임 진행 로직이 돌지 않음 확인
 - [ ] `OnStopAndReset()`을 멱등하게 구현 (미재생 상태에서 호출해도 안전)
 - [ ] Main Camera/EventSystem을 프리팹에 포함하지 않음, 카메라는 `Camera.main` 폴백
+- [ ] 프리팹의 `Keyboard Guides`에 실제 사용하는 키를 등록하고, 행동 문구는 꼭 필요할 때만 작성 (마우스 전용 게임은 비워 둠)
 - [ ] `MiniGamePlayer`의 `gamePrefabs` 리스트에 등록해 재생 테스트 (프리팹 루트의 활성 상태는 상관없음)

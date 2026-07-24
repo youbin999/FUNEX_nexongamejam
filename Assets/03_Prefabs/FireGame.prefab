@@ -52,6 +52,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FireMiniGame
   gameDescription: "\uBD88\uC744 \uD53C\uC6CC\uB77C!"
+  keyboardGuides:
+  - actionLabel: ''
+    keys: 01000000
   striker: {fileID: 6790042191085643069}
   target: {fileID: 9168272887156719572}
   clearCount: 20

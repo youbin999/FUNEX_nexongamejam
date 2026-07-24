@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -18,8 +19,15 @@ public abstract class MiniGame : MonoBehaviour
     [Tooltip("MiniGamePlayer 가 Play() 호출 전에 표시하는 게임 설명 문구")]
     [SerializeField] private string gameDescription;
 
+    [Header("키보드 가이드")]
+    [Tooltip("게임 시작 전에 표시할 키보드 조작 안내. 마우스 전용 게임은 비워 둔다")]
+    [SerializeField] private List<KeyboardGuideEntry> keyboardGuides = new List<KeyboardGuideEntry>();
+
     /// <summary>게임 시작 전 표시할 설명 문구. <see cref="MiniGamePlayer"/> 가 Play() 호출 전 연출에 사용한다.</summary>
     public string GameDescription => gameDescription;
+
+    /// <summary>게임 시작 전에 표시할 키보드 조작 안내.</summary>
+    public IReadOnlyList<KeyboardGuideEntry> KeyboardGuides => keyboardGuides;
 
     /// <summary>현재 재생 중인지 여부.</summary>
     public bool IsPlaying { get; private set; }
