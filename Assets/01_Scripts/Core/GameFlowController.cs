@@ -18,6 +18,9 @@ public class GameFlowController : MonoBehaviour
 
         [Tooltip("체크하면 이 게임 실패 시 즉시 게임 엔딩으로 진행한다")]
         public bool isCritical;
+
+        [Tooltip("이 게임 시작 시 GameBorder 에 적용할 시대 테마 스프라이트. 비워두면 기존 테마를 유지한다")]
+        public Sprite borderSprite;
     }
 
     [Header("참조")]
@@ -111,7 +114,7 @@ public class GameFlowController : MonoBehaviour
         }
 
         GameEntry entry = games[currentIndex];
-        if (entry.prefab == null || player == null || !player.PlayGame(entry.prefab))
+        if (entry.prefab == null || player == null || !player.PlayGame(entry.prefab, entry.borderSprite))
         {
             Debug.LogWarning($"GameFlowController: index {currentIndex} 게임을 재생할 수 없습니다.", this);
             PlayNext();
