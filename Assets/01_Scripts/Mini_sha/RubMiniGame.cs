@@ -49,6 +49,9 @@ public class RubMiniGame : MiniGame
     [Tooltip("0에서 1로 차오르는 게이지 값. Image.fillAmount 에 그대로 연결하면 된다")]
     public TimerEvent onTimerChanged;
 
+    [Tooltip("재생을 시작할 때 발화한다. 연출 컴포넌트들의 초기화(ResetPose 등)를 연결한다")]
+    public UnityEvent onReset;
+
     public UnityEvent onClear;
     public UnityEvent onFail;
 
@@ -133,6 +136,10 @@ public class RubMiniGame : MiniGame
     protected override void OnPlay()
     {
         ResetInternal();
+
+        // 지난 판의 연출을 여기서 지운다. 종료 직후가 아니라 다음 판을 시작할 때 지워야 결과를 볼 수 있다.
+        onReset.Invoke();
+
         state = State.Playing;
     }
 
