@@ -33,8 +33,14 @@ public class FireGrowth : MonoBehaviour
     [Tooltip("켜면 커져도 불의 밑동이 제자리에 남는다. 끄면 중심을 기준으로 커진다")]
     [SerializeField] private bool keepBottomFixed = true;
 
+    [Header("꺼짐")]
+    [Tooltip("실패했을 때 불이 사그라들어 사라지는 시간(초). 0이면 즉시 사라진다")]
+    [SerializeField] private float extinguishTime = 0.3f;
+
     private Vector3 restScale;
     private Vector3 restPosition;
+    private SpriteRenderer spriteRenderer;
+    private Color restColor;
 
     // 원래 크기 기준, 피벗에서 스프라이트 밑변까지의 로컬 거리(음수).
     private float bottomOffset;
@@ -43,6 +49,10 @@ public class FireGrowth : MonoBehaviour
     private float targetRatio;
     private float currentRatio;
     private float popAmount;
+
+    // 1 이면 그대로 보이고, 0 이면 완전히 꺼진 상태. 크기와 투명도에 함께 곱한다.
+    private float visibility = 1f;
+    private bool extinguishing;
 
     private void Awake()
     {
@@ -64,9 +74,24 @@ public class FireGrowth : MonoBehaviour
         restScale = transform.localScale;
         restPosition = transform.localPosition;
 
-        var renderer2D = GetComponent<SpriteRenderer>();
-        if (renderer2D != null && renderer2D.sprite != null)
-            bottomOffset = renderer2D.sprite.bounds.min.y;
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null)
+        {
+            restColor = spriteRenderer.color;
+
+            if (spriteRenderer.sprite != null)
+                bottomOffset = spriteRenderer.sprite.bounds.min.y;
+        }
+    }
+
+    /// <summary>
+    /// 불을 꺼뜨린다. 실패 연출용으로 <see cref="FireMiniGame.onFail"/> 에 연결한다.
+    /// 사그라들면서 완전히 사라지고, 다음 판을 시작하면 되살아난다.
+    /// </summary>
+    public void Extinguish()
+    {
+        CacheRest();
+        extinguishing = true;
     }
 
     /// <summary>
@@ -97,6 +122,13 @@ public class FireGrowth : MonoBehaviour
         targetRatio = 0f;
         currentRatio = 0f;
         popAmount = 0f;
+
+        // 꺼져 있었더라도 다시 불을 붙일 수 있어야 한다.
+        extinguishing = false;
+        visibility = 1f;
+        if (spriteRenderer != null)
+            spriteRenderer.enabled = true;
+
         ApplyRatio(0f, 0f);
     }
 
@@ -106,13 +138,32 @@ public class FireGrowth : MonoBehaviour
         currentRatio = Mathf.Lerp(currentRatio, targetRatio, 1f - Mathf.Exp(-followSpeed * Time.deltaTime));
         popAmount = Mathf.Lerp(popAmount, 0f, 1f - Mathf.Exp(-popDecay * Time.deltaTime));
 
+        if (extinguishing && visibility > 0f)
+        {
+            visibility = extinguishTime > 0f
+                ? Mathf.MoveTowards(visibility, 0f, Time.deltaTime / extinguishTime)
+                : 0f;
+
+            // 크기가 0이어도 보이지 않지만, 확실히 없애기 위해 렌더러까지 끈다.
+            if (visibility <= 0f && spriteRenderer != null)
+                spriteRenderer.enabled = false;
+        }
+
         ApplyRatio(currentRatio, popAmount);
     }
 
     private void ApplyRatio(float ratio, float extra)
     {
-        float scale = Mathf.LerpUnclamped(minScale, maxScale, growEase.Evaluate(ratio)) * (1f + extra);
+        // 꺼지는 중이면 크기와 투명도가 함께 줄어서 사그라드는 것처럼 보인다.
+        float scale = Mathf.LerpUnclamped(minScale, maxScale, growEase.Evaluate(ratio)) * (1f + extra) * visibility;
         transform.localScale = restScale * scale;
+
+        if (spriteRenderer != null)
+        {
+            Color color = restColor;
+            color.a = restColor.a * visibility;
+            spriteRenderer.color = color;
+        }
 
         if (!keepBottomFixed)
             return;
