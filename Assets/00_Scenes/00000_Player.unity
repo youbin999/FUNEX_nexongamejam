@@ -156,7 +156,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 1, g: 1, b: 1, a: 0}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -382,7 +382,7 @@ MonoBehaviour:
     borderSprite: {fileID: 0}
   - prefab: {fileID: 4657186777680439362, guid: 6e7c95e72c6956141abad54d4c53d242, type: 3}
     isCritical: 0
-    borderSprite: {fileID: 0}
+    borderSprite: {fileID: -1411474693944598997, guid: 7827973d7db50d04ab783518ed8b9b3b, type: 3}
   - prefab: {fileID: 7396776103939382718, guid: a346cefd652deac4facead9bd56e1350, type: 3}
     isCritical: 0
     borderSprite: {fileID: 0}
@@ -390,11 +390,11 @@ MonoBehaviour:
     isCritical: 0
     borderSprite: {fileID: 0}
   - prefab: {fileID: 5533263401601251690, guid: 542f1ec7acbab974ebc3ad6b77fd5f9f, type: 3}
-    isCritical: 0
+    isCritical: 1
     borderSprite: {fileID: 0}
   - prefab: {fileID: 1793571473085594207, guid: 99c89240ed27a494ca10ae4b6d357444, type: 3}
     isCritical: 0
-    borderSprite: {fileID: 0}
+    borderSprite: {fileID: 1152356169552002576, guid: 7d1664222bd094e44b0a119186329ddb, type: 3}
   playOnStart: 1
   onGameEnding:
     m_PersistentCalls:
@@ -674,8 +674,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -39.284424, y: 170.11523}
-  m_SizeDelta: {x: 1656.6716, y: 1079.4995}
+  m_AnchoredPosition: {x: -26.180908, y: -160.84546}
+  m_SizeDelta: {x: 2752.979, y: 1741.4216}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1630025802
 MonoBehaviour:
