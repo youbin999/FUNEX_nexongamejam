@@ -1880,6 +1880,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BronzeSmeltMiniGame
   gameDescription: "\uC740\uBC31\uC0C9 \uAD6C\uAC04\uC5D0\uC11C \uC2A4\uD398\uC774\uC2A4!"
+  keyboardGuides:
+  - actionLabel: ''
+    keys: 01000000
   timeLimit: 3
   onTimerChanged:
     m_PersistentCalls:

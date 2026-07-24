@@ -244,19 +244,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ArchimedesBathMiniGame
   gameDescription: "\uBAA9\uC695\uD0D5\uC5D0 \uB4E4\uC5B4\uAC00\uB77C!"
-  archimedesRenderer: {fileID: 8665632462774998033}
-  archimedesFrame0: {fileID: -6101988142988907527, guid: 5764df35212f9ce439b4b038f819f518, type: 3}
-  archimedesFrame1: {fileID: 4540303520948474036, guid: 292ab342bc76b194fb3930b92cd077bc, type: 3}
-  bathTrigger: {fileID: 6271931136619848686}
+  keyboardGuides:
+  - actionLabel: ''
+    keys: 12000000
   timeLimit: 5
-  stepDistance: 0.4
-  somersaultDuration: 0.6
-  somersaultJumpHeight: 1.2
-  somersaultSpins: 1
-  eurekaCanvasGroup: {fileID: 1395318810538306839}
-  eurekaAppearDuration: 0.35
-  eurekaHoldDuration: 0.8
-  eurekaStartScale: 0.3
   onTimerChanged:
     m_PersistentCalls:
       m_Calls:
@@ -272,6 +263,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  archimedesRenderer: {fileID: 8665632462774998033}
+  archimedesFrame0: {fileID: -6101988142988907527, guid: 5764df35212f9ce439b4b038f819f518, type: 3}
+  archimedesFrame1: {fileID: 4540303520948474036, guid: 292ab342bc76b194fb3930b92cd077bc, type: 3}
+  bathTrigger: {fileID: 6271931136619848686}
+  stepDistance: 0.4
+  somersaultDuration: 0.6
+  somersaultJumpHeight: 1.2
+  somersaultSpins: 1
+  eurekaCanvasGroup: {fileID: 1395318810538306839}
+  eurekaAppearDuration: 0.35
+  eurekaStartScale: 0.3
   onClear:
     m_PersistentCalls:
       m_Calls: []

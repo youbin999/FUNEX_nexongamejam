@@ -410,6 +410,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d3f1a62c47b4e0d9a25f7b3c08e51d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BigBangMiniGame
+  gameDescription: 
+  keyboardGuides:
+  - actionLabel: ''
+    keys: 250000003f000000
   visual: {fileID: 7009523494744153708}
   startHeat: 0.3
   heatRisePerSecond: 0.5

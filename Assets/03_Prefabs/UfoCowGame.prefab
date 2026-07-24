@@ -500,6 +500,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UfoCowMiniGame
   gameDescription: "\uC18C\uB97C \uC804\uBD80 \uBE68\uC544\uB4E4\uC5EC\uB77C!"
+  keyboardGuides:
+  - actionLabel: ''
+    keys: 0f00000012000000
+  - actionLabel: ''
+    keys: 01000000
   timeLimit: 8
   onTimerChanged:
     m_PersistentCalls:
