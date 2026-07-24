@@ -1,0 +1,380 @@
+using System.Collections;
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.InputSystem;
+
+/// <summary>
+/// "누르지 마시오" 미니게임.
+/// 제한 시간(기본 5초) 동안 버튼을 누르지 않고 버티면 성공, 한 번이라도 누르면 실패한다.
+/// 성공이든 실패든 판정 즉시 끝나지 않고, 결과 연출(눌린 이미지 등)을 잠깐 보여준 뒤
+/// <see cref="MiniGame.ReportFinished"/> 로 통지한다. 프리팹으로 만들어 <see cref="MiniGamePlayer"/> 가 재생한다.
+/// </summary>
+public class HackMiniGame : TimedMiniGame
+{
+    [Header("카메라")]
+    [Tooltip("클릭 좌표 변환에 쓸 카메라. 비워두면 Camera.main 을 쓴다")]
+    [SerializeField] private Camera targetCamera;
+
+    [Header("버튼")]
+    [Tooltip("누르면 실패하는 버튼의 스프라이트 렌더러")]
+    [SerializeField] private SpriteRenderer buttonRenderer;
+
+    [Header("버튼 스프라이트")]
+    [Tooltip("평소(누르기 전) 스프라이트")]
+    [SerializeField] private Sprite normalSprite;
+
+    [Tooltip("눌렸을 때 교체할 스프라이트")]
+    [SerializeField] private Sprite pressedSprite;
+
+    [Header("결과 연출")]
+    [Tooltip("성공/실패가 판정된 뒤 결과를 보여주고 다음으로 넘어가기까지 대기하는 시간(초)")]
+    [SerializeField] private float resultHoldDuration = 1f;
+
+    [Header("성공 연출 - 엄지")]
+    [Tooltip("성공 시 왼쪽에서 튀어나올 엄지 스프라이트")]
+    [SerializeField] private SpriteRenderer leftThumb;
+
+    [Tooltip("성공 시 오른쪽에서 튀어나올 엄지 스프라이트")]
+    [SerializeField] private SpriteRenderer rightThumb;
+
+    [Tooltip("엄지가 숨어있을 때 각자 화면 바깥(좌/우)으로 밀어낼 거리(월드 유닛)")]
+    [SerializeField] private float thumbHideDistance = 8f;
+
+    [Tooltip("엄지가 제자리로 튀어나오는 데 걸리는 시간(초)")]
+    [SerializeField] private float thumbPopDuration = 0.35f;
+
+    [Header("실패 연출 - 경고")]
+    [Tooltip("실패 시 튀어나올 경고 스프라이트들(4개). 각자 배치한 위치·크기 그대로 튀어나온다")]
+    [SerializeField] private SpriteRenderer[] warnings;
+
+    [Tooltip("경고 하나가 0에서 제 크기로 튀어나오는 데 걸리는 시간(초)")]
+    [SerializeField] private float warningPopDuration = 0.3f;
+
+    [Tooltip("경고들이 순차로 튀어나오는 간격(초). 0이면 동시에 튀어나온다")]
+    [SerializeField] private float warningStagger = 0.06f;
+
+    [Header("실패 연출 - 화면 흔들림")]
+    [Tooltip("실패 시 카메라가 흔들리는 시간(초). 0이면 흔들지 않는다")]
+    [SerializeField] private float shakeDuration = 0.3f;
+
+    [Tooltip("흔들림의 최대 세기(월드 유닛). 시간이 지날수록 점점 잦아든다")]
+    [SerializeField] private float shakeMagnitude = 0.25f;
+
+    [Header("이벤트")]
+    public UnityEvent onClear;
+    public UnityEvent onFail;
+
+    // 판정이 끝나 결과 연출 중인지 여부. true 인 동안은 추가 입력/재판정을 받지 않는다.
+    private bool resolving;
+    private Coroutine resolveRoutine;
+
+    // 엄지가 튀어나와 멈출 제자리 위치(프리팹에 배치된 로컬 좌표를 그대로 캐시한다).
+    private Vector3 leftThumbShownPos;
+    private Vector3 rightThumbShownPos;
+
+    // 경고가 튀어나와 멈출 제 크기(프리팹에 배치된 로컬 스케일을 그대로 캐시한다).
+    private Vector3[] warningShownScales;
+
+    // 화면 흔들림 처리용. 흔들기 시작 시점의 카메라 원위치를 저장해 두었다가 끝나면 복원한다.
+    private Coroutine shakeRoutine;
+    private Vector3 cameraRestorePos;
+    private bool cameraShaking;
+
+    private void Awake()
+    {
+        if (targetCamera == null)
+            targetCamera = Camera.main;
+
+        if (leftThumb != null)
+            leftThumbShownPos = leftThumb.transform.localPosition;
+        if (rightThumb != null)
+            rightThumbShownPos = rightThumb.transform.localPosition;
+
+        if (warnings != null)
+        {
+            warningShownScales = new Vector3[warnings.Length];
+            for (int i = 0; i < warnings.Length; i++)
+                if (warnings[i] != null)
+                    warningShownScales[i] = warnings[i].transform.localScale;
+        }
+    }
+
+    protected override void OnTimedPlay()
+    {
+        ResetInternal();
+    }
+
+    protected override void OnTimedStopAndReset()
+    {
+        if (resolveRoutine != null)
+        {
+            StopCoroutine(resolveRoutine);
+            resolveRoutine = null;
+        }
+
+        if (shakeRoutine != null)
+        {
+            StopCoroutine(shakeRoutine);
+            shakeRoutine = null;
+        }
+
+        // 흔들리던 중에 중단됐다면 카메라를 원위치로 되돌린다.
+        if (cameraShaking && targetCamera != null)
+            targetCamera.transform.localPosition = cameraRestorePos;
+        cameraShaking = false;
+
+        ResetInternal();
+    }
+
+    /// <summary>버튼을 다시 누를 수 있는 초기 상태(평소 스프라이트)로 되돌린다. 멱등.</summary>
+    private void ResetInternal()
+    {
+        resolving = false;
+
+        if (buttonRenderer != null && normalSprite != null)
+            buttonRenderer.sprite = normalSprite;
+
+        HideThumb(leftThumb);
+        HideThumb(rightThumb);
+
+        if (warnings != null)
+        {
+            for (int i = 0; i < warnings.Length; i++)
+            {
+                if (warnings[i] == null)
+                    continue;
+
+                if (warningShownScales != null && i < warningShownScales.Length)
+                    warnings[i].transform.localScale = warningShownScales[i];
+                warnings[i].gameObject.SetActive(false);
+            }
+        }
+    }
+
+    /// <summary>매 프레임 버튼 클릭 여부만 감시한다. 결과가 확정되기 전까지만 호출된다.</summary>
+    protected override void OnTimedUpdate()
+    {
+        if (resolving)
+            return;
+
+        if (TryGetPressPosition(out Vector2 screenPos) && IsPointerOnButton(screenPos))
+            BeginResolve(false);
+    }
+
+    /// <summary>
+    /// 제한 시간을 다 버텨냈다 — 이 게임에서는 시간 초과가 곧 성공이다.
+    /// 이미 실패 연출이 진행 중이면 그대로 두고, 아니면 성공 연출을 시작한다.
+    /// </summary>
+    protected override void OnTimeUp()
+    {
+        if (resolving)
+            return;
+
+        BeginResolve(true);
+    }
+
+    /// <summary>
+    /// 성공/실패를 확정하고 결과 연출을 시작한다. 즉시 통지하지 않고 <see cref="resultHoldDuration"/>
+    /// 만큼 결과를 보여준 뒤 <see cref="ResolveRoutine"/> 에서 통지한다.
+    /// </summary>
+    private void BeginResolve(bool success)
+    {
+        resolving = true;
+
+        // 실패(버튼 누름)일 때만 눌린 이미지로 바꾸고 화면을 흔든다. 성공은 버튼을 안 눌렀으므로 그대로 둔다.
+        if (!success)
+        {
+            if (buttonRenderer != null && pressedSprite != null)
+                buttonRenderer.sprite = pressedSprite;
+
+            if (targetCamera != null && shakeDuration > 0f)
+                shakeRoutine = StartCoroutine(ShakeCameraRoutine());
+        }
+
+        if (success)
+            onClear.Invoke();
+        else
+            onFail.Invoke();
+
+        resolveRoutine = StartCoroutine(ResolveRoutine(success));
+    }
+
+    /// <summary>결과를 잠깐 보여준 뒤 종료를 통지한다. 성공이면 엄지, 실패면 경고 연출을 먼저 재생한다.</summary>
+    private IEnumerator ResolveRoutine(bool success)
+    {
+        if (success)
+            yield return PopThumbsRoutine();
+        else
+            yield return PopWarningsRoutine();
+
+        if (resultHoldDuration > 0f)
+            yield return new WaitForSeconds(resultHoldDuration);
+
+        resolveRoutine = null;
+        ReportFinished(success);
+    }
+
+    /// <summary>경고 스프라이트 여러 개를 스케일 0에서 제 크기로 통통 튀어나오게 한다(순차 stagger 지원).</summary>
+    private IEnumerator PopWarningsRoutine()
+    {
+        if (warnings == null || warnings.Length == 0)
+            yield break;
+
+        // 모두 스케일 0으로 두고 활성화한다.
+        for (int i = 0; i < warnings.Length; i++)
+        {
+            if (warnings[i] == null)
+                continue;
+
+            warnings[i].transform.localScale = Vector3.zero;
+            warnings[i].gameObject.SetActive(true);
+        }
+
+        float total = warningPopDuration + warningStagger * Mathf.Max(0, warnings.Length - 1);
+        float time = 0f;
+        while (time < total)
+        {
+            time += Time.deltaTime;
+            for (int i = 0; i < warnings.Length; i++)
+            {
+                if (warnings[i] == null)
+                    continue;
+
+                Vector3 shown = warningShownScales != null && i < warningShownScales.Length
+                    ? warningShownScales[i]
+                    : Vector3.one;
+                float progress = warningPopDuration > 0f
+                    ? (time - warningStagger * i) / warningPopDuration
+                    : 1f;
+                float e = EaseOutBack(Mathf.Clamp01(progress));
+                warnings[i].transform.localScale = Vector3.LerpUnclamped(Vector3.zero, shown, e);
+            }
+
+            yield return null;
+        }
+
+        for (int i = 0; i < warnings.Length; i++)
+        {
+            if (warnings[i] == null)
+                continue;
+
+            warnings[i].transform.localScale = warningShownScales != null && i < warningShownScales.Length
+                ? warningShownScales[i]
+                : Vector3.one;
+        }
+    }
+
+    /// <summary>왼쪽·오른쪽 엄지를 화면 밖에서 제자리로 통통 튀어나오게 한다(ease-out-back 오버슈트).</summary>
+    private IEnumerator PopThumbsRoutine()
+    {
+        Vector3 leftHidden = leftThumbShownPos + Vector3.left * thumbHideDistance;
+        Vector3 rightHidden = rightThumbShownPos + Vector3.right * thumbHideDistance;
+
+        ShowThumbAt(leftThumb, leftHidden);
+        ShowThumbAt(rightThumb, rightHidden);
+
+        float time = 0f;
+        while (time < thumbPopDuration)
+        {
+            time += Time.deltaTime;
+            float e = EaseOutBack(Mathf.Clamp01(time / thumbPopDuration));
+
+            if (leftThumb != null)
+                leftThumb.transform.localPosition = Vector3.LerpUnclamped(leftHidden, leftThumbShownPos, e);
+            if (rightThumb != null)
+                rightThumb.transform.localPosition = Vector3.LerpUnclamped(rightHidden, rightThumbShownPos, e);
+
+            yield return null;
+        }
+
+        if (leftThumb != null)
+            leftThumb.transform.localPosition = leftThumbShownPos;
+        if (rightThumb != null)
+            rightThumb.transform.localPosition = rightThumbShownPos;
+    }
+
+    /// <summary>카메라를 무작위로 흔들었다가 원위치로 되돌린다. 시간이 지날수록 세기가 잦아든다.</summary>
+    private IEnumerator ShakeCameraRoutine()
+    {
+        Transform cam = targetCamera.transform;
+        cameraRestorePos = cam.localPosition;
+        cameraShaking = true;
+
+        float time = 0f;
+        while (time < shakeDuration)
+        {
+            time += Time.deltaTime;
+            // 뒤로 갈수록 세기가 잦아든다(선형). 끝까지 세게 유지하다 마지막에만 사그라든다.
+            float damper = 1f - Mathf.Clamp01(time / shakeDuration);
+
+            // 매 프레임 '최대 세기'로 방향만 무작위로 튄다(반지름 랜덤이 아니라 각도 랜덤).
+            float angle = Random.value * Mathf.PI * 2f;
+            Vector3 offset = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f) * (shakeMagnitude * damper);
+            cam.localPosition = cameraRestorePos + offset;
+            yield return null;
+        }
+
+        cam.localPosition = cameraRestorePos;
+        cameraShaking = false;
+        shakeRoutine = null;
+    }
+
+    /// <summary>엄지를 지정 위치에 놓고 활성화한다.</summary>
+    private static void ShowThumbAt(SpriteRenderer thumb, Vector3 localPosition)
+    {
+        if (thumb == null)
+            return;
+
+        thumb.transform.localPosition = localPosition;
+        thumb.gameObject.SetActive(true);
+    }
+
+    /// <summary>엄지를 비활성화한다.</summary>
+    private static void HideThumb(SpriteRenderer thumb)
+    {
+        if (thumb != null)
+            thumb.gameObject.SetActive(false);
+    }
+
+    /// <summary>끝에서 살짝 넘쳤다가 제자리로 돌아오는 통통 튀는 이징(0~1 입력, 1 부근에서 1을 넘겼다 수렴).</summary>
+    private static float EaseOutBack(float x)
+    {
+        const float c1 = 1.70158f;
+        const float c3 = c1 + 1f;
+        float p = x - 1f;
+        return 1f + c3 * p * p * p + c1 * p * p;
+    }
+
+    /// <summary>이번 프레임에 눌림(마우스 좌클릭/터치 시작)이 있었으면 화면 좌표를 반환한다.</summary>
+    private static bool TryGetPressPosition(out Vector2 screenPosition)
+    {
+        Mouse mouse = Mouse.current;
+        if (mouse != null && mouse.leftButton.wasPressedThisFrame)
+        {
+            screenPosition = mouse.position.ReadValue();
+            return true;
+        }
+
+        Touchscreen touch = Touchscreen.current;
+        if (touch != null && touch.primaryTouch.press.wasPressedThisFrame)
+        {
+            screenPosition = touch.primaryTouch.position.ReadValue();
+            return true;
+        }
+
+        screenPosition = default;
+        return false;
+    }
+
+    /// <summary>화면 좌표가 버튼 스프라이트의 영역(월드 AABB) 안에 있는지 검사한다.</summary>
+    private bool IsPointerOnButton(Vector2 screenPosition)
+    {
+        if (buttonRenderer == null || targetCamera == null)
+            return false;
+
+        Vector3 world = targetCamera.ScreenToWorldPoint(screenPosition);
+        Bounds bounds = buttonRenderer.bounds;
+        return world.x >= bounds.min.x && world.x <= bounds.max.x
+            && world.y >= bounds.min.y && world.y <= bounds.max.y;
+    }
+}

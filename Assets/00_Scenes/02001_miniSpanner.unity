@@ -136,7 +136,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &353073727
 SpriteRenderer:
   serializedVersion: 2
@@ -227,7 +227,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &494482181
 SpriteRenderer:
   serializedVersion: 2
@@ -389,6 +389,70 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &537568830
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 537568832}
+  - component: {fileID: 537568831}
+  m_Layer: 0
+  m_Name: Minimanager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &537568831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 537568830}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59a907987fe24d39b525880d96cd8e00, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MiniGamePlayer
+  gamePrefabs:
+  - {fileID: 562160154704496516, guid: c41684de35ac45ada326578c7c5a4e0a, type: 3}
+  preloadOnAwake: 1
+  playFirstOnStart: 1
+  onGameFinished:
+    m_PersistentCalls:
+      m_Calls: []
+  descriptionCanvasGroup: {fileID: 0}
+  descriptionText: {fileID: 0}
+  descriptionRect: {fileID: 0}
+  descriptionTransitionDuration: 0.25
+  descriptionHoldDuration: 1.5
+  descriptionStartScale: 0.8
+  screenFadeCanvasGroup: {fileID: 0}
+  fadeOutDuration: 0.3
+  fadeInDuration: 0.3
+  gameBorderRect: {fileID: 0}
+  gameBorderImage: {fileID: 0}
+  borderTransitionDuration: 0.35
+  transitionHoldDuration: 0.6
+--- !u!4 &537568832
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 537568830}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -699,7 +763,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1738947022
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -800,7 +864,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1800000002
 Transform:
   m_ObjectHideFlags: 0
@@ -875,6 +939,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b2e47d1c05a4f3ea9d6104b7e35c281, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpannerMiniGame
+  gameDescription: 
   pivot: {fileID: 1800000002}
   clearTurns: 2
   timeLimit: 5
@@ -957,7 +1022,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1800000042
 Transform:
   m_ObjectHideFlags: 0
@@ -1105,7 +1170,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &1861666548
 SpriteRenderer:
   serializedVersion: 2
@@ -1195,7 +1260,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2064381791
 Transform:
   m_ObjectHideFlags: 0
@@ -1224,3 +1289,4 @@ SceneRoots:
   - {fileID: 1861666549}
   - {fileID: 1738947025}
   - {fileID: 2064381791}
+  - {fileID: 537568832}
