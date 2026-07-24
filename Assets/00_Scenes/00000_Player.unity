@@ -368,16 +368,25 @@ MonoBehaviour:
   - prefab: {fileID: 3102439326765463788, guid: 4cd0269129acd204c9d63d2d4539c792, type: 3}
     isCritical: 0
     borderSprite: {fileID: 0}
+  - prefab: {fileID: 562160154704496516, guid: c41684de35ac45ada326578c7c5a4e0a, type: 3}
+    isCritical: 0
+    borderSprite: {fileID: 0}
+  - prefab: {fileID: 1137410263306520644, guid: 3f387d812ed7d05438306a72d2949023, type: 3}
+    isCritical: 1
+    borderSprite: {fileID: 0}
+  - prefab: {fileID: 3390688864203735000, guid: 142412d3334caa8408aa8b783eba0185, type: 3}
+    isCritical: 0
+    borderSprite: {fileID: 1250316274037762026, guid: 74eaa5d12046003439fb8d2225b9e40c, type: 3}
   - prefab: {fileID: 4657186777680439362, guid: 6e7c95e72c6956141abad54d4c53d242, type: 3}
     isCritical: 0
+    borderSprite: {fileID: 0}
+  - prefab: {fileID: 7396776103939382718, guid: a346cefd652deac4facead9bd56e1350, type: 3}
+    isCritical: 1
     borderSprite: {fileID: 0}
   - prefab: {fileID: 4700864808614509273, guid: d109eaaff3d885844a73d86db8d12dc2, type: 3}
     isCritical: 0
     borderSprite: {fileID: 0}
-  - prefab: {fileID: 3390688864203735000, guid: 142412d3334caa8408aa8b783eba0185, type: 3}
-    isCritical: 0
-    borderSprite: {fileID: 0}
-  - prefab: {fileID: 562160154704496516, guid: c41684de35ac45ada326578c7c5a4e0a, type: 3}
+  - prefab: {fileID: 4700864808614509273, guid: d109eaaff3d885844a73d86db8d12dc2, type: 3}
     isCritical: 0
     borderSprite: {fileID: 0}
   playOnStart: 1
