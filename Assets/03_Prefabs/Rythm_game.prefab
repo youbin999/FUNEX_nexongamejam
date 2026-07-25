@@ -52,6 +52,8 @@ MonoBehaviour:
   minInterval: 0
   stepPitchRise: 0.03
   stepPitchCap: 0.5
+  stopOnDisable: 0
+  stopFadeDuration: 0.15
 --- !u!1 &465863414161887807
 GameObject:
   m_ObjectHideFlags: 0
@@ -159,7 +161,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4265193724990902446
 Transform:
   m_ObjectHideFlags: 0
@@ -500,7 +502,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TimingDropMiniGame
   gameDescription: "\uD130\uD2B8\uB824\uB77C!"
-  keyboardGuides: []
+  keyboardGuides:
+  - actionLabel: 
+    keys: 01000000
   failurePenaltyPrefab: {fileID: 7008092060532276377, guid: 95496a10f77271f4fa2f5e350a76d39d, type: 3}
   failureShakeDuration: 0.4
   failureShakeAmplitude: 0.35
@@ -590,7 +594,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2803310119490730580
 Transform:
   m_ObjectHideFlags: 0

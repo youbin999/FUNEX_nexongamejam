@@ -97,7 +97,7 @@ BronzeSmeltMiniGame          BronzeGauge
 
 | 경로 | 내용 |
 | :--- | :--- |
-| `Assets/02_Sprite/07_Bronze/` | `blast furnace_off/on`(1920x1080 배경), `Bronze Sword`, `Tool1~4` |
+| `Assets/02_Sprite/07_Bronze/` | `blast furnace_off/on`(1920x1080 배경), `Bronze Sword`, `Tool1~4`, `iron_Good/Fail.mp3` |
 | `Assets/03_Prefabs/BronzeGame.prefab` | 미니게임 프리팹 |
 | `Assets/03_Prefabs/BronzeToolBounce.physicsMaterial2D` | 마찰 0 / 반발 1 — 도구가 감속 없이 계속 튕긴다 |
 | `Assets/03_Prefabs/BlackSmokePuff.prefab` | `Cloud.png`를 검게 물들인 `SteamPuff` |
@@ -198,9 +198,8 @@ Unity CLI로 에디터에 붙어 플레이 모드에서 실측한 값이다.
 
 ## 7. 알려진 제약 / 손볼 만한 것
 
-- **효과음이 비어 있다.** 프로젝트에 오디오 에셋이 아직 없어서 `clearSfx` / `failSfx` 슬롯이 빈
-  채로 두었다(비어 있으면 무음으로 정상 동작). 클립이 생기면 인스펙터에 끼우기만 하면 되고,
-  재생은 `AudioManager.Instance.PlaySfx()`를 탄다.
+- **판정 순간의 타격음은 없다.** `clearSfx` / `failSfx`는 성공/실패가 갈린 뒤에 울리는 소리라,
+  스페이스를 누르는 순간 판정과 무관하게 나는 공통 타격음이 필요하면 필드를 따로 추가해야 한다.
 - **기본 판정 창 96ms는 빡빡하다.** 1절의 표를 보고 조절할 것. 정 어려우면 `pingPong`을 켜서
   기회를 여러 번 주는 방법도 있다.
 - **게이지는 색상 사각형으로 만들어져 있다.** 전용 스프라이트가 생기면 `Track` / `CopperFill` /

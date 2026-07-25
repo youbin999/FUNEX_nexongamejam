@@ -146,14 +146,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RatCatchMiniGame
   gameDescription: "\uC7A1\uC544\uB77C!"
   keyboardGuides:
-  - actionLabel: w
-    keys: 
-  - actionLabel: a
-    keys: 
-  - actionLabel: s
-    keys: 
-  - actionLabel: d
-    keys: 
+  - actionLabel: 
+    keys: 250000000f0000002100000012000000
+  - actionLabel: 
+    keys: 01000000
   failurePenaltyPrefab: {fileID: -7303443672653005118, guid: 9dd69c286f249ac44b07d92cb0105637, type: 3}
   failureShakeDuration: 0.4
   failureShakeAmplitude: 0.35

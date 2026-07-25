@@ -36,11 +36,45 @@ public sealed class MiniGameIntroPresenter : MonoBehaviour
     [Tooltip("등장 시작/퇴장 종료 시점의 스케일 값")]
     [SerializeField] private float startScale = 0.8f;
 
+    [Header("설명 텍스트 가독성")]
+    [Tooltip("설명 글자에 두를 테두리 두께(0~1). 밝은 배경(예: 주식 게임)에서 글자가 묻히는 걸 막는다. 0이면 테두리 없음")]
+    [Range(0f, 1f)]
+    [SerializeField] private float descriptionOutlineWidth = 0.15f;
+
+    [Tooltip("설명 글자 테두리 색")]
+    [SerializeField] private Color descriptionOutlineColor = Color.black;
+
+    // ShaderUtilities 의 상수 이름은 TMP 버전마다 달라질 수 있어 프로퍼티를 직접 잡는다.
+    private static readonly int OutlineWidthId = Shader.PropertyToID("_OutlineWidth");
+    private static readonly int OutlineColorId = Shader.PropertyToID("_OutlineColor");
+
     private readonly List<KeyboardGuideRowView> spawnedRows = new List<KeyboardGuideRowView>();
 
     private void Awake()
     {
         HideImmediate();
+        ApplyDescriptionOutline();
+    }
+
+    /// <summary>
+    /// 설명 글자에 테두리를 두른다. 흰 배경 위에서도 글자가 읽히게 하는 게 목적이다.
+    ///
+    /// <c>fontMaterial</c> 은 이 텍스트 전용 머티리얼 인스턴스를 만들어 돌려준다.
+    /// <c>fontSharedMaterial</c> 을 건드리면 같은 폰트를 쓰는 다른 텍스트는 물론
+    /// 프로젝트의 머티리얼 에셋까지 바뀌므로 쓰지 않는다.
+    /// </summary>
+    private void ApplyDescriptionOutline()
+    {
+        if (descriptionText == null || descriptionOutlineWidth <= 0f)
+            return;
+
+        Material material = descriptionText.fontMaterial;
+        if (material == null)
+            return;
+
+        material.EnableKeyword("OUTLINE_ON");
+        material.SetFloat(OutlineWidthId, descriptionOutlineWidth);
+        material.SetColor(OutlineColorId, descriptionOutlineColor);
     }
 
     private void OnDisable()
