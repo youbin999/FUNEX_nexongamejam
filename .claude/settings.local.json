@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "PowerShell(git check-ignore -v \"Assets/01_Scripts/Settings/GameSettings.cs\")",
-      "Bash(echo \"exit=$?\")"
+      "Bash(echo \"exit=$?\")",
+      "Bash(awk '{o+=gsub\\(/{/,\"{\"\\); c+=gsub\\(/}/,\"}\"\\)} END{print \"open=\"o, \"close=\"c}' Assets/01_Scripts/Mini_timing/TimingDropMiniGame.cs)",
+      "Bash(awk '/^--- !u!20 /,/^--- !u!\\(4|1\\) /' Assets/00_Scenes/03001_Minigame_Chamho.unity)",
+      "Bash(cd \"C:/Users/USER/AppData/Local/Unity/Editor\" && tail -60 Editor.log)",
+      "Bash(awk '{o+=gsub\\(/{/,\"{\"\\); c+=gsub\\(/}/,\"}\"\\)} END{print \"braces:\",o,c}' Assets/01_Scripts/Mini_timing/TimingDropMiniGame.cs)"
     ]
   }
 }

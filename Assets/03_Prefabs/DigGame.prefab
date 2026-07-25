@@ -274,6 +274,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DigMiniGame
   gameDescription: 
   shovel: {fileID: 3677015501937976361}
+  groundRenderer: {fileID: 0}
+  groundStages: []
   clearCount: 3
   requiredHold: 0.3
   releaseGrace: 0.2
