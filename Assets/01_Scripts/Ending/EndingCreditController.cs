@@ -13,9 +13,10 @@ using UnityEngine.UI;
 ///                      │
 ///   대본 도착 → 크레딧 롤 시작 ─┬─ (병렬) 이미지 생성 → 도착 시 배경에 페이드인
 ///                              │
-///   롤 종료 → 에필로그 표시 → onCreditsFinished
+///   롤 종료 → 에필로그 표시 → (이미지 합류) → 갤러리 저장 → onCreditsFinished
 ///
 /// 이미지가 0초에 있을 필요가 없다는 점을 이용해, 생성 지연을 롤 시간에 흡수시킨다.
+/// 다만 갤러리에는 텍스트와 이미지가 한 쌍으로 들어가야 하므로, 저장 직전에 이미지 쪽을 합류시킨다.
 /// </summary>
 public class EndingCreditController : MonoBehaviour
 {
@@ -66,12 +67,19 @@ public class EndingCreditController : MonoBehaviour
     [Tooltip("이미지 생성 타임아웃(초)")]
     [SerializeField] private int imageTimeout = 60;
 
-    [Tooltip("체크하면 API 를 호출하지 않고 항상 폴백 텍스트를 쓴다. 연출만 손볼 때 켜면 편하다")]
+    [Tooltip("체크하면 API 를 호출하지 않고 항상 폴백 텍스트를 쓴다. 연출만 손볼 때 켜면 편하다.\n" +
+        "이미지 생성도 함께 건너뛰므로 갤러리에는 저장되지 않는다")]
     [SerializeField] private bool forceFallback;
+
+    [Tooltip("끄면 이번 엔딩을 갤러리에 남기지 않는다. 연출 테스트로 저장본이 지저분해질 때 끄면 된다")]
+    [SerializeField] private bool saveToGallery = true;
 
     [Header("이벤트")]
     [Tooltip("에필로그까지 끝나면 발화. 갤러리 표시나 타이틀 복귀에 연결한다")]
     public UnityEvent onCreditsFinished;
+
+    /// <summary>생성에 성공한 엔딩 이미지. 갤러리 저장에 그대로 쓴다. 실패했으면 null.</summary>
+    private Texture2D endingImage;
 
     private void Start()
     {
@@ -97,12 +105,19 @@ public class EndingCreditController : MonoBehaviour
             script = FallbackEndingNarrator.Build(result);
 
         // 이미지는 롤과 병렬로 생성한다 — 롤이 끝나기 전에만 도착하면 된다.
-        StartCoroutine(ResolveImageRoutine(result, script.image_prompt));
+        Coroutine imaging = StartCoroutine(ResolveImageRoutine(result, script.image_prompt));
 
         yield return ScrollCreditsRoutine(script);
 
         yield return new WaitForSeconds(epilogueDelay);
         ShowEpilogue(script.epilogue);
+
+        // 롤이 짧았거나 생성이 느렸으면 이미지가 아직 안 떠 있을 수 있다.
+        // 갤러리에는 텍스트와 이미지가 한 쌍으로 들어가야 하므로 여기서 합류시킨다.
+        // 생성기에 타임아웃이 걸려 있어 무한정 기다리지는 않는다.
+        yield return imaging;
+
+        SaveToGallery(script, result);
 
         onCreditsFinished.Invoke();
     }
@@ -162,6 +177,7 @@ public class EndingCreditController : MonoBehaviour
         if (texture == null)
             yield break;
 
+        endingImage = texture;
         backgroundImage.texture = texture;
         backgroundImage.enabled = true;
 
@@ -236,6 +252,24 @@ public class EndingCreditController : MonoBehaviour
         var parent = rect.parent as RectTransform;
         float height = parent != null ? parent.rect.height : 0f;
         return height > 1f ? height : Screen.height;
+    }
+
+    /// <summary>
+    /// 이번 엔딩을 갤러리에 남긴다. 이미지가 없으면(생성 실패·폴백 모드) 저장하지 않는다 —
+    /// 갤러리는 크레딧 텍스트와 이미지가 한 쌍일 때만 의미가 있다.
+    /// </summary>
+    private void SaveToGallery(EndingScript script, RunResult result)
+    {
+        if (!saveToGallery)
+            return;
+
+        if (endingImage == null)
+        {
+            Debug.LogWarning("EndingCreditController: 엔딩 이미지가 없어 갤러리에 남기지 않습니다.");
+            return;
+        }
+
+        GalleryStore.Save(script, endingImage, result);
     }
 
     private void ShowEpilogue(string epilogue)

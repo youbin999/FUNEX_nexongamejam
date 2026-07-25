@@ -107,8 +107,34 @@ public class RunResult : MonoBehaviour
     /// <summary>
     /// 캐시 파일명 등에 쓸 조합 키. 결과 개수까지 포함해야
     /// "3개 중 전부 실패(0)"와 "5개 중 전부 실패(0)"가 충돌하지 않는다.
+    ///
+    /// 개수와 성패 패턴만으로는 부족하다 — 시대마다 미니게임을 랜덤으로 뽑으므로
+    /// 전혀 다른 사건을 겪고도 개수와 패턴이 같아지는 판이 흔하다.
+    /// 그러면 이전 판의 엔딩 이미지가 캐시에서 그대로 나와 갤러리에 같은 그림이 쌓인다.
+    /// 어떤 사건이었는지(<see cref="EventsSignature"/>)까지 키에 넣어 판을 구분한다.
     /// </summary>
-    public string CombinationKey => $"{outcomes.Count}_{CombinationMask:X}{(EndedEarly ? "_early" : string.Empty)}";
+    public string CombinationKey =>
+        $"{outcomes.Count}_{CombinationMask:X}_{StableHash.Of(EventsSignature):X8}{(EndedEarly ? "_early" : string.Empty)}";
+
+    /// <summary>
+    /// 이번 판에 어떤 사건을 겪었는지를 나타내는 문자열. 조합 키의 재료다.
+    /// 등록 순서(= 시대 순서)가 달라지면 다른 판으로 본다.
+    /// 중단으로 끝난 판은 중단을 유발한 사건까지 포함해야 마지막 시대가 구분된다.
+    /// </summary>
+    private string EventsSignature
+    {
+        get
+        {
+            var sb = new StringBuilder();
+            foreach (MiniGameOutcome o in outcomes)
+                sb.Append(o.era).Append(':').Append(o.eventLabel).Append('|');
+
+            if (EndedEarly)
+                sb.Append("early:").Append(EndedAtEra).Append(':').Append(EndedByEvent);
+
+            return sb.ToString();
+        }
+    }
 
     /// <summary>LLM 에 넘길 결과 요약을 사람이 읽는 형태로 직렬화한다.</summary>
     public string ToPromptPayload()
