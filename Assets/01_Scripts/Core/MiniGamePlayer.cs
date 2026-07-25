@@ -55,6 +55,12 @@ public class MiniGamePlayer : MonoBehaviour
     [Tooltip("시대(스테이지)별 테마 교체 대상 Image. PlayGame 호출 시 넘긴 borderSprite 로 교체된다")]
     [SerializeField] private Image gameBorderImage;
 
+    [Tooltip("보더 스프라이트 교체 시 투명도 전환에 사용할 CanvasGroup. 비워두면 GameBorder Image 오브젝트에서 자동으로 찾는다")]
+    [SerializeField] private CanvasGroup gameBorderCanvasGroup;
+
+    [Tooltip("기존 보더가 사라지고 새 보더가 나타나는 각각의 페이드 시간(초)")]
+    [SerializeField] private float borderSpriteFadeDuration = 0.15f;
+
     [Tooltip("보더가 축소/재확대되는 데 걸리는 시간(초)")]
     [SerializeField] private float borderTransitionDuration = 0.35f;
 
@@ -119,6 +125,9 @@ public class MiniGamePlayer : MonoBehaviour
             borderExpandedSizeDelta = gameBorderRect.sizeDelta;
         }
 
+        if (gameBorderCanvasGroup == null && gameBorderImage != null)
+            gameBorderCanvasGroup = gameBorderImage.GetComponent<CanvasGroup>();
+
         HideEraYearTextImmediate();
 
         if (preloadOnAwake)
@@ -128,6 +137,7 @@ public class MiniGamePlayer : MonoBehaviour
     private void OnDisable()
     {
         HideEraYearTextImmediate();
+        RestoreBorderOpacityImmediate();
     }
 
     private void Start()
@@ -247,7 +257,7 @@ public class MiniGamePlayer : MonoBehaviour
         }
 
         if (borderSprite != null && gameBorderImage != null)
-            gameBorderImage.sprite = borderSprite;
+            yield return ChangeBorderSprite(borderSprite);
 
         yield return AnimateBorder(borderExpandedAnchoredPosition, borderExpandedSizeDelta,
             BorderFramedAnchoredPosition, BorderFramedSizeDelta, borderTransitionDuration);
@@ -299,6 +309,42 @@ public class MiniGamePlayer : MonoBehaviour
         }
 
         screenFadeCanvasGroup.alpha = to;
+    }
+
+    /// <summary>기존 보더를 숨긴 뒤 스프라이트를 교체하고 새 보더를 다시 표시한다.</summary>
+    private IEnumerator ChangeBorderSprite(Sprite sprite)
+    {
+        if (gameBorderCanvasGroup == null || borderSpriteFadeDuration <= 0f)
+        {
+            gameBorderImage.sprite = sprite;
+            yield break;
+        }
+
+        yield return FadeBorder(gameBorderCanvasGroup.alpha, 0f, borderSpriteFadeDuration);
+        gameBorderImage.sprite = sprite;
+        yield return FadeBorder(0f, 1f, borderSpriteFadeDuration);
+    }
+
+    /// <summary>GameBorder CanvasGroup 의 alpha 를 보간한다.</summary>
+    private IEnumerator FadeBorder(float from, float to, float duration)
+    {
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            gameBorderCanvasGroup.alpha =
+                Mathf.Lerp(from, to, Mathf.Clamp01(elapsed / duration));
+            yield return null;
+        }
+
+        gameBorderCanvasGroup.alpha = to;
+    }
+
+    /// <summary>중단된 보더 페이드가 다음 재생에 영향을 주지 않도록 완전히 표시된 상태로 복원한다.</summary>
+    private void RestoreBorderOpacityImmediate()
+    {
+        if (gameBorderCanvasGroup != null)
+            gameBorderCanvasGroup.alpha = 1f;
     }
 
     /// <summary>gameBorderRect 의 anchoredPosition/sizeDelta 를 보간한다. 비어 있으면 즉시 반환.</summary>
@@ -435,6 +481,7 @@ public class MiniGamePlayer : MonoBehaviour
         }
 
         HideEraYearTextImmediate();
+        RestoreBorderOpacityImmediate();
 
         if (introPresenter != null)
             introPresenter.HideImmediate();
