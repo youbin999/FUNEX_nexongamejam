@@ -57,6 +57,8 @@ MonoBehaviour:
   - actionLabel: 
     keys: 0f00000012000000
   failurePenaltyPrefab: {fileID: 5191798919311284758, guid: a28def50345168f43af2ad55bb540da2, type: 3}
+  failureShakeDuration: 0.4
+  failureShakeAmplitude: 0.35
   timeLimit: 5
   onTimerChanged:
     m_PersistentCalls:
@@ -71,7 +73,6 @@ MonoBehaviour:
   clearCount: 20
   leftKey: 15
   rightKey: 18
-  targetCamera: {fileID: 0}
   clearImage: {fileID: 7700000062}
   failImage: {fileID: 7700000072}
   resultHoldDuration: 1.2
@@ -79,6 +80,9 @@ MonoBehaviour:
   imageShakeMagnitude: 0.3
   cameraShakeDuration: 0.4
   cameraShakeMagnitude: 0.6
+  failureFlashDuration: 0.16
+  failureFlashAlpha: 0.55
+  failureFlashColor: {r: 0.72, g: 0.015, b: 0.015, a: 1}
   onPunch:
     m_PersistentCalls:
       m_Calls:
@@ -696,7 +700,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7700000071
 Transform:
   m_ObjectHideFlags: 0
@@ -825,6 +829,8 @@ MonoBehaviour:
   minInterval: 0.03
   stepPitchRise: 0.03
   stepPitchCap: 0.5
+  stopOnDisable: 0
+  stopFadeDuration: 0.15
 --- !u!1 &4642549231205085651
 GameObject:
   m_ObjectHideFlags: 0
@@ -855,7 +861,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
-  m_Children:
+  m_Children: []
   m_Father: {fileID: 7700000011}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
