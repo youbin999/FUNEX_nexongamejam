@@ -52,6 +52,8 @@ MonoBehaviour:
   minInterval: 0.03
   stepPitchRise: 0.03
   stepPitchCap: 0.5
+  stopOnDisable: 0
+  stopFadeDuration: 0.15
 --- !u!1 &3661208839416820731
 GameObject:
   m_ObjectHideFlags: 0
@@ -519,7 +521,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af9771e6b965adf47b0cdc08db0b316b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DigMiniGame
-  gameDescription: "\uCC38\uD638\uB97C \uD30C\uB77C!"
+  gameDescription: "\uD30C\uB77C!"
   keyboardGuides:
   - actionLabel: 
     keys: 2500000021000000

@@ -1,5 +1,59 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8800000011
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8800000012}
+  - component: {fileID: 8800000013}
+  m_Layer: 0
+  m_Name: Sfx_Clear
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8800000012
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8800000011}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 118820455176514959}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8800000013
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8800000011}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d3a92c7b18f4e5480a2c93de17f4b60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SfxPlayer
+  clips:
+  - {fileID: 8300000, guid: 2caa4e52e8426d248907a6507730d58f, type: 3}
+  volume: 1
+  pitch: 1
+  pitchJitter: 0
+  minInterval: 0
+  stepPitchRise: 0.03
+  stepPitchCap: 0.5
+  stopOnDisable: 0
+  stopFadeDuration: 0.15
 --- !u!1 &35769414922785511
 GameObject:
   m_ObjectHideFlags: 0
@@ -421,6 +475,8 @@ MonoBehaviour:
   markedLabel: {fileID: 5543837656920649856}
   correctColor: {r: 0.4, g: 0.85, b: 0.4, a: 0.85}
   wrongColor: {r: 0.85, g: 0.3, b: 0.3, a: 0.85}
+  correctLabel: "\uB9C8\uB140!"
+  wrongLabel: X
 --- !u!1 &539374652736273898
 GameObject:
   m_ObjectHideFlags: 0
@@ -842,6 +898,8 @@ MonoBehaviour:
   markedLabel: {fileID: 3751643803398749999}
   correctColor: {r: 0.4, g: 0.85, b: 0.4, a: 0.85}
   wrongColor: {r: 0.85, g: 0.3, b: 0.3, a: 0.85}
+  correctLabel: "\uB9C8\uB140!"
+  wrongLabel: X
 --- !u!1 &915483140237903672
 GameObject:
   m_ObjectHideFlags: 0
@@ -900,6 +958,8 @@ MonoBehaviour:
   markedLabel: {fileID: 3095245294577676515}
   correctColor: {r: 0.4, g: 0.85, b: 0.4, a: 0.85}
   wrongColor: {r: 0.85, g: 0.3, b: 0.3, a: 0.85}
+  correctLabel: "\uB9C8\uB140!"
+  wrongLabel: X
 --- !u!1 &1016203597781764341
 GameObject:
   m_ObjectHideFlags: 0
@@ -958,6 +1018,8 @@ MonoBehaviour:
   markedLabel: {fileID: 4956259086492162105}
   correctColor: {r: 0.4, g: 0.85, b: 0.4, a: 0.85}
   wrongColor: {r: 0.85, g: 0.3, b: 0.3, a: 0.85}
+  correctLabel: "\uB9C8\uB140!"
+  wrongLabel: X
 --- !u!1 &1032338074611670277
 GameObject:
   m_ObjectHideFlags: 0
@@ -1241,6 +1303,8 @@ MonoBehaviour:
   markedLabel: {fileID: 2878452861988835435}
   correctColor: {r: 0.4, g: 0.85, b: 0.4, a: 0.85}
   wrongColor: {r: 0.85, g: 0.3, b: 0.3, a: 0.85}
+  correctLabel: "\uB9C8\uB140!"
+  wrongLabel: X
 --- !u!1 &1649396458461006790
 GameObject:
   m_ObjectHideFlags: 0
@@ -2055,6 +2119,8 @@ MonoBehaviour:
   markedLabel: {fileID: 733696142740552201}
   correctColor: {r: 0.4, g: 0.85, b: 0.4, a: 0.85}
   wrongColor: {r: 0.85, g: 0.3, b: 0.3, a: 0.85}
+  correctLabel: "\uB9C8\uB140!"
+  wrongLabel: X
 --- !u!1 &2520154626221217695
 GameObject:
   m_ObjectHideFlags: 0
@@ -2189,6 +2255,8 @@ MonoBehaviour:
   markedLabel: {fileID: 6661386368283568516}
   correctColor: {r: 0.4, g: 0.85, b: 0.4, a: 0.85}
   wrongColor: {r: 0.85, g: 0.3, b: 0.3, a: 0.85}
+  correctLabel: "\uB9C8\uB140!"
+  wrongLabel: X
 --- !u!1 &2715575567437394187
 GameObject:
   m_ObjectHideFlags: 0
@@ -2296,6 +2364,7 @@ Transform:
   m_Children:
   - {fileID: 2804951857824909245}
   - {fileID: 4749502591283159889}
+  - {fileID: 8800000012}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4657186777680439362
@@ -2310,7 +2379,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05d5aae3a219962469940b6e24be3bc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WitchFindMiniGame
-  gameDescription: "\uB9C8\uB140\uB97C \uCC3E\uC544\uB77C!"
+  gameDescription: "\uACE8\uB77C\uB0B4\uB77C!"
   keyboardGuides:
   - actionLabel: 
     keys: 250000000f0000002100000012000000
@@ -2507,6 +2576,8 @@ MonoBehaviour:
   markedLabel: {fileID: 1246662085670550683}
   correctColor: {r: 0.4, g: 0.85, b: 0.4, a: 0.85}
   wrongColor: {r: 0.85, g: 0.3, b: 0.3, a: 0.85}
+  correctLabel: "\uB9C8\uB140!"
+  wrongLabel: X
 --- !u!1 &2970596206288392829
 GameObject:
   m_ObjectHideFlags: 0
@@ -2778,6 +2849,8 @@ MonoBehaviour:
   markedLabel: {fileID: 7538905287876176407}
   correctColor: {r: 0.4, g: 0.85, b: 0.4, a: 0.85}
   wrongColor: {r: 0.85, g: 0.3, b: 0.3, a: 0.85}
+  correctLabel: "\uB9C8\uB140!"
+  wrongLabel: X
 --- !u!1 &3179836669305999110
 GameObject:
   m_ObjectHideFlags: 0
@@ -3199,6 +3272,8 @@ MonoBehaviour:
   markedLabel: {fileID: 1252377312264443712}
   correctColor: {r: 0.4, g: 0.85, b: 0.4, a: 0.85}
   wrongColor: {r: 0.85, g: 0.3, b: 0.3, a: 0.85}
+  correctLabel: "\uB9C8\uB140!"
+  wrongLabel: X
 --- !u!1 &3968350143625834425
 GameObject:
   m_ObjectHideFlags: 0
@@ -3832,6 +3907,8 @@ MonoBehaviour:
   markedLabel: {fileID: 8035866633779192067}
   correctColor: {r: 0.4, g: 0.85, b: 0.4, a: 0.85}
   wrongColor: {r: 0.85, g: 0.3, b: 0.3, a: 0.85}
+  correctLabel: "\uB9C8\uB140!"
+  wrongLabel: X
 --- !u!1 &4544392462319035786
 GameObject:
   m_ObjectHideFlags: 0
@@ -4329,6 +4406,8 @@ MonoBehaviour:
   markedLabel: {fileID: 8091174314182296099}
   correctColor: {r: 0.4, g: 0.85, b: 0.4, a: 0.85}
   wrongColor: {r: 0.85, g: 0.3, b: 0.3, a: 0.85}
+  correctLabel: "\uB9C8\uB140!"
+  wrongLabel: X
 --- !u!1 &5231438010461197858
 GameObject:
   m_ObjectHideFlags: 0
@@ -4675,6 +4754,8 @@ MonoBehaviour:
   markedLabel: {fileID: 6153096965653622924}
   correctColor: {r: 0.4, g: 0.85, b: 0.4, a: 0.85}
   wrongColor: {r: 0.85, g: 0.3, b: 0.3, a: 0.85}
+  correctLabel: "\uB9C8\uB140!"
+  wrongLabel: X
 --- !u!1 &5555366682658933578
 GameObject:
   m_ObjectHideFlags: 0
@@ -5109,6 +5190,8 @@ MonoBehaviour:
   markedLabel: {fileID: 7646809727196989289}
   correctColor: {r: 0.4, g: 0.85, b: 0.4, a: 0.85}
   wrongColor: {r: 0.85, g: 0.3, b: 0.3, a: 0.85}
+  correctLabel: "\uB9C8\uB140!"
+  wrongLabel: X
 --- !u!1 &5891850646061411937
 GameObject:
   m_ObjectHideFlags: 0
@@ -5529,6 +5612,8 @@ MonoBehaviour:
   markedLabel: {fileID: 5335144762445127405}
   correctColor: {r: 0.4, g: 0.85, b: 0.4, a: 0.85}
   wrongColor: {r: 0.85, g: 0.3, b: 0.3, a: 0.85}
+  correctLabel: "\uB9C8\uB140!"
+  wrongLabel: X
 --- !u!1 &7161540829708794605
 GameObject:
   m_ObjectHideFlags: 0
@@ -6113,6 +6198,8 @@ MonoBehaviour:
   markedLabel: {fileID: 4228698589747834509}
   correctColor: {r: 0.4, g: 0.85, b: 0.4, a: 0.85}
   wrongColor: {r: 0.85, g: 0.3, b: 0.3, a: 0.85}
+  correctLabel: "\uB9C8\uB140!"
+  wrongLabel: X
 --- !u!1 &7806964265530487329
 GameObject:
   m_ObjectHideFlags: 0
@@ -7114,55 +7201,3 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!1 &8800000011
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 8800000012}
-  - component: {fileID: 8800000013}
-  m_Layer: 0
-  m_Name: Sfx_Clear
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &8800000012
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8800000011}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 118820455176514959}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8800000013
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8800000011}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d3a92c7b18f4e5480a2c93de17f4b60, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SfxPlayer
-  clips:
-  - {fileID: 8300000, guid: 2caa4e52e8426d248907a6507730d58f, type: 3}
-  volume: 1
-  pitch: 1
-  pitchJitter: 0.0
-  minInterval: 0.0
-  stepPitchRise: 0.03
-  stepPitchCap: 0.5

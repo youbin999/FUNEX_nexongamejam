@@ -154,7 +154,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
-  m_Children:
+  m_Children: []
   m_Father: {fileID: 7947990104756543968}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -457,8 +457,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b2e47d1c05a4f3ea9d6104b7e35c281, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpannerMiniGame
-  gameDescription: "\uC2A4\uD328\uB108\uB97C \uB3CC\uB824\uB77C!"
+  gameDescription: "\uB3CC\uB824\uB77C!"
   keyboardGuides: []
+  failurePenaltyPrefab: {fileID: 0}
+  failureShakeDuration: 0.4
+  failureShakeAmplitude: 0.35
   pivot: {fileID: 5784042407714050566}
   clearTurns: 1
   timeLimit: 5

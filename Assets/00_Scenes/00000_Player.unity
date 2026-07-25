@@ -588,6 +588,17 @@ MonoBehaviour:
     successVisual: 
     failureVisual: 
     visualWeight: 5
+  - prefab: {fileID: 4870077937529432869, guid: 7965430b867292849b305bb0d48c5182, type: 3}
+    kind: 0
+    era: 3
+    borderSprite: {fileID: 0}
+    eraYearText: 
+    eventLabel: 
+    successMeaning: 
+    failureMeaning: 
+    successVisual: 
+    failureVisual: 
+    visualWeight: 5
   - prefab: {fileID: 7396776103939382718, guid: a346cefd652deac4facead9bd56e1350, type: 3}
     kind: 2
     era: 3
@@ -621,6 +632,19 @@ MonoBehaviour:
     eventLabel: 
     successMeaning: 
     failureMeaning: 
+    successVisual: 
+    failureVisual: 
+    visualWeight: 5
+  - prefab: {fileID: 4657186777680439362, guid: 0e5158902dad44f1896b9e200df9e1dd, type: 3}
+    kind: 1
+    era: 4
+    borderSprite: {fileID: 0}
+    eraYearText: 
+    eventLabel: 
+    successMeaning: "\uD398\uB2C8\uC2E4\uB9B0\uC758 \uBC1C\uBA85\uC73C\uB85C \uD604\uB300
+      \uC758\uD559\uC774 \uBC1C\uC804\uD560 \uC218 \uC788\uC5C8\uB2E4."
+    failureMeaning: "\uD56D\uC0DD\uC81C\uC758 \uBD80\uC7AC\uB85C \uC778\uD574 \uC778\uB958\uC758
+      \uD3C9\uADE0 \uC218\uBA85\uC774 \uB2E8\uCD95\uB418\uC5C8\uB2E4."
     successVisual: 
     failureVisual: 
     visualWeight: 5
@@ -1038,7 +1062,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1024, y: 256}
+  m_SizeDelta: {x: 1500, y: 512}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1494011300
 MonoBehaviour:
@@ -1087,12 +1111,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 204.2
-  m_fontSizeBase: 204.2
+  m_fontSize: 170
+  m_fontSizeBase: 170
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 100
+  m_fontSizeMax: 170
   m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -1104,7 +1128,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 0
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}

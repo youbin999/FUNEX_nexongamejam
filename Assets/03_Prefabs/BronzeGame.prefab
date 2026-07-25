@@ -1879,7 +1879,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90620b3dfdb56624ca9340e49b0c1ee6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BronzeSmeltMiniGame
-  gameDescription: "\uC740\uBC31\uC0C9 \uAD6C\uAC04\uC5D0\uC11C \uC2A4\uD398\uC774\uC2A4!"
+  gameDescription: "\uC628\uB3C4\uB97C \uB9DE\uCDB0\uB77C!"
   keyboardGuides:
   - actionLabel: 
     keys: 01000000

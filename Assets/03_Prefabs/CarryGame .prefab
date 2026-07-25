@@ -140,7 +140,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f8b40d17ac36e849b5210cf3d7a64e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarryMiniGame
-  gameDescription: "\uB52E\uD600\uB77C"
+  gameDescription: "\uB365\uD600\uB77C"
   keyboardGuides:
   - actionLabel: 
     keys: 01000000
@@ -728,7 +728,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
-  m_Children:
+  m_Children: []
   m_Father: {fileID: 6896214138385303286}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}

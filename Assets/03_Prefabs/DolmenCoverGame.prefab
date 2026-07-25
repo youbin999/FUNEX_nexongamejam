@@ -174,7 +174,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: 0.7431539}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -184,7 +184,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 18, y: 10.5}
+  m_Size: {x: 18, y: 9.013692}
   m_EdgeRadius: 0
 --- !u!1 &850419060467917687
 GameObject:
@@ -239,7 +239,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31cc66d2f69e42d7b2bbc559e0cabf0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DolmenCoverMiniGame
-  gameDescription: "\uACE0\uC778\uB3CC\uC744 \uB36E\uC5B4\uB77C!"
+  gameDescription: "\uB36E\uC5B4\uB77C!"
   keyboardGuides:
   - actionLabel: 
     keys: 250000000f0000002100000012000000
@@ -250,24 +250,15 @@ MonoBehaviour:
   onTimerChanged:
     m_PersistentCalls:
       m_Calls: []
-  supportStones:
-  - {fileID: 5170968897260707192}
-  - {fileID: 1423838103162538274}
   coverStone: {fileID: 3404901254190453097}
   allStones:
   - {fileID: 5170968897260707192}
   - {fileID: 1423838103162538274}
   - {fileID: 3404901254190453097}
-  controlForce: 28
+  controlForce: 175
   maxControlSpeed: 4.2
-  maxCoverTilt: 16
-  maxSupportTilt: 13
-  stableDuration: 0.25
-  finalCheckLeadTime: 0.08
   failureBounds: {fileID: 4607460082625311077}
   screenBoundaryMargin: 0.25
-  fallbackFailureHeight: -5
-  physicsFailureDelay: 0.5
   onClear:
     m_PersistentCalls:
       m_Calls:
