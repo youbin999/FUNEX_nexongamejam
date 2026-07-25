@@ -59,6 +59,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HackMiniGame
   gameDescription: "\uB204\uB974\uC9C0\uB9C8!"
+  keyboardGuides: []
+  failurePenaltyPrefab: {fileID: 0}
+  failureShakeDuration: 0.4
+  failureShakeAmplitude: 0.35
   timeLimit: 5
   onTimerChanged:
     m_PersistentCalls:
@@ -323,7 +327,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5500000041
 Transform:
   m_ObjectHideFlags: 0
@@ -414,7 +418,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5500000051
 Transform:
   m_ObjectHideFlags: 0
@@ -505,7 +509,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5500000061
 Transform:
   m_ObjectHideFlags: 0
@@ -596,7 +600,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5500000071
 Transform:
   m_ObjectHideFlags: 0
@@ -687,7 +691,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5500000081
 Transform:
   m_ObjectHideFlags: 0
@@ -778,7 +782,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5500000091
 Transform:
   m_ObjectHideFlags: 0
@@ -869,7 +873,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7138350517995994081
 Transform:
   m_ObjectHideFlags: 0
@@ -1035,7 +1039,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3945577613599247924
 Transform:
   m_ObjectHideFlags: 0

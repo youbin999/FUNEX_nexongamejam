@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// MiniGamePlayer 를 제어하여 인스펙터에 등록된 미니게임들을 순서대로 재생하는 게임 흐름 컨트롤러.
@@ -16,14 +17,56 @@ public class GameFlowController : MonoBehaviour
         [Tooltip("재생할 미니게임 프리팹. player 쪽에는 따로 등록할 필요 없다 — Start 시점에 이 목록이 자동으로 주입된다")]
         public MiniGame prefab;
 
-        [Tooltip("체크하면 이 게임 실패 시 즉시 게임 엔딩으로 진행한다")]
-        public bool isCritical;
+        [Tooltip("미니게임의 서사적 성격.\n" +
+            "Normal: 실패해도 아무 영향 없음\n" +
+            "Change: 실패해도 흐름은 이어지지만 엔딩 서사·엔딩 이미지에 반영됨\n" +
+            "Critical: 실패 시 즉시 엔딩으로 이동")]
+        public MiniGameKind kind = MiniGameKind.Normal;
+
+        [Tooltip("이 게임이 속한 시대")]
+        public Era era = Era.Prehistoric;
 
         [Tooltip("이 게임 시작 시 GameBorder 에 적용할 시대 테마 스프라이트. 비워두면 기존 테마를 유지한다")]
         public Sprite borderSprite;
 
-        [Tooltip("시대 테마가 바뀔 때 표시할 연도 문구. borderSprite 가 지정된 엔트리에서만 사용한다")]
         public string eraYearText;
+
+        [Header("엔딩 맥락 (Change: 성공/실패 모두 반영, Critical: 실패 시 failureMeaning만 반영)")]
+        [Tooltip("사건 이름. 예: '마녀사냥에서 마녀를 색출'")]
+        public string eventLabel;
+
+        [Tooltip("성공했을 때의 역사적 의미(한국어). 크레딧 문장의 재료 (Change 전용)")]
+        [TextArea(2, 4)] public string successMeaning;
+
+        [Tooltip("실패했을 때의 역사적 의미(한국어). 크레딧 문장의 재료.\n" +
+            "Change: 크레딧 본문에 그대로 삽입됨\n" +
+            "Critical: 흐름 중단 서사에 반영됨(RunResult.EndedFailureMeaning)")]
+        [TextArea(2, 4)] public string failureMeaning;
+
+        [Tooltip("성공했을 때 엔딩 이미지에 들어갈 시각 요소(영문 구절).\n" +
+            "예: a witch burned at the stake, shown only as a faded illustration in a children's storybook")]
+        [TextArea(2, 4)] public string successVisual;
+
+        [Tooltip("실패했을 때 엔딩 이미지에 들어갈 시각 요소(영문 구절).\n" +
+            "예: a young witch in a modern school uniform sitting among ordinary students")]
+        [TextArea(2, 4)] public string failureVisual;
+
+        [Tooltip("서사 비중. 높을수록 엔딩 이미지 전경에 배치되도록 유도한다")]
+        [Range(0, 10)] public int visualWeight = 5;
+
+        /// <summary>실패 시 즉시 엔딩으로 가야 하는 게임인지.</summary>
+        public bool IsCritical => kind == MiniGameKind.Critical;
+
+        /// <summary>결과에 따라 이 항목을 엔딩 재료(<see cref="MiniGameOutcome"/>)로 변환한다.</summary>
+        public MiniGameOutcome ToOutcome(bool success) => new MiniGameOutcome
+        {
+            eventLabel = string.IsNullOrWhiteSpace(eventLabel) && prefab != null ? prefab.name : eventLabel,
+            era = era.ToKorean(),
+            success = success,
+            meaning = success ? successMeaning : failureMeaning,
+            visual = success ? successVisual : failureVisual,
+            visualWeight = visualWeight,
+        };
     }
 
     [Header("참조")]
@@ -36,6 +79,10 @@ public class GameFlowController : MonoBehaviour
     [Header("옵션")]
     [Tooltip("Start 에서 자동으로 흐름을 시작한다")]
     [SerializeField] private bool playOnStart = true;
+
+    [Header("엔딩")]
+    [Tooltip("크리티컬 실패 또는 모든 미니게임 완료 시 전환할 엔딩 씬 이름")]
+    [SerializeField] private string endingSceneName = "99_Ending";
 
     [Header("이벤트")]
     [Tooltip("크리티컬 게임 실패 시 발화. 게임 엔딩 씬 전환 등에 연결한다")]
@@ -100,8 +147,18 @@ public class GameFlowController : MonoBehaviour
     /// <summary>처음부터 등록된 순서대로 게임 흐름을 시작한다.</summary>
     public void StartFlow()
     {
+        if (player != null)
+        {
+            player.StopCurrent();
+            player.ClearFailurePenalties();
+        }
+
         ended = false;
         currentIndex = -1;
+
+        // 재시작 시 이전 판의 엔딩 재료가 섞이지 않도록 비운다.
+        RunResult.Instance.Clear();
+
         PlayNext();
     }
 
@@ -113,6 +170,7 @@ public class GameFlowController : MonoBehaviour
         {
             ended = true;
             onAllGamesCleared.Invoke();
+            LoadEndingScene();
             return;
         }
 
@@ -134,13 +192,40 @@ public class GameFlowController : MonoBehaviour
             return;
 
         GameEntry entry = games[currentIndex];
-        if (!success && entry.isCritical)
+
+        // 변화 미니게임은 성공/실패 모두 엔딩 재료가 된다 — 실패만 기록하는 게 아니다.
+        if (entry.kind == MiniGameKind.Change)
+            RunResult.Instance.Record(entry.ToOutcome(success));
+
+        if (!success && entry.IsCritical)
         {
             ended = true;
+            RunResult.Instance.MarkEarlyEnding(entry.era.ToKorean(), entry.eventLabel, entry.failureMeaning);
             onGameEnding.Invoke();
+            LoadEndingScene();
             return;
         }
 
         PlayNext();
+    }
+
+    /// <summary>현재 판의 <see cref="RunResult"/>를 유지한 채 엔딩 씬으로 전환한다.</summary>
+    private void LoadEndingScene()
+    {
+        if (string.IsNullOrWhiteSpace(endingSceneName))
+        {
+            Debug.LogError("GameFlowController: 엔딩 씬 이름이 비어 있어 전환할 수 없습니다.", this);
+            return;
+        }
+
+        if (!Application.CanStreamedLevelBeLoaded(endingSceneName))
+        {
+            Debug.LogError(
+                $"GameFlowController: 엔딩 씬 '{endingSceneName}'을 로드할 수 없습니다. Build Settings 등록 여부를 확인하세요.",
+                this);
+            return;
+        }
+
+        SceneManager.LoadScene(endingSceneName);
     }
 }

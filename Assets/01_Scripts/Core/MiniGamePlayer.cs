@@ -33,6 +33,10 @@ public class MiniGamePlayer : MonoBehaviour
     [Tooltip("게임이 끝나면 (인스턴스, 성공 여부) 를 넘긴다. 이 통지 이후 인스턴스는 자동으로 초기화·비활성화된다")]
     public GameFinishedEvent onGameFinished;
 
+    [Header("실패 패널티")]
+    [Tooltip("실패 패널티를 생성하고 한 판 동안 보존할 관리자. 비워두면 패널티 대기 없이 종료한다.")]
+    [SerializeField] private FailurePenaltyController failurePenaltyController;
+
     [Header("게임 시작 프롬프트")]
     [Tooltip("설명과 키 가이드 표시를 담당하는 Presenter. 비워두면 프롬프트 없이 바로 게임을 시작한다")]
     [SerializeField] private MiniGameIntroPresenter introPresenter;
@@ -100,6 +104,10 @@ public class MiniGamePlayer : MonoBehaviour
     // 현재 진행 중인 트랜지션(페이드/보더) 코루틴. StopCurrent() 로 중간에 취소할 수 있어야 한다.
     private Coroutine transitionRoutine;
 
+    // 실패 패널티 최초 연출 완료 콜백이 중단된 게임을 다시 종료시키지 못하게 막는 토큰.
+    private int finishSequence;
+    private MiniGame finishingInstance;
+
     // GameBorder 의 "확대(평상시)" 기준값. Awake 시점에 씬에 세팅된 값을 그대로 캐시한다.
     private Vector2 borderExpandedAnchoredPosition;
     private Vector2 borderExpandedSizeDelta;
@@ -119,6 +127,9 @@ public class MiniGamePlayer : MonoBehaviour
 
     private void Awake()
     {
+        if (failurePenaltyController == null)
+            failurePenaltyController = GetComponent<FailurePenaltyController>();
+
         if (gameBorderRect != null)
         {
             borderExpandedAnchoredPosition = gameBorderRect.anchoredPosition;
@@ -474,6 +485,8 @@ public class MiniGamePlayer : MonoBehaviour
     /// <summary>현재 게임을 강제로 중단·초기화하고 비활성화한다. (onGameFinished 는 발화하지 않는다)</summary>
     public void StopCurrent()
     {
+        CancelPendingFinish();
+
         if (transitionRoutine != null)
         {
             StopCoroutine(transitionRoutine);
@@ -500,6 +513,15 @@ public class MiniGamePlayer : MonoBehaviour
         CleanupInstance(instance);
     }
 
+    /// <summary>현재 한 판에 누적된 실패 패널티를 모두 제거한다.</summary>
+    public void ClearFailurePenalties()
+    {
+        CancelPendingFinish();
+
+        if (failurePenaltyController != null)
+            failurePenaltyController.ClearAll();
+    }
+
     /// <summary>
     /// 게임 종료 통지 수신. Current 를 먼저 비운 뒤 onGameFinished 를 발화한다.
     /// 인스턴스 정리는 즉시 하지 않고 pendingCleanup 에 보관한다 — 화면 페이드아웃이
@@ -508,6 +530,34 @@ public class MiniGamePlayer : MonoBehaviour
     /// 않았다면(흐름 종료 등) 아래에서 즉시 정리해 인스턴스가 방치되지 않게 한다.
     /// </summary>
     private void OnGameFinished(MiniGame instance, bool success)
+    {
+        if (!success && failurePenaltyController != null &&
+            instance != null && instance.FailurePenaltyPrefab != null)
+        {
+            finishingInstance = instance;
+            int sequence = ++finishSequence;
+
+            bool started = failurePenaltyController.Apply(
+                instance.FailurePenaltyPrefab,
+                () => CompletePenalizedFailure(instance, sequence));
+
+            if (started)
+                return;
+        }
+
+        CompleteGameFinished(instance, success);
+    }
+
+    private void CompletePenalizedFailure(MiniGame instance, int sequence)
+    {
+        if (sequence != finishSequence || finishingInstance != instance)
+            return;
+
+        finishingInstance = null;
+        CompleteGameFinished(instance, false);
+    }
+
+    private void CompleteGameFinished(MiniGame instance, bool success)
     {
         // Invoke 이전에 Current 를 먼저 비워서, 콜백 안에서 즉시 다음 게임을 재생해도(재진입)
         // IsPlaying 가드에 걸려 PlayGame 이 막히지 않도록 한다.
@@ -522,6 +572,12 @@ public class MiniGamePlayer : MonoBehaviour
             CleanupInstance(instance);
             pendingCleanup = null;
         }
+    }
+
+    private void CancelPendingFinish()
+    {
+        finishSequence++;
+        finishingInstance = null;
     }
 
     /// <summary>인스턴스를 초기화·비활성화하고 구독을 해제한 뒤 프리로드 풀로 되돌린다.</summary>

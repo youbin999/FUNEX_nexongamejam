@@ -623,6 +623,7 @@ MonoBehaviour:
   keyboardGuides:
   - actionLabel: 
     keys: 2500000021000000
+  failurePenaltyPrefab: {fileID: 7412580364119003003, guid: 34877292998d1dc6479c14e5e2b35f71, type: 3}
   shovel: {fileID: 3677015501937976361}
   groundRenderer: {fileID: 566052060958295606}
   groundStages:

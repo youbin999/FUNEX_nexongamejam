@@ -134,6 +134,7 @@ MonoBehaviour:
   keyboardGuides:
   - actionLabel: ''
     keys: 250000000f0000002100000012000000
+  failurePenaltyPrefab: {fileID: 2056246690226794063, guid: 8f72d278920e4d942965c6b5a6d687f5, type: 3}
   timeLimit: 8
   onTimerChanged:
     m_PersistentCalls:
@@ -167,6 +168,7 @@ MonoBehaviour:
   failureBounds: {fileID: 4607460082625311077}
   screenBoundaryMargin: 0.25
   fallbackFailureHeight: -5
+  physicsFailureDelay: 0.5
   onClear:
     m_PersistentCalls:
       m_Calls:
