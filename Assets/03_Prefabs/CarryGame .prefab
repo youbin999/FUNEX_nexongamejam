@@ -126,6 +126,8 @@ Transform:
   - {fileID: 8907895245708172545}
   - {fileID: 4351802605055491372}
   - {fileID: 8773515771083356681}
+  - {fileID: 1010000000000000002}
+  - {fileID: 1010000000000000012}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7810906958207532481
@@ -140,7 +142,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f8b40d17ac36e849b5210cf3d7a64e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarryMiniGame
-  gameDescription: "\uB365\uD600\uB77C"
+  gameDescription: "\uB365\uD600\uB77C!"
   keyboardGuides:
   - actionLabel: 
     keys: 01000000
@@ -169,7 +171,19 @@ MonoBehaviour:
   targetCamera: {fileID: 0}
   onMash:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1010000000000000003}
+        m_TargetAssemblyTypeName: SfxPlayer, Assembly-CSharp
+        m_MethodName: PlayStep
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   onProgressChanged:
     m_PersistentCalls:
       m_Calls:
@@ -193,10 +207,130 @@ MonoBehaviour:
       m_Calls: []
   onClear:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1010000000000000013}
+        m_TargetAssemblyTypeName: SfxPlayer, Assembly-CSharp
+        m_MethodName: Play
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   onFail:
     m_PersistentCalls:
       m_Calls: []
+--- !u!1 &1010000000000000001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1010000000000000002}
+  - component: {fileID: 1010000000000000003}
+  m_Layer: 0
+  m_Name: Sfx_Mash
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1010000000000000002
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1010000000000000001}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6896214138385303286}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1010000000000000003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1010000000000000001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d3a92c7b18f4e5480a2c93de17f4b60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SfxPlayer
+  clips:
+  - {fileID: 8300000, guid: 37b6b6929193259428b1be5e537f9b8c, type: 3}
+  volume: 1
+  pitch: 1
+  pitchJitter: 0.05
+  minInterval: 0.05
+  stepPitchRise: 0.03
+  stepPitchCap: 0.4
+  stopOnDisable: 1
+  stopFadeDuration: 0.1
+--- !u!1 &1010000000000000011
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1010000000000000012}
+  - component: {fileID: 1010000000000000013}
+  m_Layer: 0
+  m_Name: Sfx_Clear
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1010000000000000012
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1010000000000000011}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6896214138385303286}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1010000000000000013
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1010000000000000011}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d3a92c7b18f4e5480a2c93de17f4b60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SfxPlayer
+  clips:
+  - {fileID: 8300000, guid: e1a7ea9718ffa544db44545d96656ceb, type: 3}
+  volume: 1
+  pitch: 1
+  pitchJitter: 0
+  minInterval: 0
+  stepPitchRise: 0.03
+  stepPitchCap: 0.5
+  stopOnDisable: 1
+  stopFadeDuration: 0.1
 --- !u!1 &3508411080310977178
 GameObject:
   m_ObjectHideFlags: 0
