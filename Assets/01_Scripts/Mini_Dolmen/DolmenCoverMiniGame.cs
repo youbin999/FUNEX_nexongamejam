@@ -45,6 +45,9 @@ public sealed class DolmenCoverMiniGame : TimedMiniGame
     private bool failureReported;
     private State state = State.Idle;
 
+    // Update 에서 읽어둔 조작 방향. 실제 힘은 물리 스텝(FixedUpdate)에서 가한다.
+    private Vector2 controlDirection;
+
     private void Awake()
     {
         targetCamera = Camera.main;
@@ -73,10 +76,23 @@ public sealed class DolmenCoverMiniGame : TimedMiniGame
         if (state != State.Playing)
             return;
 
-        ApplyCoverControl();
+        SampleCoverControl();
 
         if (IsCoverTouchingBorder())
             FailForBorderContact();
+    }
+
+    /// <summary>
+    /// 힘은 프레임이 아니라 물리 스텝 단위로 가한다.
+    /// Update 에서 AddForce 를 호출하면 프레임률이 떨어질 때 가속도까지 같이 느려진다.
+    /// </summary>
+    private void FixedUpdate()
+    {
+        if (state != State.Playing || !IsPlaying)
+            return;
+
+        if (coverStone != null)
+            coverStone.ApplyControlForce(controlDirection, controlForce, maxControlSpeed);
     }
 
     protected override void OnTimeUp()
@@ -88,6 +104,7 @@ public sealed class DolmenCoverMiniGame : TimedMiniGame
     private void ResetInternal(bool enablePhysics)
     {
         failureReported = false;
+        controlDirection = Vector2.zero;
 
         if (allStones == null)
             return;
@@ -103,10 +120,10 @@ public sealed class DolmenCoverMiniGame : TimedMiniGame
         }
     }
 
-    private void ApplyCoverControl()
+    /// <summary>키 입력을 읽어 조작 방향만 갱신한다. 놓친 입력이 없도록 매 프레임 샘플링한다.</summary>
+    private void SampleCoverControl()
     {
-        if (coverStone == null)
-            return;
+        controlDirection = Vector2.zero;
 
         Keyboard keyboard = Keyboard.current;
         if (keyboard == null)
@@ -123,7 +140,7 @@ public sealed class DolmenCoverMiniGame : TimedMiniGame
         if (direction.sqrMagnitude > 1f)
             direction.Normalize();
 
-        coverStone.ApplyControlForce(direction, controlForce, maxControlSpeed);
+        controlDirection = direction;
     }
 
     private bool IsCoverTouchingBorder()
