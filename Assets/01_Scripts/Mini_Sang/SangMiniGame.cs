@@ -107,6 +107,11 @@ public class SangMiniGame : TimedMiniGame
     [Tooltip("결과를 보여준 뒤 종료까지 유지하는 시간(초)")]
     [SerializeField] private float resultHoldDuration = 0.9f;
 
+    [Header("긋는 소리")]
+    [Tooltip("긋는 동안 계속 재생할 AudioSource. 이 프리팹 안에 두어야 게임이 끝나면 같이 멈춘다.\n" +
+        "Loop 를 켜 두고, 마우스를 누르고 있는 동안에만 재생된다")]
+    [SerializeField] private AudioSource drawLoopSource;
+
     [Header("이벤트")]
     [Tooltip("진행 비율(0~1)을 넘긴다. Image.fillAmount 등에 연결")]
     public ProgressEvent onProgressChanged;
@@ -163,6 +168,7 @@ public class SangMiniGame : TimedMiniGame
     {
         progressIndex = -1;
         dragging = false;
+        StopDrawSound();
 
         // 점·선을 다시 보이게 하고 색을 초기화한다.
         SetDotsVisible(true);
@@ -185,6 +191,22 @@ public class SangMiniGame : TimedMiniGame
         HideThumb(failThumb);
 
         onProgressChanged.Invoke(0f);
+    }
+
+    /// <summary>긋는 소리를 시작한다. 이미 재생 중이면 그대로 둔다.</summary>
+    private void StartDrawSound()
+    {
+        if (drawLoopSource == null || drawLoopSource.isPlaying)
+            return;
+
+        drawLoopSource.Play();
+    }
+
+    /// <summary>긋는 소리를 멈춘다. 멱등.</summary>
+    private void StopDrawSound()
+    {
+        if (drawLoopSource != null && drawLoopSource.isPlaying)
+            drawLoopSource.Stop();
     }
 
     /// <summary>점(과 궤적 선)을 통째로 보이거나 숨긴다. 둘 다 dotContainer 아래에 있다.</summary>
@@ -227,15 +249,21 @@ public class SangMiniGame : TimedMiniGame
         if (!dragging)
         {
             if (pressed)
+            {
                 dragging = true;
+                StartDrawSound();
+            }
             else
+            {
                 return;
+            }
         }
 
         // 드래그 중 손을 떼면 그 순간의 진행 비율로 즉시 판정한다.
         if (released || !isPressed)
         {
             dragging = false;
+            StopDrawSound();
             EvaluateAndResolve();
             return;
         }
@@ -295,6 +323,7 @@ public class SangMiniGame : TimedMiniGame
 
         state = State.Resolved;
         dragging = false;
+        StopDrawSound();
 
         if (success)
             onClear.Invoke();
