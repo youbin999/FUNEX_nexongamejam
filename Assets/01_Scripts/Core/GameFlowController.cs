@@ -28,6 +28,8 @@ public class GameFlowController : MonoBehaviour
         [Tooltip("이 게임 시작 시 GameBorder 에 적용할 시대 테마 스프라이트. 비워두면 기존 테마를 유지한다")]
         public Sprite borderSprite;
 
+        public string eraYearText;
+
         [Header("엔딩 맥락 (Change 일 때만 사용)")]
         [Tooltip("사건 이름. 예: '마녀사냥에서 마녀를 색출'")]
         public string eventLabel;
