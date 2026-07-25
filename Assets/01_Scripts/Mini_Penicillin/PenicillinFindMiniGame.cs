@@ -399,14 +399,18 @@ public class PenicillinFindMiniGame : TimedMiniGame
     }
 
     /// <summary>
-    /// 실패 연출: 페니가 통통 튀며 팝아웃된다. 그리드는 그대로 둔다 —
-    /// 잘못 고른 접시에 뜬 X 표시가 보여야 왜 실패했는지 알 수 있다.
+    /// 실패 연출: 그리드가 사라지고 페니가 통통 튀며 팝아웃된다.
+    /// 클리어와 마찬가지로 접시 그리드는 통째로 걷어낸다 — 페니만 화면에 남아야 결과가 또렷하다.
     ///
     /// 실패는 <see cref="MiniGame.ReportFinished"/> 가 즉시 통지하므로 화면에 남는 시간이 길지 않다.
     /// 오래 보여주려면 프리팹에 failurePenaltyPrefab 을 물려 정리를 미루는 쪽이 맞다.
     /// </summary>
     private IEnumerator FailPopRoutine()
     {
+        // 페니 배선이 비어 있어도 그리드는 걷는다. 아래 조기 반환보다 먼저 처리해야 한다.
+        if (gridRoot != null)
+            gridRoot.SetActive(false);
+
         if (feniFailRenderer == null)
             yield break;
 
