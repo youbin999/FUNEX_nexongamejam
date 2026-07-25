@@ -38,6 +38,15 @@ public abstract class TimedMiniGame : MiniGame
     /// <summary>성공/실패가 이미 확정되어 더 이상 입력을 받지 않는 상태인지.</summary>
     protected bool ResultLocked => resultLocked;
 
+    /// <summary>
+    /// 성공 통지를 내보내도 되는지. false 인 동안에는 제한 시간이 다 차도 통지를 미룬다.
+    /// 클리어 연출이 남은 시간보다 길어질 수 있는 게임이 재정의한다 —
+    /// 통지 직후 <see cref="MiniGamePlayer"/> 가 화면을 덮기 시작하므로, 연출을 끝까지 보여주려면
+    /// 여기서 붙잡아야 한다. 기본은 true 라 재정의하지 않은 게임의 타이밍은 그대로다.
+    /// 반드시 언젠가 true 가 되어야 한다 — 계속 false 면 게임이 끝나지 않는다.
+    /// </summary>
+    protected virtual bool IsSuccessPresentationDone => true;
+
     protected sealed override void OnPlay()
     {
         ResetTimer();
@@ -69,7 +78,7 @@ public abstract class TimedMiniGame : MiniGame
 
         if (successPending)
         {
-            if (elapsed >= timeLimit)
+            if (elapsed >= timeLimit && IsSuccessPresentationDone)
                 ReportFinished(true);
             return;
         }

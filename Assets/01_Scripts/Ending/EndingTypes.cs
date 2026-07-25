@@ -16,30 +16,44 @@ public enum MiniGameKind
     Critical,
 }
 
-/// <summary>시대(스테이지) 구분.</summary>
+/// <summary>
+/// 시대(스테이지) 구분.
+/// 값(정수)이 곧 직렬화 데이터이므로 <b>순서를 바꾸거나 중간에 끼워 넣지 말 것</b> —
+/// 씬에 저장된 <c>era:</c> 숫자가 통째로 밀린다. 이름만 바꾸는 것은 안전하다.
+/// </summary>
 public enum Era
 {
     BigBang,
     Prehistoric,
-    Greek,
+
+    /// <summary>청동기 시대. 상형 문자·청동기·부력이 여기 묶여 있다(옛 이름: Greek).</summary>
+    BronzeAge,
+
     Medieval,
     Modern,
     Contemporary,
     Future,
 }
 
-/// <summary><see cref="Era"/> 를 프롬프트/자막에 쓸 한국어 이름으로 바꾼다.</summary>
+/// <summary>
+/// <see cref="Era"/> 를 프롬프트/자막에 쓸 한국어 이름으로 바꾼다.
+///
+/// <b>여기 적힌 이름이 곧 플레이어가 엔딩 크레딧에서 읽는 시대명이고, Gemini 프롬프트에 실리는 시대명이다.</b>
+/// 화면에 뜨는 시대 자막은 <c>GameFlowController.GameEntry.eraYearText</c> 가 따로 들고 있으므로,
+/// 둘 중 하나만 고치면 "화면에는 청동기 시대, 크레딧에는 고대 그리스"처럼 어긋난다.
+/// 아래 값은 현재 <c>00000_Player.unity</c> 의 자막과 일치시켜 둔 것이다 — 한쪽을 바꾸면 반드시 같이 바꾼다.
+/// </summary>
 public static class EraNames
 {
     private static readonly Dictionary<Era, string> Korean = new Dictionary<Era, string>
     {
         { Era.BigBang, "빅뱅" },
-        { Era.Prehistoric, "선사시대" },
-        { Era.Greek, "고대 그리스" },
-        { Era.Medieval, "중세" },
-        { Era.Modern, "근대" },
-        { Era.Contemporary, "현대" },
-        { Era.Future, "미래" },
+        { Era.Prehistoric, "석기시대" },
+        { Era.BronzeAge, "청동기 시대" },
+        { Era.Medieval, "중세 시대" },
+        { Era.Modern, "근대 시대" },
+        { Era.Contemporary, "현대 시대" },
+        { Era.Future, "미래 시대" },
     };
 
     public static string ToKorean(this Era era)

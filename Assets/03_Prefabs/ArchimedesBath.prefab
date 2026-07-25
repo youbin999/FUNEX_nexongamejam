@@ -304,7 +304,7 @@ MonoBehaviour:
   failurePenaltyPrefab: {fileID: 0}
   failureShakeDuration: 0.4
   failureShakeAmplitude: 0.35
-  timeLimit: 3.5
+  timeLimit: 5
   onTimerChanged:
     m_PersistentCalls:
       m_Calls: []
