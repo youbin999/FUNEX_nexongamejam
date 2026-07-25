@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// MiniGamePlayer 를 제어하여 인스펙터에 등록된 미니게임들을 순서대로 재생하는 게임 흐름 컨트롤러.
@@ -78,6 +79,10 @@ public class GameFlowController : MonoBehaviour
     [Header("옵션")]
     [Tooltip("Start 에서 자동으로 흐름을 시작한다")]
     [SerializeField] private bool playOnStart = true;
+
+    [Header("엔딩")]
+    [Tooltip("크리티컬 실패 또는 모든 미니게임 완료 시 전환할 엔딩 씬 이름")]
+    [SerializeField] private string endingSceneName = "99_Ending";
 
     [Header("이벤트")]
     [Tooltip("크리티컬 게임 실패 시 발화. 게임 엔딩 씬 전환 등에 연결한다")]
@@ -165,6 +170,7 @@ public class GameFlowController : MonoBehaviour
         {
             ended = true;
             onAllGamesCleared.Invoke();
+            LoadEndingScene();
             return;
         }
 
@@ -196,9 +202,30 @@ public class GameFlowController : MonoBehaviour
             ended = true;
             RunResult.Instance.MarkEarlyEnding(entry.era.ToKorean(), entry.eventLabel, entry.failureMeaning);
             onGameEnding.Invoke();
+            LoadEndingScene();
             return;
         }
 
         PlayNext();
+    }
+
+    /// <summary>현재 판의 <see cref="RunResult"/>를 유지한 채 엔딩 씬으로 전환한다.</summary>
+    private void LoadEndingScene()
+    {
+        if (string.IsNullOrWhiteSpace(endingSceneName))
+        {
+            Debug.LogError("GameFlowController: 엔딩 씬 이름이 비어 있어 전환할 수 없습니다.", this);
+            return;
+        }
+
+        if (!Application.CanStreamedLevelBeLoaded(endingSceneName))
+        {
+            Debug.LogError(
+                $"GameFlowController: 엔딩 씬 '{endingSceneName}'을 로드할 수 없습니다. Build Settings 등록 여부를 확인하세요.",
+                this);
+            return;
+        }
+
+        SceneManager.LoadScene(endingSceneName);
     }
 }

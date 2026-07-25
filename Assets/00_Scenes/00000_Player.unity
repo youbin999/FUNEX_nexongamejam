@@ -608,8 +608,8 @@ MonoBehaviour:
     kind: 2
     era: 4
     borderSprite: {fileID: 0}
-    eraYearText: "\uC804\uAD6C\uC758 \uBC1C\uBA85"
-    eventLabel: 
+    eraYearText: 
+    eventLabel: "\uC804\uAD6C\uC758 \uBC1C\uBA85"
     successMeaning: 
     failureMeaning: "\uC804\uAD6C\uB97C \uBC1C\uBA85\uD558\uC9C0 \uBABB\uD574 \uC778\uB958\uB294
       \uCE60\uD759\uAC19\uC740 \uBC24\uC744 \uC815\uBCF5\uD558\uC9C0 \uBABB\uD588\uB2E4."
@@ -692,6 +692,7 @@ MonoBehaviour:
     failureVisual: earth is fulled with trash
     visualWeight: 4
   playOnStart: 1
+  endingSceneName: 99_Ending
   onGameEnding:
     m_PersistentCalls:
       m_Calls: []
