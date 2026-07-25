@@ -19,6 +19,10 @@ public sealed class GalleryDetailView : MonoBehaviour
     [Header("텍스트")]
     [SerializeField] private TMP_Text creditText;
     [SerializeField] private TMP_Text epilogueText;
+
+    [Tooltip("world 이름 전용 라벨. 비워두면 이름이 날짜 줄 앞에 붙는다")]
+    [SerializeField] private TMP_Text nameText;
+
     [SerializeField] private TMP_Text dateText;
 
     [Tooltip("크레딧이 길 때 위에서부터 보이도록 되감을 스크롤. 없어도 동작한다")]
@@ -53,8 +57,14 @@ public sealed class GalleryDetailView : MonoBehaviour
                 epilogueText.text = entry.epilogue;
         }
 
+        if (nameText != null)
+            nameText.text = entry.DisplayName;
+
+        // 이름 라벨이 따로 없는(옛 구성) 패널에서는 날짜 줄이 이름까지 떠안는다.
         if (dateText != null)
-            dateText.text = entry.DisplayDate;
+            dateText.text = nameText != null
+                ? entry.DisplayDate
+                : $"{entry.DisplayName}\n{entry.DisplayDate}";
 
         gameObject.SetActive(true);
 

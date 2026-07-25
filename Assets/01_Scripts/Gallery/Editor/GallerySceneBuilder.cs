@@ -248,6 +248,9 @@ public static class GallerySceneBuilder
         var contentFitter = textContent.gameObject.AddComponent<ContentSizeFitter>();
         contentFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
+        TextMeshProUGUI worldName = AddText("Name", textContent, string.Empty, 40f, TextAlignmentOptions.TopLeft);
+        worldName.color = Ink;
+
         TextMeshProUGUI date = AddText("Date", textContent, string.Empty, 26f, TextAlignmentOptions.TopLeft);
         date.color = Accent;
 
@@ -268,6 +271,7 @@ public static class GallerySceneBuilder
             ("imageFitter", fitter),
             ("creditText", credit),
             ("epilogueText", epilogue),
+            ("nameText", worldName),
             ("dateText", date),
             ("creditScroll", creditScroll));
 
@@ -335,21 +339,33 @@ public static class GallerySceneBuilder
         RectTransform thumbRect = NewUI("Thumbnail", rect);
         thumbRect.anchorMin = new Vector2(0f, 0f);
         thumbRect.anchorMax = new Vector2(1f, 1f);
-        thumbRect.offsetMin = new Vector2(10f, 52f);
+        // 아래쪽 78px 은 이름 + 날짜 두 줄이 쓴다.
+        thumbRect.offsetMin = new Vector2(10f, 78f);
         thumbRect.offsetMax = new Vector2(-10f, -10f);
         var thumbnail = thumbRect.gameObject.AddComponent<RawImage>();
 
-        TextMeshProUGUI date = AddText("Date", rect, string.Empty, 24f, TextAlignmentOptions.Center);
+        TextMeshProUGUI worldName = AddText("Name", rect, string.Empty, 26f, TextAlignmentOptions.Center);
+        worldName.color = Ink;
+        worldName.textWrappingMode = TextWrappingModes.NoWrap;
+        worldName.overflowMode = TextOverflowModes.Ellipsis;
+        worldName.rectTransform.anchorMin = new Vector2(0f, 0f);
+        worldName.rectTransform.anchorMax = new Vector2(1f, 0f);
+        worldName.rectTransform.pivot = new Vector2(0.5f, 0f);
+        worldName.rectTransform.offsetMin = new Vector2(10f, 42f);
+        worldName.rectTransform.offsetMax = new Vector2(-10f, 76f);
+
+        TextMeshProUGUI date = AddText("Date", rect, string.Empty, 18f, TextAlignmentOptions.Center);
         date.color = Accent;
         date.rectTransform.anchorMin = new Vector2(0f, 0f);
         date.rectTransform.anchorMax = new Vector2(1f, 0f);
         date.rectTransform.pivot = new Vector2(0.5f, 0f);
-        date.rectTransform.offsetMin = new Vector2(10f, 10f);
-        date.rectTransform.offsetMax = new Vector2(-10f, 42f);
+        date.rectTransform.offsetMin = new Vector2(10f, 12f);
+        date.rectTransform.offsetMax = new Vector2(-10f, 38f);
 
         var view = go.AddComponent<GalleryItemView>();
         Wire(view,
             ("thumbnail", thumbnail),
+            ("nameLabel", worldName),
             ("dateLabel", date),
             ("button", button));
 

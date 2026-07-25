@@ -10,6 +10,10 @@ using UnityEngine.UI;
 public sealed class GalleryItemView : MonoBehaviour
 {
     [SerializeField] private RawImage thumbnail;
+
+    [Tooltip("플레이어가 붙인 world 이름. 비워두면 이름은 표시되지 않는다")]
+    [SerializeField] private TMP_Text nameLabel;
+
     [SerializeField] private TMP_Text dateLabel;
     [SerializeField] private Button button;
 
@@ -32,6 +36,9 @@ public sealed class GalleryItemView : MonoBehaviour
             thumbnail.texture = texture;
             thumbnail.enabled = texture != null;
         }
+
+        if (nameLabel != null)
+            nameLabel.text = entry != null ? entry.DisplayName : string.Empty;
 
         if (dateLabel != null)
             dateLabel.text = entry != null ? entry.DisplayDate : string.Empty;

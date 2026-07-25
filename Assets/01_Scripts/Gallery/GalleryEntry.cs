@@ -14,6 +14,12 @@ public class GalleryEntry
     /// <summary>저장 시각(ISO 8601, 로컬). 목록 정렬과 표시에 쓴다.</summary>
     public string savedAt;
 
+    /// <summary>
+    /// 플레이어가 엔딩 끝에서 직접 붙인 world 이름.
+    /// 이 필드가 없던 시절의 저장본은 JsonUtility 가 빈 문자열로 채운다 — 표시할 때만 폴백을 쓴다.
+    /// </summary>
+    public string worldName;
+
     /// <summary>images 폴더 안의 이미지 파일명.</summary>
     public string imageFile;
 
@@ -45,6 +51,10 @@ public class GalleryEntry
             return time == DateTime.MinValue ? string.Empty : time.ToString("yyyy.MM.dd HH:mm");
         }
     }
+
+    /// <summary>목록·상세에 표시할 이름. 이름 없이 저장된 옛 엔트리는 폴백 문구로 보인다.</summary>
+    public string DisplayName =>
+        string.IsNullOrWhiteSpace(worldName) ? "이름 없는 worla" : worldName;
 
     /// <summary>상세 화면에 그대로 뿌릴 크레딧 본문.</summary>
     public string CreditBody => creditLines == null ? string.Empty : string.Join("\n", creditLines);

@@ -3,6 +3,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 /// <summary>
@@ -13,10 +14,12 @@ using UnityEngine.UI;
 ///                      │
 ///   대본 도착 → 크레딧 롤 시작 ─┬─ (병렬) 이미지 생성 → 도착 시 배경에 페이드인
 ///                              │
-///   롤 종료 → 에필로그 표시 → (이미지 합류) → 갤러리 저장 → onCreditsFinished
+///   롤 종료 → 에필로그 표시 → (이미지 합류) → 이름 입력 탭 → 갤러리 저장 → onCreditsFinished → 갤러리 씬
 ///
 /// 이미지가 0초에 있을 필요가 없다는 점을 이용해, 생성 지연을 롤 시간에 흡수시킨다.
 /// 다만 갤러리에는 텍스트와 이미지가 한 쌍으로 들어가야 하므로, 저장 직전에 이미지 쪽을 합류시킨다.
+///
+/// 저장 시점이 "이름 확정 후"이므로, 탭을 띄운 채 게임을 끄면 그 판은 갤러리에 남지 않는다.
 /// </summary>
 public class EndingCreditController : MonoBehaviour
 {
@@ -35,6 +38,9 @@ public class EndingCreditController : MonoBehaviour
 
     [Tooltip("배경 이미지 페이드용 CanvasGroup. 비워두면 페이드 없이 즉시 표시된다")]
     [SerializeField] private CanvasGroup backgroundGroup;
+
+    [Tooltip("크레딧이 끝난 뒤 world 이름을 받는 탭. 비워두면 이름 없이 저장하고 넘어간다")]
+    [SerializeField] private WorldNamePrompt namePrompt;
 
     [Header("연출 타이밍")]
     [Tooltip("크레딧이 시작되기 전 암전 상태로 머무는 최소 시간(초). 대본이 더 빨리 와도 이만큼은 기다린다")]
@@ -74,8 +80,12 @@ public class EndingCreditController : MonoBehaviour
     [Tooltip("끄면 이번 엔딩을 갤러리에 남기지 않는다. 연출 테스트로 저장본이 지저분해질 때 끄면 된다")]
     [SerializeField] private bool saveToGallery = true;
 
+    [Header("종료 후")]
+    [Tooltip("이름 확정 뒤 넘어갈 씬 이름. 비워두면 씬을 옮기지 않는다. Build Settings 에 등록돼 있어야 한다")]
+    [SerializeField] private string gallerySceneName = "00000_Gallery";
+
     [Header("이벤트")]
-    [Tooltip("에필로그까지 끝나면 발화. 갤러리 표시나 타이틀 복귀에 연결한다")]
+    [Tooltip("에필로그·이름 입력까지 끝나면 발화. 씬 이동 직전에 불린다")]
     public UnityEvent onCreditsFinished;
 
     /// <summary>생성에 성공한 엔딩 이미지. 갤러리 저장에 그대로 쓴다. 실패했으면 null.</summary>
@@ -117,9 +127,44 @@ public class EndingCreditController : MonoBehaviour
         // 생성기에 타임아웃이 걸려 있어 무한정 기다리지는 않는다.
         yield return imaging;
 
-        SaveToGallery(script, result);
+        // 이름은 이미지를 보고 짓는 것이므로 이미지가 합류한 뒤에 물어본다.
+        string worldName = null;
+        yield return PromptForNameRoutine(n => worldName = n);
+
+        SaveToGallery(script, result, worldName);
 
         onCreditsFinished.Invoke();
+
+        GoToGallery();
+    }
+
+    /// <summary>
+    /// 이름 입력 탭을 띄우고 확정될 때까지 기다린다.
+    /// 탭이 없거나 저장 자체를 하지 않는 판이면 묻지 않고 그냥 통과한다 —
+    /// 저장되지 않을 이름을 받아봐야 갈 곳이 없다.
+    /// </summary>
+    private IEnumerator PromptForNameRoutine(Action<string> onResolved)
+    {
+        if (namePrompt == null || !saveToGallery || endingImage == null)
+            yield break;
+
+        bool done = false;
+        namePrompt.Show(endingImage, n =>
+        {
+            onResolved(n);
+            done = true;
+        });
+
+        yield return new WaitUntil(() => done);
+    }
+
+    /// <summary>이름을 확정하고 나면 갤러리로 넘어간다.</summary>
+    private void GoToGallery()
+    {
+        if (string.IsNullOrEmpty(gallerySceneName))
+            return;
+
+        SceneManager.LoadScene(gallerySceneName);
     }
 
     private void PrepareInitialState()
@@ -258,7 +303,7 @@ public class EndingCreditController : MonoBehaviour
     /// 이번 엔딩을 갤러리에 남긴다. 이미지가 없으면(생성 실패·폴백 모드) 저장하지 않는다 —
     /// 갤러리는 크레딧 텍스트와 이미지가 한 쌍일 때만 의미가 있다.
     /// </summary>
-    private void SaveToGallery(EndingScript script, RunResult result)
+    private void SaveToGallery(EndingScript script, RunResult result, string worldName)
     {
         if (!saveToGallery)
             return;
@@ -269,7 +314,7 @@ public class EndingCreditController : MonoBehaviour
             return;
         }
 
-        GalleryStore.Save(script, endingImage, result);
+        GalleryStore.Save(script, endingImage, result, worldName);
     }
 
     private void ShowEpilogue(string epilogue)

@@ -36,12 +36,16 @@ public static class GalleryStore
     /// </summary>
     public static IReadOnlyList<GalleryEntry> LoadAll() => LoadDatabase().entries;
 
+    /// <summary>이름 입력 칸의 글자 수 상한. UI 쪽 characterLimit 과 같은 값으로 맞춰둔다.</summary>
+    public const int MaxWorldNameLength = 20;
+
     /// <summary>
     /// 엔딩 한 편을 갤러리에 추가한다.
     /// 대본이나 이미지가 없으면 저장하지 않는다 — 갤러리는 텍스트와 이미지가 한 쌍일 때만 의미가 있다.
     /// </summary>
+    /// <param name="worldName">플레이어가 붙인 이름. 비워두면 이름 없는 엔트리로 남는다.</param>
     /// <returns>저장된 엔트리. 저장하지 못했으면 null.</returns>
-    public static GalleryEntry Save(EndingScript script, Texture2D image, RunResult result)
+    public static GalleryEntry Save(EndingScript script, Texture2D image, RunResult result, string worldName = null)
     {
         if (script == null || !script.IsValid)
         {
@@ -60,6 +64,7 @@ public static class GalleryStore
         {
             id = BuildId(combinationKey),
             savedAt = DateTime.Now.ToString("o"),
+            worldName = NormalizeWorldName(worldName),
             creditLines = script.credit_lines,
             epilogue = script.epilogue,
             combinationKey = combinationKey,
@@ -160,6 +165,27 @@ public static class GalleryStore
             Debug.LogWarning($"GalleryStore: 인덱스 저장 실패 — {e.Message}");
             return false;
         }
+    }
+
+    /// <summary>
+    /// 이름을 저장 가능한 형태로 다듬는다. 입력 UI 쪽 제한과 별개로 여기가 최종 방어선이다.
+    /// 개행·제어문자는 목록 레이아웃을 깨뜨리므로 공백으로 바꾸고, 길이는 상한에서 자른다.
+    /// 식별자·파일명에는 이름을 쓰지 않으므로 문자 종류 자체는 제한하지 않는다.
+    /// </summary>
+    private static string NormalizeWorldName(string raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw))
+            return string.Empty;
+
+        var builder = new System.Text.StringBuilder(raw.Length);
+        foreach (char c in raw)
+            builder.Append(char.IsControl(c) ? ' ' : c);
+
+        string trimmed = builder.ToString().Trim();
+
+        return trimmed.Length > MaxWorldNameLength
+            ? trimmed.Substring(0, MaxWorldNameLength).TrimEnd()
+            : trimmed;
     }
 
     /// <summary>시각 + 조합 키로 만드는 식별자. 파일명으로 쓰므로 영숫자와 언더스코어만 남긴다.</summary>
