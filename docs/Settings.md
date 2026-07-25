@@ -22,8 +22,13 @@ ESC 로 여닫는 설정 창을 **타이틀 씬에서 한 번 만들고, 그 뒤
 - **정렬 순서.** 플레이 씬의 공용 UI Canvas 는 Sorting Order 가 100 이라 설정 창 기본값(1)으로는
   뒤에 깔린다. `canvasSortingOrder`(기본 1000)로 올려서 항상 위에 그린다. 실패 패널티 오버레이도
   최대 100 이므로 전부 덮는다.
-- **중복.** 엔딩을 지나 타이틀로 돌아오면 씬에 놓인 `Setting_Canvas` 가 또 깨어난다.
-  먼저 따라온 인스턴스가 이미 있으므로 새로 깨어난 쪽이 스스로 `Destroy` 된다.
+- **중복 (타이틀 복귀).** 엔딩·갤러리를 지나 타이틀로 돌아오면 씬에 놓인 `Setting_Canvas` 가 또 깨어난다.
+  이때 새로 깨어난 쪽을 지우면 **타이틀의 SETTING 버튼이 죽는다** — 버튼 `OnClick` 이 씬 안의
+  `SettingsMenu` 컴포넌트를 직접 참조하고 있어서, 그 컴포넌트가 사라지면 눌러도 아무 일이 없다.
+  그래서 지우지 않고 **중계기(proxy)** 로 남긴다. 자기 패널은 즉시 감추고, `Open()`/`Close()`/
+  `Toggle()` 호출은 살아 있는 창으로 넘긴다. ESC 는 중계기가 보지 않는다(두 번 먹히면 열자마자 닫힌다).
+- **씬이 바뀌면 창을 닫는다.** 창을 연 채로 화면이 넘어가면 `Time.timeScale` 이 0인 채로 다음 씬이
+  시작해서 멈춘 것처럼 보인다. `sceneLoaded` 에서 열려 있으면 닫아 시간을 되돌린다.
 - **BGM 소스.** `AudioManager` 는 루트라서 잘 따라오지만, `bgmSource` 가 타이틀 씬의
   `Setting_manager` 에 있어서 소스만 씬과 함께 사라졌다. 이제 `BuildSources()` 가 계층 밖의
   소스를 자기 밑으로 데려오므로 BGM 도 플레이 씬까지 이어진다.
@@ -46,6 +51,15 @@ if (SettingsMenu.IsAnyOpen || SettingsMenu.EscapeConsumedThisFrame)
 
 `IsAnyOpen` 만 보면 안 된다 — ESC 로 창을 닫는 프레임에는 이미 `false` 라서 같은 입력이 두 번 먹힌다.
 `EscapeConsumedThisFrame` 이 그 프레임을 막아준다.
+
+### 글자를 치는 중일 때
+
+입력 칸(`TMP_InputField` / `InputField`)에 포커스가 있으면 ESC 는 설정 창을 열지 않는다
+(`ignoreEscapeWhileTyping`). 엔딩의 월드 이름 입력이 이 경우다 — 이름을 치다 ESC 를 누르면
+입력 칸이 포커스를 놓고, 설정 창은 뜨지 않는다. 포커스가 빠진 뒤 ESC 를 다시 누르면 그때 창이 열린다.
+
+`WorldNamePrompt` 는 `restoreOriginalTextOnEscape = false` 로 두어 ESC 에 쳐둔 이름이 날아가지 않게 한다
+(TMP 기본값은 원래 값으로 되돌리기라, 빈 칸에서 시작한 이름이 통째로 지워진다).
 
 ## BGM 넣는 자리
 
@@ -83,11 +97,14 @@ BGM 은 전부 [AudioManager](../Assets/01_Scripts/Settings/AudioManager.cs) 를
 타이틀·갤러리·엔딩처럼 씬 내내 한 곡이면 이걸 쓴다. 빈 오브젝트에 붙이고 클립만 꽂으면 끝이다.
 앞 씬과 같은 곡이면 끊지 않고 이어서 흐른다.
 
-타이틀은 지금 `AudioManager` 의 **Startup Bgm**(`Title.mp3`)으로 곡이 물려 있다. 다만 `AudioManager`
-는 씬을 넘어 살아남으므로 **Startup Bgm 은 게임을 켜고 딱 한 번만 돈다** — 엔딩을 지나 타이틀로
-돌아오면 마지막 시대 곡이 그대로 흐른다. 돌아올 때마다 타이틀 곡을 다시 틀고 싶으면
-`Startup Bgm` 을 비우고 타이틀 씬에 `SceneBgm` 을 붙여 `Title.mp3` 를 꽂으면 된다.
-(둘 다 쓰면 서로 곡을 밀어내니 씬당 하나만 쓴다)
+타이틀은 지금 `AudioManager` 의 **Startup Bgm**(`Title.mp3`)으로 곡이 물려 있다.
+
+`AudioManager` 는 씬을 넘어 살아남으므로 원래대로면 Startup Bgm 은 게임을 켜고 한 번만 돌고,
+엔딩·갤러리를 지나 타이틀로 돌아왔을 때 마지막 시대 곡이 그대로 흘러 버린다. 그래서 씬에서
+새로 깨어난 `AudioManager` 가 **자기 Startup Bgm 만 살아 있는 매니저에게 넘겨주고** 사라지도록 했다.
+타이틀로 돌아오면 타이틀 곡이 다시 겹쳐 들어온다. 씬마다 `AudioManager` 를 하나씩 놓고
+Startup Bgm 을 채워도 같은 방식으로 동작한다.
+(한 씬에서 `SceneBgm` 과 Startup Bgm 을 같이 쓰면 서로 곡을 밀어내니 씬당 하나만 쓴다)
 
 ### 3. 그 밖
 

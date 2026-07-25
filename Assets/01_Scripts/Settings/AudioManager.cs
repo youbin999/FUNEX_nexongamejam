@@ -97,6 +97,12 @@ public class AudioManager : MonoBehaviour
     {
         if (instance != null && instance != this)
         {
+            // 이미 따라온 매니저가 있다. 이 씬에 지정된 시작 곡만 넘겨주고 사라진다 —
+            // 엔딩·갤러리를 지나 타이틀로 돌아왔을 때 타이틀 곡이 다시 흐르게 하려는 것이다.
+            // (startupBgm 은 매니저가 씬을 넘어 살아남기 때문에 원래는 게임당 한 번만 돈다)
+            if (startupBgm != null)
+                instance.PlayBgm(startupBgm, startupBgmVolume, restartIfSame: false, fadeDuration: bgmFadeDuration);
+
             Destroy(gameObject);
             return;
         }

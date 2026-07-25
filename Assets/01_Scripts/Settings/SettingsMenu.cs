@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 /// <summary>
@@ -34,6 +36,9 @@ public class SettingsMenu : MonoBehaviour
 
     [Tooltip("ESC 로 열고 닫는다")]
     [SerializeField] private bool toggleWithEscape = true;
+
+    [Tooltip("글자 입력 칸에 포커스가 있는 동안에는 ESC 를 무시한다 (엔딩의 월드 이름 입력 등)")]
+    [SerializeField] private bool ignoreEscapeWhileTyping = true;
 
     [Tooltip("창이 열려 있는 동안 게임을 멈춘다 (Time.timeScale = 0)")]
     [SerializeField] private bool pauseWhileOpen = true;
@@ -73,11 +78,14 @@ public class SettingsMenu : MonoBehaviour
     private bool isOpen;
     private int escapeFrame = -1;
 
+    // 씬에 놓인 창이 이미 따라온 창과 겹칠 때, 이쪽은 중계기가 되어 저쪽에 일을 시킨다.
+    private SettingsMenu proxyTarget;
+
     /// <summary>지금 살아 있는 설정 창. 없으면 null.</summary>
     public static SettingsMenu Instance => instance;
 
     /// <summary>설정 창이 열려 있는지 여부. 다른 스크립트에서 입력을 막을 때 쓰면 된다.</summary>
-    public bool IsOpen => isOpen;
+    public bool IsOpen => proxyTarget != null ? proxyTarget.IsOpen : isOpen;
 
     /// <summary>설정 창이 살아 있고 열려 있는지. 씬 어디서나 안전하게 물어볼 수 있다.</summary>
     public static bool IsAnyOpen => instance != null && instance.isOpen;
@@ -94,8 +102,12 @@ public class SettingsMenu : MonoBehaviour
     {
         if (instance != null && instance != this)
         {
-            // 타이틀로 되돌아온 경우 — 이미 따라온 창이 있으니 씬에 놓인 쪽을 버린다.
-            Destroy(gameObject);
+            // 타이틀로 되돌아온 경우다. 이미 따라온 창이 있으니 이쪽은 창 노릇을 하지 않는다.
+            // 다만 오브젝트를 지워 버리면 타이틀 씬의 SETTING 버튼이 죽은 컴포넌트를 가리키게 돼
+            // 버튼이 먹통이 된다(OnClick 은 이 컴포넌트를 직접 참조한다).
+            // 그래서 지우는 대신 중계기로 남겨 클릭을 살아 있는 창으로 넘긴다.
+            proxyTarget = instance;
+            SetOpen(false, notify: false);
             return;
         }
 
@@ -114,6 +126,16 @@ public class SettingsMenu : MonoBehaviour
         SetOpen(false, notify: false);
     }
 
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
     private void OnDestroy()
     {
         if (instance != this)
@@ -126,9 +148,22 @@ public class SettingsMenu : MonoBehaviour
             Time.timeScale = savedTimeScale;
     }
 
+    /// <summary>
+    /// 씬이 바뀌면 창을 닫는다. 창을 연 채로 화면이 넘어가면(갤러리에서 타이틀로 돌아가기 등)
+    /// 새 씬이 <c>Time.timeScale = 0</c> 인 채로 시작해서 멈춘 것처럼 보인다.
+    /// </summary>
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (instance != this || !isOpen)
+            return;
+
+        Close();
+    }
+
     private void Update()
     {
-        if (!toggleWithEscape)
+        // 중계기는 입력을 보지 않는다. 두 쪽이 다 ESC 를 먹으면 열자마자 다시 닫힌다.
+        if (proxyTarget != null || !toggleWithEscape)
             return;
 
         Keyboard keyboard = Keyboard.current;
@@ -138,8 +173,34 @@ public class SettingsMenu : MonoBehaviour
         if (!keyboard.escapeKey.wasPressedThisFrame)
             return;
 
+        // 이름을 치고 있는 중이면 ESC 는 입력 칸 몫이다. 창까지 열리면 글자는 날아가는데
+        // 설정 창만 뜨는 꼴이 된다. 칸에서 포커스가 빠진 다음부터 ESC 가 창을 연다.
+        if (ignoreEscapeWhileTyping && IsTypingInInputField())
+            return;
+
         escapeFrame = Time.frameCount;
         Toggle();
+    }
+
+    /// <summary>
+    /// 지금 글자를 입력하는 칸에 포커스가 있는지.
+    /// 엔딩의 월드 이름 입력처럼 ESC 를 입력 칸이 먼저 써야 하는 상황을 걸러낸다.
+    /// 이 컴포넌트가 EventSystem 보다 먼저 도는 덕에(<c>DefaultExecutionOrder(-100)</c>)
+    /// 입력 칸이 ESC 로 포커스를 놓기 전에 확인할 수 있다.
+    /// </summary>
+    private static bool IsTypingInInputField()
+    {
+        EventSystem events = EventSystem.current;
+        GameObject selected = events != null ? events.currentSelectedGameObject : null;
+        if (selected == null)
+            return false;
+
+        var tmpField = selected.GetComponent<TMP_InputField>();
+        if (tmpField != null && tmpField.isFocused)
+            return true;
+
+        var uiField = selected.GetComponent<InputField>();
+        return uiField != null && uiField.isFocused;
     }
 
     /// <summary>
@@ -179,6 +240,12 @@ public class SettingsMenu : MonoBehaviour
     /// <summary>설정 창을 연다.</summary>
     public void Open()
     {
+        if (proxyTarget != null)
+        {
+            proxyTarget.Open();
+            return;
+        }
+
         if (isOpen)
             return;
 
@@ -190,6 +257,12 @@ public class SettingsMenu : MonoBehaviour
     /// <summary>설정 창을 닫고 값을 디스크에 저장한다.</summary>
     public void Close()
     {
+        if (proxyTarget != null)
+        {
+            proxyTarget.Close();
+            return;
+        }
+
         if (!isOpen)
             return;
 
@@ -200,6 +273,12 @@ public class SettingsMenu : MonoBehaviour
     /// <summary>열려 있으면 닫고, 닫혀 있으면 연다. ESC 와 같은 동작.</summary>
     public void Toggle()
     {
+        if (proxyTarget != null)
+        {
+            proxyTarget.Toggle();
+            return;
+        }
+
         if (isOpen)
             Close();
         else
@@ -209,6 +288,12 @@ public class SettingsMenu : MonoBehaviour
     /// <summary>버튼으로 창모드를 켜고 끄고 싶을 때 OnClick 에 연결한다.</summary>
     public void ToggleWindowed()
     {
+        if (proxyTarget != null)
+        {
+            proxyTarget.ToggleWindowed();
+            return;
+        }
+
         GameSettings.Fullscreen = !GameSettings.Fullscreen;
         RefreshControls();
     }
@@ -216,6 +301,12 @@ public class SettingsMenu : MonoBehaviour
     /// <summary>모든 설정을 기본값으로 되돌린다.</summary>
     public void ResetToDefaults()
     {
+        if (proxyTarget != null)
+        {
+            proxyTarget.ResetToDefaults();
+            return;
+        }
+
         GameSettings.ResetToDefaults();
         BuildResolutions();
         RefreshControls();
