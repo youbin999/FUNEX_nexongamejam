@@ -153,25 +153,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DosirakBombMiniGame
   gameDescription: "\uB3C4\uC2DC\uB77D\uC744 \uAC74\uB0B4\uB77C!"
-  targetCamera: {fileID: 0}
-  clickableLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  backgroundRenderer: {fileID: 8868301165739402144}
-  dosirakRenderer: {fileID: 1750233661753282234}
-  dosirakCollider: {fileID: 1381085086413385106}
-  explosionRenderer: {fileID: 7647104735380360486}
-  timeLimit: 5
-  throwUpwardSpeedThreshold: 6
-  overshootDuration: 0.18
-  minOvershootDistance: 9
-  suckInDuration: 0.3
-  explosionAppearDuration: 0.25
-  explosionHoldDuration: 0.4
-  explosionFadeDuration: 0.4
-  backgroundFadeDuration: 0.6
-  snapBackDuration: 0.25
-  successEndBuffer: 0.1
+  keyboardGuides: []
+  timeLimit: 2
   onTimerChanged:
     m_PersistentCalls:
       m_Calls:
@@ -187,6 +170,23 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  targetCamera: {fileID: 0}
+  clickableLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  backgroundRenderer: {fileID: 8868301165739402144}
+  dosirakRenderer: {fileID: 1750233661753282234}
+  dosirakCollider: {fileID: 1381085086413385106}
+  explosionRenderer: {fileID: 7647104735380360486}
+  throwUpwardSpeedThreshold: 6
+  overshootDuration: 0.18
+  minOvershootDistance: 9
+  suckInDuration: 0.3
+  explosionAppearDuration: 0.25
+  explosionHoldDuration: 0.4
+  explosionFadeDuration: 0.4
+  backgroundFadeDuration: 0.6
+  snapBackDuration: 0.25
   onClear:
     m_PersistentCalls:
       m_Calls: []
