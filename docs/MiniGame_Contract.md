@@ -13,6 +13,10 @@
 `OnTimedUpdate()` 세 훅과, 성공 시 `SucceedWhenTimeUp()`, 조작 실수로 인한 즉시 실패 시
 `FailImmediately()` 호출만 신경 쓰면 된다. 시간 초과 시의 기본 동작은 `ReportFinished(false)`
 이며, 실패 연출이 필요하면 `OnTimeUp()` 을 재정의해서 연출 후 `base.OnTimeUp()` 을 호출한다.
+클리어 연출이 남은 제한 시간보다 길어질 수 있으면 `IsSuccessPresentationDone` 을 재정의해
+연출이 끝날 때까지 false 를 돌려준다 — 성공 통지가 그만큼 미뤄져 연출이 잘리지 않는다
+(구현 예: `Assets/01_Scripts/Mini_Penicillin/PenicillinFindMiniGame.cs`).
+**반드시 언젠가 true 가 되어야 한다.** 계속 false 면 게임이 끝나지 않고 흐름이 멈춘다.
 실제 구현 예시는 `Assets/01_Scripts/Mini_archimedes/ArchimedesBathMiniGame.cs`,
 `Assets/01_Scripts/Mini_dosirak/DosirakBombMiniGame.cs` 참고.
 

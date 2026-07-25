@@ -31,7 +31,14 @@ public class GameFlowController : MonoBehaviour
         [Tooltip("이 게임 시작 시 GameBorder 에 적용할 시대 테마 스프라이트. 비워두면 기존 테마를 유지한다")]
         public Sprite borderSprite;
 
+        [Tooltip("시대 전환 시 화면에 뜨는 자막. borderSprite 를 지정한 항목에서만 표시된다.\n" +
+            "비워두면 EraNames 의 시대 이름(크레딧·엔딩 프롬프트가 쓰는 것과 같은 값)이 대신 뜬다.\n" +
+            "직접 채울 거면 EraNames 쪽 이름과 맞춰야 화면과 크레딧이 같은 시대를 말한다")]
         public string eraYearText;
+
+        /// <summary>화면에 띄울 시대 자막. 비어 있으면 크레딧과 같은 이름으로 떨어져 표기가 갈리지 않는다.</summary>
+        public string EraLabel =>
+            string.IsNullOrWhiteSpace(eraYearText) ? era.ToKorean() : eraYearText;
 
         [Header("엔딩 맥락 (Change: 성공/실패 모두 반영, Critical: 실패 결과 반영)")]
         [Tooltip("사건 이름. 예: '마녀사냥에서 마녀를 색출'")]
@@ -208,7 +215,7 @@ public class GameFlowController : MonoBehaviour
         PlayEraBgm(entry.era);
 
         if (entry.prefab == null || player == null ||
-            !player.PlayGame(entry.prefab, entry.borderSprite, entry.eraYearText))
+            !player.PlayGame(entry.prefab, entry.borderSprite, entry.EraLabel))
         {
             Debug.LogWarning($"GameFlowController: index {currentIndex} 게임을 재생할 수 없습니다.", this);
             PlayNext();

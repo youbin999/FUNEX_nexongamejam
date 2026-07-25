@@ -105,6 +105,11 @@ public class PenicillinFindMiniGame : TimedMiniGame
     // 성공 연출과 실패 연출은 동시에 나지 않으므로 코루틴 슬롯 하나를 공유한다.
     private Coroutine outcomeRoutine;
 
+    // 클리어 연출이 아직 도는 중인지. 제한 시간이 다 차도 이게 내려갈 때까지는 성공을 통지하지 않는다.
+    // outcomeRoutine 의 null 여부로 대신하지 않는 이유는, 연출이 한 프레임에 끝나 버리는 배선
+    // (페니·BOOO 가 비어 있는 경우)에서 StartCoroutine 이 돌려준 값이 뒤늦게 덮어써지기 때문이다.
+    private bool clearPresentationPlaying;
+
     // 인스펙터에 배치된 자리를 기억해 뒀다가 매 판 그 자리로 되돌린다.
     private Vector3 feniBasePosition;
     private Sprite feniBaseSprite;
@@ -133,6 +138,12 @@ public class PenicillinFindMiniGame : TimedMiniGame
             }
         }
     }
+
+    /// <summary>
+    /// 페니가 올라와 윙크하고 BOOO 가 다 튀어나올 때까지는 성공을 통지하지 않는다.
+    /// 제한 시간(3초)이 짧아서 늦게 클리어하면 연출이 잘린 채 다음 게임으로 넘어가 버린다.
+    /// </summary>
+    protected override bool IsSuccessPresentationDone => !clearPresentationPlaying;
 
     protected override void OnTimedUpdate()
     {
@@ -186,6 +197,9 @@ public class PenicillinFindMiniGame : TimedMiniGame
             StopCoroutine(outcomeRoutine);
             outcomeRoutine = null;
         }
+
+        // 연출을 끊었으면 붙잡아 둘 이유도 사라진다. 여기서 안 내리면 다음 판이 끝나지 않는다.
+        clearPresentationPlaying = false;
 
         if (feniFailRenderer != null)
         {
@@ -329,6 +343,9 @@ public class PenicillinFindMiniGame : TimedMiniGame
                 state = State.Cleared;
                 onClear.Invoke();
                 SucceedWhenTimeUp();
+
+                // StartCoroutine 이 연출을 그 자리에서 끝내 버릴 수도 있으므로 플래그를 먼저 올린다.
+                clearPresentationPlaying = true;
                 outcomeRoutine = StartCoroutine(ClearRoutine());
             }
         }
@@ -355,7 +372,9 @@ public class PenicillinFindMiniGame : TimedMiniGame
 
     /// <summary>
     /// 클리어 연출: 그리드가 사라지고 → 페니가 아래에서 올라오고 → 윙크로 바뀌며 → BOOO 가 팝아웃된다.
-    /// 연출이 끝난 뒤엔 그대로 유지된 채 제한 시간이 다 찰 때까지 기다린다.
+    /// 성공 통지는 <b>제한 시간과 이 연출이 둘 다 끝난 뒤</b>에 나간다
+    /// (<see cref="IsSuccessPresentationDone"/>). 연출이 먼저 끝나면 남은 시간만큼 그대로 유지되고,
+    /// 제한 시간이 먼저 차면 연출이 끝날 때까지 종료가 미뤄진다.
     /// </summary>
     private IEnumerator ClearRoutine()
     {
@@ -375,6 +394,7 @@ public class PenicillinFindMiniGame : TimedMiniGame
 
         yield return BoooPopRoutine();
 
+        clearPresentationPlaying = false;
         outcomeRoutine = null;
     }
 
