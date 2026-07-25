@@ -27,6 +27,13 @@ public abstract class MiniGame : MonoBehaviour
     [Tooltip("실패 시 생성해 현재 한 판 동안 유지할 패널티 프리팹. 비워두면 패널티 없이 종료한다.")]
     [SerializeField] private FailurePenalty failurePenaltyPrefab;
 
+    [Header("실패 카메라 임팩트")]
+    [Tooltip("실패가 확정되는 순간 적용할 카메라 셰이크 시간(초). 0이면 셰이크하지 않는다.")]
+    [SerializeField] private float failureShakeDuration = 0.4f;
+
+    [Tooltip("실패가 확정되는 순간 적용할 카메라 셰이크 진폭.")]
+    [SerializeField] private float failureShakeAmplitude = 0.35f;
+
     /// <summary>게임 시작 전 표시할 설명 문구. <see cref="MiniGamePlayer"/> 가 Play() 호출 전 연출에 사용한다.</summary>
     public string GameDescription => gameDescription;
 
@@ -38,6 +45,12 @@ public abstract class MiniGame : MonoBehaviour
 
     /// <summary>현재 재생 중인지 여부.</summary>
     public bool IsPlaying { get; private set; }
+
+    /// <summary>
+    /// 파생 게임이나 실패 패널티가 자체 카메라 임팩트를 재생하는지 여부.
+    /// 중복 셰이크를 피해야 하는 게임만 재정의한다.
+    /// </summary>
+    protected virtual bool HasOwnFailureCameraImpact => false;
 
     /// <summary>
     /// 게임을 시작한다. 이미 플레이 중이면 무시한다.
@@ -80,6 +93,10 @@ public abstract class MiniGame : MonoBehaviour
             return;
 
         IsPlaying = false;
+
+        if (!success && !HasOwnFailureCameraImpact && failureShakeDuration > 0f && failureShakeAmplitude > 0f)
+            CameraEffectManager.Instance.Shake(failureShakeDuration, failureShakeAmplitude);
+
         Finished?.Invoke(this, success);
     }
 }

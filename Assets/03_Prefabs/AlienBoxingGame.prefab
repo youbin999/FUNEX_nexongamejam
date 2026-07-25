@@ -55,6 +55,7 @@ MonoBehaviour:
   keyboardGuides:
   - actionLabel: 
     keys: 0f00000012000000
+  failurePenaltyPrefab: {fileID: 5191798919311284758, guid: a28def50345168f43af2ad55bb540da2, type: 3}
   timeLimit: 5
   onTimerChanged:
     m_PersistentCalls:

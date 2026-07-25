@@ -114,6 +114,11 @@ public class DigMiniGame : MiniGame
     /// <summary>0에서 1로 차오르는 제한 시간 값.</summary>
     public float TimerRatio => useTimeLimit && timeLimit > 0f ? Mathf.Clamp01(elapsed / timeLimit) : 0f;
 
+    /// <summary>
+    /// 실패 패널티가 강한 일렁임과 셰이크를 직접 재생하므로 공통 실패 셰이크는 생략한다.
+    /// </summary>
+    protected override bool HasOwnFailureCameraImpact => true;
+
     private void Start()
     {
         // 게임 진행이 아니라 게이지 초기 표시만 한다.
