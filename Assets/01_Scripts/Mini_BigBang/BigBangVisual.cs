@@ -14,6 +14,9 @@ public class BigBangVisual : MonoBehaviour
     [Tooltip("비워두면 같은 오브젝트의 VideoPlayer 를 찾아 쓴다")]
     [SerializeField] private VideoPlayer videoPlayer;
 
+    [Tooltip("영상과 같은 위치로 스크럽할 효과음. 비워두면 무음으로 동작한다")]
+    [SerializeField] private BigBangAudio audioScrub;
+
     [Header("구간")]
     [Tooltip("진행도 0 이 대응할 영상 위치(0~1). 앞쪽 암전 구간을 잘라낼 때 쓴다")]
     [SerializeField, Range(0f, 1f)] private float startRatio = 0f;
@@ -63,6 +66,10 @@ public class BigBangVisual : MonoBehaviour
         pendingProgress = 0f;
         lastFrame = -1;
 
+        // 효과음은 영상 준비(Prepare)를 기다릴 필요가 없으므로 먼저 띄운다.
+        if (audioScrub != null)
+            audioScrub.Begin(MapProgress(0f));
+
         if (videoPlayer == null)
             return;
 
@@ -82,6 +89,12 @@ public class BigBangVisual : MonoBehaviour
     {
         pendingProgress = Mathf.Clamp01(progress);
 
+        // 효과음은 영상 준비 여부와 무관하게, 그리고 프레임 격자로 스냅되기 전의 연속적인
+        // 위치를 받아야 한다. ApplyProgress 안(프레임 중복 체크 뒤)에 두면 30fps 단위로
+        // 끊긴 위치가 넘어가 소리가 계단처럼 들린다.
+        if (audioScrub != null)
+            audioScrub.SetPosition(MapProgress(pendingProgress));
+
         if (prepared)
             ApplyProgress(pendingProgress, false);
     }
@@ -91,6 +104,9 @@ public class BigBangVisual : MonoBehaviour
     {
         pendingProgress = 0f;
         lastFrame = -1;
+
+        if (audioScrub != null)
+            audioScrub.ResetAudio(MapProgress(0f));
 
         if (videoPlayer == null)
             return;
@@ -121,17 +137,26 @@ public class BigBangVisual : MonoBehaviour
         ApplyProgress(pendingProgress, true);
     }
 
+    /// <summary>
+    /// 진행도(0~1)를 영상과 효과음이 공유하는 미디어 위치(0~1)로 변환한다.
+    /// 영상의 밝기 변화가 균등하지 않으므로 곡선으로 한 번 보정한 뒤 구간에 매핑한다.
+    /// 두 매체가 반드시 이 함수 하나만 거치게 해서 서로 어긋날 여지를 없앤다.
+    /// </summary>
+    private float MapProgress(float progress)
+    {
+        float shaped = progressCurve != null && progressCurve.length > 0
+            ? Mathf.Clamp01(progressCurve.Evaluate(progress))
+            : progress;
+
+        return Mathf.Lerp(startRatio, endRatio, shaped);
+    }
+
     private void ApplyProgress(float progress, bool force)
     {
         if (videoPlayer == null || frameCount <= 0)
             return;
 
-        // 영상의 밝기 변화가 균등하지 않으므로, 곡선으로 한 번 보정한 뒤 구간에 매핑한다.
-        float shaped = progressCurve != null && progressCurve.length > 0
-            ? Mathf.Clamp01(progressCurve.Evaluate(progress))
-            : progress;
-
-        float mapped = Mathf.Lerp(startRatio, endRatio, shaped);
+        float mapped = MapProgress(progress);
         long lastIndex = frameCount - 1;
         long target = (long)Mathf.Round(mapped * lastIndex);
 
