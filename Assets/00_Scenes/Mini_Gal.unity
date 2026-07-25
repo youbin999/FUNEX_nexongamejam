@@ -119,6 +119,73 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &1745825896
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1745825898}
+  - component: {fileID: 1745825897}
+  m_Layer: 0
+  m_Name: MiniManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1745825897
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1745825896}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59a907987fe24d39b525880d96cd8e00, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MiniGamePlayer
+  gamePrefabs:
+  - {fileID: 3390688864203735000, guid: 142412d3334caa8408aa8b783eba0185, type: 3}
+  preloadOnAwake: 1
+  playFirstOnStart: 1
+  onGameFinished:
+    m_PersistentCalls:
+      m_Calls: []
+  failurePenaltyController: {fileID: 0}
+  introPresenter: {fileID: 0}
+  screenFadeCanvasGroup: {fileID: 0}
+  fadeOutDuration: 0.3
+  fadeInDuration: 0.3
+  gameBorderRect: {fileID: 0}
+  gameBorderImage: {fileID: 0}
+  gameBorderCanvasGroup: {fileID: 0}
+  borderSpriteFadeDuration: 0.15
+  borderTransitionDuration: 0.35
+  transitionHoldDuration: 0.6
+  eraYearText: {fileID: 0}
+  eraTransitionExtraHoldDuration: 1.5
+  eraTextScrambleDurationPerCharacter: 0.12
+  eraTextScrambleInterval: 0.035
+  eraTextRandomCharacterPool: ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*?
+--- !u!4 &1745825898
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1745825896}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2015924507
 GameObject:
   m_ObjectHideFlags: 0
@@ -206,70 +273,6 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -10}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1745825896
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1745825898}
-  - component: {fileID: 1745825897}
-  m_Layer: 0
-  m_Name: MiniManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1745825897
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1745825896}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59a907987fe24d39b525880d96cd8e00, type: 3}
-  m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::MiniGamePlayer
-  gamePrefabs:
-  - {fileID: 9900000012, guid: 4d0c8b7e2f15493aa6b1e39d70c82f56, type: 3}
-  preloadOnAwake: 1
-  playFirstOnStart: 1
-  onGameFinished:
-    m_PersistentCalls:
-      m_Calls: []
-  descriptionCanvasGroup: {fileID: 0}
-  descriptionText: {fileID: 0}
-  descriptionRect: {fileID: 0}
-  descriptionTransitionDuration: 0.25
-  descriptionHoldDuration: 1.5
-  descriptionStartScale: 0.8
-  screenFadeCanvasGroup: {fileID: 0}
-  fadeOutDuration: 0.3
-  fadeInDuration: 0.3
-  gameBorderRect: {fileID: 0}
-  gameBorderImage: {fileID: 0}
-  borderTransitionDuration: 0.35
-  transitionHoldDuration: 0.6
---- !u!4 &1745825898
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1745825896}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

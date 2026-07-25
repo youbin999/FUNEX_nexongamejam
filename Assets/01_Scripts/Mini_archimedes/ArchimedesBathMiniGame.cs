@@ -43,6 +43,9 @@ public class ArchimedesBathMiniGame : TimedMiniGame
     [SerializeField] private float eurekaStartScale = 0.3f;
 
     [Header("이벤트")]
+    [Tooltip("공중제비를 돌기 시작하는 순간 발화한다. '유레카!' 목소리처럼 연출과 함께 나야 하는 소리를 연결한다")]
+    public UnityEvent onSomersault;
+
     public UnityEvent onClear;
     public UnityEvent onFail;
 
@@ -137,6 +140,9 @@ public class ArchimedesBathMiniGame : TimedMiniGame
     {
         if (archimedesRenderer == null)
             yield break;
+
+        // 도는 순간에 맞춰 소리를 낸다. 연출이 다 끝난 뒤(onClear)면 너무 늦다.
+        onSomersault.Invoke();
 
         Transform t = archimedesRenderer.transform;
         Vector3 groundPosition = t.position;

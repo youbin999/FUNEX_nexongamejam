@@ -227,6 +227,7 @@ Transform:
   - {fileID: 5475530409229097469}
   - {fileID: 3053882095519507298}
   - {fileID: 3451314135890948762}
+  - {fileID: 8820000102}
   - {fileID: 7602935011783328961}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -261,6 +262,21 @@ MonoBehaviour:
   eurekaCanvasGroup: {fileID: 1395318810538306839}
   eurekaAppearDuration: 0.35
   eurekaStartScale: 0.3
+  onSomersault:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8820000103}
+        m_TargetAssemblyTypeName: SfxPlayer, Assembly-CSharp
+        m_MethodName: Play
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument:
+          m_BoolArgument: 0
+        m_CallState: 2
   onClear:
     m_PersistentCalls:
       m_Calls:
@@ -662,5 +678,57 @@ MonoBehaviour:
   pitch: 1
   pitchJitter: 0.06
   minInterval: 0.03
+  stepPitchRise: 0.03
+  stepPitchCap: 0.5
+--- !u!1 &8820000101
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8820000102}
+  - component: {fileID: 8820000103}
+  m_Layer: 0
+  m_Name: Sfx_Eureka
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8820000102
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8820000101}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 118820455176514959}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8820000103
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8820000101}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d3a92c7b18f4e5480a2c93de17f4b60, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::SfxPlayer
+  clips:
+  - {fileID: 8300000, guid: 8b651cbe185467140b6233c5c018dab8, type: 3}
+  volume: 1
+  pitch: 1
+  pitchJitter: 0
+  minInterval: 0.3
   stepPitchRise: 0.03
   stepPitchCap: 0.5
