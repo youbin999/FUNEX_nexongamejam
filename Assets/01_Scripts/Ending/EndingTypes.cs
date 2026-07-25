@@ -21,6 +21,7 @@ public enum Era
 {
     BigBang,
     Prehistoric,
+    Greek,
     Medieval,
     Modern,
     Contemporary,
@@ -34,6 +35,7 @@ public static class EraNames
     {
         { Era.BigBang, "빅뱅" },
         { Era.Prehistoric, "선사시대" },
+        { Era.Greek, "고대 그리스" },
         { Era.Medieval, "중세" },
         { Era.Modern, "근대" },
         { Era.Contemporary, "현대" },

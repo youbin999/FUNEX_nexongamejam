@@ -41,6 +41,9 @@ public class RunResult : MonoBehaviour
     /// <summary>중단을 유발한 사건 이름. <see cref="EndedEarly"/> 가 false 면 빈 문자열.</summary>
     public string EndedByEvent { get; private set; } = string.Empty;
 
+    /// <summary>중단을 유발한 사건의 실패 의미(한국어). <see cref="EndedEarly"/> 가 false 면 빈 문자열.</summary>
+    public string EndedFailureMeaning { get; private set; } = string.Empty;
+
     private void Awake()
     {
         // 씬에 직접 배치한 경우의 중복 방지.
@@ -64,11 +67,12 @@ public class RunResult : MonoBehaviour
     }
 
     /// <summary>핵심 미니게임 실패로 흐름이 중단됐음을 기록한다.</summary>
-    public void MarkEarlyEnding(string era, string eventLabel)
+    public void MarkEarlyEnding(string era, string eventLabel, string failureMeaning = null)
     {
         EndedEarly = true;
         EndedAtEra = era ?? string.Empty;
         EndedByEvent = eventLabel ?? string.Empty;
+        EndedFailureMeaning = failureMeaning ?? string.Empty;
     }
 
     /// <summary>새 판을 시작할 때 호출한다. 재시작 시 이전 판 결과가 섞이지 않게 한다.</summary>
@@ -78,6 +82,7 @@ public class RunResult : MonoBehaviour
         EndedEarly = false;
         EndedAtEra = string.Empty;
         EndedByEvent = string.Empty;
+        EndedFailureMeaning = string.Empty;
     }
 
     /// <summary>
@@ -111,6 +116,7 @@ public class RunResult : MonoBehaviour
         var sb = new StringBuilder();
         sb.AppendLine(EndedEarly
             ? $"[진행 결과] 인류는 {EndedAtEra}에서 '{EndedByEvent}'에 실패해 더 나아가지 못했다."
+              + (string.IsNullOrWhiteSpace(EndedFailureMeaning) ? string.Empty : $" 그 의미: {EndedFailureMeaning}")
             : "[진행 결과] 인류는 미래까지 도달했다.");
 
         if (outcomes.Count == 0)

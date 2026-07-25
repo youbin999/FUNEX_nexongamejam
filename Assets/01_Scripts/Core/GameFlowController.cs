@@ -30,14 +30,16 @@ public class GameFlowController : MonoBehaviour
 
         public string eraYearText;
 
-        [Header("엔딩 맥락 (Change 일 때만 사용)")]
+        [Header("엔딩 맥락 (Change: 성공/실패 모두 반영, Critical: 실패 시 failureMeaning만 반영)")]
         [Tooltip("사건 이름. 예: '마녀사냥에서 마녀를 색출'")]
         public string eventLabel;
 
-        [Tooltip("성공했을 때의 역사적 의미(한국어). 크레딧 문장의 재료")]
+        [Tooltip("성공했을 때의 역사적 의미(한국어). 크레딧 문장의 재료 (Change 전용)")]
         [TextArea(2, 4)] public string successMeaning;
 
-        [Tooltip("실패했을 때의 역사적 의미(한국어). 크레딧 문장의 재료")]
+        [Tooltip("실패했을 때의 역사적 의미(한국어). 크레딧 문장의 재료.\n" +
+            "Change: 크레딧 본문에 그대로 삽입됨\n" +
+            "Critical: 흐름 중단 서사에 반영됨(RunResult.EndedFailureMeaning)")]
         [TextArea(2, 4)] public string failureMeaning;
 
         [Tooltip("성공했을 때 엔딩 이미지에 들어갈 시각 요소(영문 구절).\n" +
@@ -192,7 +194,7 @@ public class GameFlowController : MonoBehaviour
         if (!success && entry.IsCritical)
         {
             ended = true;
-            RunResult.Instance.MarkEarlyEnding(entry.era.ToKorean(), entry.eventLabel);
+            RunResult.Instance.MarkEarlyEnding(entry.era.ToKorean(), entry.eventLabel, entry.failureMeaning);
             onGameEnding.Invoke();
             return;
         }

@@ -1226,6 +1226,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StockMiniGame
   gameDescription: "\uC0C1\uC2B9\uC5D4 \uB9E4\uC218! \uD558\uB77D\uC5D4 \uB9E4\uB3C4!"
+  keyboardGuides:
+  - actionLabel: 
+    keys: 2500000021000000
+  failurePenaltyPrefab: {fileID: 0}
+  failureShakeDuration: 0.4
+  failureShakeAmplitude: 0.35
   timeLimit: 5
   onTimerChanged:
     m_PersistentCalls:
