@@ -380,6 +380,8 @@ MonoBehaviour:
   fadeInDuration: 0.3
   gameBorderRect: {fileID: 1630025801}
   gameBorderImage: {fileID: 1630025802}
+  gameBorderCanvasGroup: {fileID: 0}
+  borderSpriteFadeDuration: 0.15
   borderTransitionDuration: 0.35
   transitionHoldDuration: 0.6
   eraYearText: {fileID: 1578787885}
@@ -455,7 +457,7 @@ MonoBehaviour:
   games:
   - prefab: {fileID: 3102439326765463788, guid: 4cd0269129acd204c9d63d2d4539c792, type: 3}
     isCritical: 0
-    borderSprite: {fileID: 8606453610214823136, guid: 593a65498821e214ab53f9e91968141c, type: 3}
+    borderSprite: {fileID: 21300000, guid: 593a65498821e214ab53f9e91968141c, type: 3}
     eraYearText: "\uAE30\uC6D0\uC804 3000\uB144"
   - prefab: {fileID: 562160154704496516, guid: c41684de35ac45ada326578c7c5a4e0a, type: 3}
     isCritical: 0
@@ -467,7 +469,7 @@ MonoBehaviour:
     eraYearText: 
   - prefab: {fileID: 3390688864203735000, guid: 142412d3334caa8408aa8b783eba0185, type: 3}
     isCritical: 0
-    borderSprite: {fileID: 1250316274037762026, guid: 74eaa5d12046003439fb8d2225b9e40c, type: 3}
+    borderSprite: {fileID: 21300000, guid: 74eaa5d12046003439fb8d2225b9e40c, type: 3}
     eraYearText: "\uAE30\uC6D0\uC804 1500\uB144"
   - prefab: {fileID: 6600000012, guid: 5b2d8e1f4a6c47039d5e7a1b3c9f0e26, type: 3}
     isCritical: 0
@@ -479,7 +481,7 @@ MonoBehaviour:
     eraYearText: 
   - prefab: {fileID: 4657186777680439362, guid: 6e7c95e72c6956141abad54d4c53d242, type: 3}
     isCritical: 0
-    borderSprite: {fileID: -1411474693944598997, guid: 7827973d7db50d04ab783518ed8b9b3b, type: 3}
+    borderSprite: {fileID: 21300000, guid: 7827973d7db50d04ab783518ed8b9b3b, type: 3}
     eraYearText: "\uAE30\uC6D0\uD6C4 1500\uB144"
   - prefab: {fileID: 7396776103939382718, guid: a346cefd652deac4facead9bd56e1350, type: 3}
     isCritical: 1
@@ -487,7 +489,7 @@ MonoBehaviour:
     eraYearText: 
   - prefab: {fileID: 4700864808614509273, guid: d109eaaff3d885844a73d86db8d12dc2, type: 3}
     isCritical: 0
-    borderSprite: {fileID: -5083450741022506161, guid: 25322d51181498745be0f4cb9ccb3611, type: 3}
+    borderSprite: {fileID: 21300000, guid: 25322d51181498745be0f4cb9ccb3611, type: 3}
     eraYearText: "\uAE30\uC6D0\uD6C4 1900\uB144"
   - prefab: {fileID: 8796445717193832805, guid: 133e85cc3a50fcc48a57f374f8b9f011, type: 3}
     isCritical: 0
@@ -499,12 +501,12 @@ MonoBehaviour:
     eraYearText: 
   - prefab: {fileID: 5500000012, guid: f3a8c1b6d9e24705a1c8b3f6e9d02417, type: 3}
     isCritical: 1
-    borderSprite: {fileID: 1152356169552002576, guid: 7d1664222bd094e44b0a119186329ddb, type: 3}
+    borderSprite: {fileID: 21300000, guid: 7d1664222bd094e44b0a119186329ddb, type: 3}
     eraYearText: "\uAE30\uC6D0\uD6C4 2026\uB144, \uD604\uC7AC"
   - prefab: {fileID: 1793571473085594207, guid: 99c89240ed27a494ca10ae4b6d357444, type: 3}
     isCritical: 0
-    borderSprite: {fileID: 0}
-    eraYearText: 
+    borderSprite: {fileID: -8945467959818111224, guid: 188115b7c96669846b360eec57dac7f7, type: 3}
+    eraYearText: "\uAE30\uC6D0\uD6C4 2200\uB144"
   - prefab: {fileID: -4765541157340919056, guid: 8e1f5a3c7b2d49608c4a6e2f1b7d0359, type: 3}
     isCritical: 0
     borderSprite: {fileID: 0}
@@ -903,6 +905,7 @@ GameObject:
   - component: {fileID: 1630025801}
   - component: {fileID: 1630025803}
   - component: {fileID: 1630025802}
+  - component: {fileID: 1630025804}
   m_Layer: 5
   m_Name: GameBorder
   m_TagString: Untagged
@@ -926,8 +929,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -100, y: 0}
-  m_SizeDelta: {x: 6432.751, y: 3963.17}
+  m_AnchoredPosition: {x: -38, y: 0.000061035156}
+  m_SizeDelta: {x: 772.9373, y: 545.9241}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1630025802
 MonoBehaviour:
@@ -949,7 +952,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 1152356169552002576, guid: 7d1664222bd094e44b0a119186329ddb, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 593a65498821e214ab53f9e91968141c, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -967,6 +970,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1630025800}
   m_CullTransparentMesh: 1
+--- !u!225 &1630025804
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1630025800}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &2009430177
 GameObject:
   m_ObjectHideFlags: 0
