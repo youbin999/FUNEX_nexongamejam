@@ -46,7 +46,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SfxPlayer
   clips:
   - {fileID: 8300000, guid: 2caa4e52e8426d248907a6507730d58f, type: 3}
-  volume: 1
+  - {fileID: 8300000, guid: 40f657d8feff3184aaaaccd55f896f48, type: 3}
+  volume: 0.783
   pitch: 1
   pitchJitter: 0
   minInterval: 0
@@ -351,6 +352,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3337111706688401971}
   - component: {fileID: 2102560040159619025}
+  - component: {fileID: 7770581581087212329}
   m_Layer: 5
   m_Name: Grid
   m_TagString: Untagged
@@ -417,6 +419,14 @@ MonoBehaviour:
   m_Spacing: {x: 20, y: 20}
   m_Constraint: 1
   m_ConstraintCount: 4
+--- !u!222 &7770581581087212329
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 432621718775470801}
+  m_CullTransparentMesh: 1
 --- !u!1 &527344376633007335
 GameObject:
   m_ObjectHideFlags: 0
@@ -2441,7 +2451,19 @@ MonoBehaviour:
         m_CallState: 2
   onFail:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8800000013}
+        m_TargetAssemblyTypeName: SfxPlayer, Assembly-CSharp
+        m_MethodName: Play
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &2928477960277675127
 GameObject:
   m_ObjectHideFlags: 0
