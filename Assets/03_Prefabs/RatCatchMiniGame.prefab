@@ -147,7 +147,7 @@ MonoBehaviour:
   gameDescription: "\uC7A1\uC544\uB77C!"
   keyboardGuides:
   - actionLabel: 
-    keys: 250000000f0000002100000012000000
+    keys: 250000000f000000210000001200000001000000
   - actionLabel: 
     keys: 01000000
   failurePenaltyPrefab: {fileID: -7303443672653005118, guid: 9dd69c286f249ac44b07d92cb0105637, type: 3}
