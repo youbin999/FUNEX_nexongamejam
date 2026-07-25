@@ -76,6 +76,10 @@ public class EndingImageGenerator
             yield break;
         }
 
+        Debug.Log(
+            "EndingImageGenerator: 이미지 생성 AI에 전달하는 최종 프롬프트\n" +
+            imagePrompt);
+
         Texture2D generated = null;
 
         // 조합 키를 시드로 쓴다. 같은 판이면 시드가 같아 결과가 크게 흔들리지 않는다.

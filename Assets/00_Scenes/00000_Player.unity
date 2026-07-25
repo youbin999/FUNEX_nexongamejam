@@ -668,8 +668,8 @@ MonoBehaviour:
     failureMeaning: "\uC778\uB958\uB294 \uC138\uACC4 \uD575\uC804\uC7C1\uC73C\uB85C
       \uC790\uBA78\uD588\uB2E4."
     successVisual: 
-    failureVisual: nuclear war in global
-    visualWeight: 7
+    failureVisual: 'nuclear war in global, nuclear Mushroom Cloud '
+    visualWeight: 10
   - prefab: {fileID: -4765541157340919056, guid: 8e1f5a3c7b2d49608c4a6e2f1b7d0359, type: 3}
     kind: 1
     era: 6

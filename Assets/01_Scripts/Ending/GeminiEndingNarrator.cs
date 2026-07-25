@@ -56,6 +56,11 @@ public class GeminiEndingNarrator : IEndingNarrator
 
     public IEnumerator Generate(RunResult result, Action<EndingScript> onDone, Action<string> onFail)
     {
+        string promptPayload = result.ToPromptPayload();
+        Debug.Log(
+            "GeminiEndingNarrator: 엔딩 이미지 프롬프트 생성에 전달하는 결과 목록\n" +
+            promptPayload);
+
         if (!GeminiApiConfig.HasKey)
         {
             onFail("API 키가 없습니다.");
@@ -63,7 +68,7 @@ public class GeminiEndingNarrator : IEndingNarrator
         }
 
         string url = string.Format(Endpoint, model);
-        byte[] body = Encoding.UTF8.GetBytes(BuildRequestBody(result));
+        byte[] body = Encoding.UTF8.GetBytes(BuildRequestBody(promptPayload));
 
         using (var req = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST))
         {
@@ -105,10 +110,10 @@ public class GeminiEndingNarrator : IEndingNarrator
     /// generateContent 요청 본문을 만든다.
     /// responseSchema 는 고정이라 리터럴로 두고, 가변 부분만 이스케이프해 끼워 넣는다.
     /// </summary>
-    private string BuildRequestBody(RunResult result)
+    private string BuildRequestBody(string promptPayload)
     {
         string system = JsonText.Escape(SystemInstruction);
-        string user = JsonText.Escape(result.ToPromptPayload());
+        string user = JsonText.Escape(promptPayload);
 
         return
             "{" +
