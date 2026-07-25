@@ -460,8 +460,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpannerMiniGame
   gameDescription: "\uC2A4\uD328\uB108\uB97C \uB3CC\uB824\uB77C!"
+  keyboardGuides: []
   pivot: {fileID: 5784042407714050566}
-  clearTurns: 2
+  clearTurns: 1
   timeLimit: 5
   turnDirection: 2
   ratchet: 0

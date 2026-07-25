@@ -383,7 +383,7 @@ MonoBehaviour:
   games:
   - prefab: {fileID: 3102439326765463788, guid: 4cd0269129acd204c9d63d2d4539c792, type: 3}
     isCritical: 0
-    borderSprite: {fileID: 0}
+    borderSprite: {fileID: 8606453610214823136, guid: 593a65498821e214ab53f9e91968141c, type: 3}
   - prefab: {fileID: 562160154704496516, guid: c41684de35ac45ada326578c7c5a4e0a, type: 3}
     isCritical: 0
     borderSprite: {fileID: 0}
@@ -393,21 +393,30 @@ MonoBehaviour:
   - prefab: {fileID: 3390688864203735000, guid: 142412d3334caa8408aa8b783eba0185, type: 3}
     isCritical: 0
     borderSprite: {fileID: 1250316274037762026, guid: 74eaa5d12046003439fb8d2225b9e40c, type: 3}
+  - prefab: {fileID: 6600000012, guid: 5b2d8e1f4a6c47039d5e7a1b3c9f0e26, type: 3}
+    isCritical: 0
+    borderSprite: {fileID: 0}
   - prefab: {fileID: 72291910205155039, guid: e6f0bf9670e1982478561fdd3e743a6b, type: 3}
     isCritical: 1
     borderSprite: {fileID: 0}
   - prefab: {fileID: 4657186777680439362, guid: 6e7c95e72c6956141abad54d4c53d242, type: 3}
     isCritical: 0
-    borderSprite: {fileID: 0}
+    borderSprite: {fileID: -1411474693944598997, guid: 7827973d7db50d04ab783518ed8b9b3b, type: 3}
   - prefab: {fileID: 7396776103939382718, guid: a346cefd652deac4facead9bd56e1350, type: 3}
-    isCritical: 0
+    isCritical: 1
     borderSprite: {fileID: 0}
   - prefab: {fileID: 4700864808614509273, guid: d109eaaff3d885844a73d86db8d12dc2, type: 3}
     isCritical: 0
-    borderSprite: {fileID: 0}
-  - prefab: {fileID: 5533263401601251690, guid: 542f1ec7acbab974ebc3ad6b77fd5f9f, type: 3}
+    borderSprite: {fileID: -5083450741022506161, guid: 25322d51181498745be0f4cb9ccb3611, type: 3}
+  - prefab: {fileID: 8796445717193832805, guid: 133e85cc3a50fcc48a57f374f8b9f011, type: 3}
     isCritical: 0
     borderSprite: {fileID: 0}
+  - prefab: {fileID: 5533263401601251690, guid: 542f1ec7acbab974ebc3ad6b77fd5f9f, type: 3}
+    isCritical: 1
+    borderSprite: {fileID: 0}
+  - prefab: {fileID: 5500000012, guid: f3a8c1b6d9e24705a1c8b3f6e9d02417, type: 3}
+    isCritical: 0
+    borderSprite: {fileID: 1152356169552002576, guid: 7d1664222bd094e44b0a119186329ddb, type: 3}
   - prefab: {fileID: 1793571473085594207, guid: 99c89240ed27a494ca10ae4b6d357444, type: 3}
     isCritical: 0
     borderSprite: {fileID: 0}
@@ -691,8 +700,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -39.2845, y: 170.1152}
-  m_SizeDelta: {x: 1656.6716, y: 1079.4995}
+  m_AnchoredPosition: {x: -100, y: 0}
+  m_SizeDelta: {x: 6432.751, y: 3963.17}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1630025802
 MonoBehaviour:
@@ -714,7 +723,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 8606453610214823136, guid: 593a65498821e214ab53f9e91968141c, type: 3}
+  m_Sprite: {fileID: 1152356169552002576, guid: 7d1664222bd094e44b0a119186329ddb, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
