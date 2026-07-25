@@ -5883,8 +5883,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92e7b49d348884649be654049efde089, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AudioManager
-  bgmSource: {fileID: 0}
-  startupBgm: {fileID: 0}
+  bgmSource: {fileID: 374635205}
+  startupBgm: {fileID: 8300000, guid: e139297e06dea0741bae5c1b9991695c, type: 3}
   bgmBaseVolume: 1
   sfxChannels: 8
   sfxBaseVolume: 1
