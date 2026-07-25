@@ -30,7 +30,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
-  m_Children:
+  m_Children: []
   m_Father: {fileID: 555500002}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -159,8 +159,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RubMiniGame
   gameDescription: "\uC2F9\uC2F9 \uBE4C\uC5B4\uB77C!"
   keyboardGuides:
-  - actionLabel: ''
+  - actionLabel: 
     keys: 0f00000012000000
+  failurePenaltyPrefab: {fileID: 0}
+  failureShakeDuration: 0.4
+  failureShakeAmplitude: 0.35
   timeLimit: 3
   onTimerChanged:
     m_PersistentCalls:
@@ -1481,13 +1484,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SfxPlayer
   clips:
-  - {fileID: 8300000, guid: 1723f1184394b004196469245ebaacc1, type: 3}
+  - {fileID: 8300000, guid: 57e917ca0a90b3f4aa3a5408bd279936, type: 3}
   volume: 1
   pitch: 1
   pitchJitter: 0.08
   minInterval: 0.03
   stepPitchRise: 0.03
   stepPitchCap: 0.5
+  stopOnDisable: 1
+  stopFadeDuration: 0.1
 --- !u!1 &8800000211
 GameObject:
   m_ObjectHideFlags: 0
@@ -1536,7 +1541,9 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 25b00a2929979d34eb391f37e897731f, type: 3}
   volume: 1
   pitch: 1
-  pitchJitter: 0.0
-  minInterval: 0.0
+  pitchJitter: 0
+  minInterval: 0
   stepPitchRise: 0.03
   stepPitchCap: 0.5
+  stopOnDisable: 0
+  stopFadeDuration: 0.15
