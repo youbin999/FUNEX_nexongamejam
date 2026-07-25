@@ -2837,6 +2837,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SettingsMenu
   panel: {fileID: 1989296557}
   toggleWithEscape: 1
+  ignoreEscapeWhileTyping: 1
   pauseWhileOpen: 1
   dontDestroyOnLoad: 1
   canvasSortingOrder: 1000
@@ -6348,6 +6349,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1787864009}
   - component: {fileID: 1787864008}
+  - component: {fileID: 1787864010}
   m_Layer: 0
   m_Name: 'AudioManager '
   m_TagString: Untagged
@@ -6369,7 +6371,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AudioManager
   bgmSource: {fileID: 374635205}
   startupBgm: {fileID: 8300000, guid: e139297e06dea0741bae5c1b9991695c, type: 3}
+  startupBgmVolume: 1
   bgmBaseVolume: 1
+  bgmFadeDuration: 1.2
   sfxChannels: 8
   sfxBaseVolume: 1
   dontDestroyOnLoad: 1
@@ -6388,6 +6392,51 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1787864010
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1787864007}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fdbe4571a834154aa748fe5c11b14e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EraBgmDirector
+  tracks:
+  - era: 1
+    clip: {fileID: 8300000, guid: 1caaac88fd4836d47826261a9c480938, type: 3}
+    volume: 1
+    fadeDuration: -1
+  - era: 2
+    clip: {fileID: 8300000, guid: 2ade127c66f928641ba355560e4183e4, type: 3}
+    volume: 1
+    fadeDuration: -1
+  - era: 3
+    clip: {fileID: 8300000, guid: b9bfaebc04ba50549842f1c3ee8c746b, type: 3}
+    volume: 1
+    fadeDuration: -1
+  - era: 4
+    clip: {fileID: 8300000, guid: 28b821d3492c42b43ba4ba640a37b9bf, type: 3}
+    volume: 1
+    fadeDuration: -1
+  - era: 5
+    clip: {fileID: 8300000, guid: d5068420590d4b14faca1f43315e9a08, type: 3}
+    volume: 1
+    fadeDuration: -1
+  - era: 6
+    clip: {fileID: 8300000, guid: 2b060f6ead970064ea922b27da5cbcd1, type: 3}
+    volume: 1
+    fadeDuration: -1
+  - era: 0
+    clip: {fileID: 0}
+    volume: 1
+    fadeDuration: -1
+  fadeDuration: 1.5
+  playOnStart: 0
+  startEra: 0
+  dontDestroyOnLoad: 0
 --- !u!1 &1852263235
 GameObject:
   m_ObjectHideFlags: 0
