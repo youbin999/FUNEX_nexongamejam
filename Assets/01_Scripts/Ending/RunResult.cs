@@ -29,7 +29,7 @@ public class RunResult : MonoBehaviour
 
     private readonly List<MiniGameOutcome> outcomes = new List<MiniGameOutcome>();
 
-    /// <summary>이번 판에서 플레이한 변화 미니게임 결과들. 등록 순서 = 시대 순서.</summary>
+    /// <summary>이번 판의 엔딩에 반영할 Change 결과와 Critical 실패 결과. 등록 순서 = 시대 순서.</summary>
     public IReadOnlyList<MiniGameOutcome> Outcomes => outcomes;
 
     /// <summary>핵심 미니게임 실패로 흐름이 중단됐는지 여부.</summary>
@@ -152,7 +152,7 @@ public class RunResult : MonoBehaviour
             return sb.ToString();
         }
 
-        sb.AppendLine("[변화 사건]");
+        sb.AppendLine("[엔딩 반영 사건]");
         foreach (MiniGameOutcome o in outcomes)
         {
             sb.AppendLine($"- 시대: {o.era} / 사건: {o.eventLabel} / 결과: {(o.success ? "성공" : "실패")}");

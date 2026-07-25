@@ -77,6 +77,9 @@ public class EndingCreditController : MonoBehaviour
     [Tooltip("이미지 생성 타임아웃(초)")]
     [SerializeField] private int imageTimeout = 60;
 
+    [Tooltip("켜면 같은 미니게임 결과 조합의 엔딩 이미지를 재사용한다. 끄면 매번 새 이미지를 생성한다")]
+    [SerializeField] private bool useImageCache;
+
     [Tooltip("체크하면 API 를 호출하지 않고 항상 폴백 텍스트를 쓴다. 연출만 손볼 때 켜면 편하다.\n" +
         "이미지 생성도 함께 건너뛰므로 갤러리에는 저장되지 않는다")]
     [SerializeField] private bool forceFallback;
@@ -218,7 +221,7 @@ public class EndingCreditController : MonoBehaviour
         if (forceFallback || backgroundImage == null)
             yield break;
 
-        var generator = new EndingImageGenerator(imageProvider, imageModel, imageTimeout);
+        var generator = new EndingImageGenerator(imageProvider, imageModel, imageTimeout, useImageCache);
         Texture2D texture = null;
 
         yield return generator.GetOrCreate(result.CombinationKey, imagePrompt, t => texture = t);

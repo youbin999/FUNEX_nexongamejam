@@ -536,8 +536,8 @@ MonoBehaviour:
       \uC778\uAC04\uC774 \uC9C4\uCD9C\uD588\uB2E4."
     failureMeaning: "\uBD80\uB825\uC744 \uBC1C\uACAC\uD558\uC9C0 \uBABB\uD574 \uC778\uAC04\uC740
       \uC721\uC9C0\uC5D0\uB9CC \uBA38\uBB3C\uB800\uB2E4."
-    successVisual: some ships are on the sea
-    failureVisual: some people afraid of waters
+    successVisual: sea
+    failureVisual: 
     visualWeight: 2
   - prefab: {fileID: 6600000012, guid: 5b2d8e1f4a6c47039d5e7a1b3c9f0e26, type: 3}
     kind: 2

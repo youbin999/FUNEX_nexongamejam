@@ -33,7 +33,7 @@ public class GameFlowController : MonoBehaviour
 
         public string eraYearText;
 
-        [Header("엔딩 맥락 (Change: 성공/실패 모두 반영, Critical: 실패 시 failureMeaning만 반영)")]
+        [Header("엔딩 맥락 (Change: 성공/실패 모두 반영, Critical: 실패 결과 반영)")]
         [Tooltip("사건 이름. 예: '마녀사냥에서 마녀를 색출'")]
         public string eventLabel;
 
@@ -225,6 +225,9 @@ public class GameFlowController : MonoBehaviour
         if (!success && entry.IsCritical)
         {
             ended = true;
+            // 조기 엔딩을 일으킨 Critical 실패도 엔딩 재료로 기록해야
+            // failureVisual 이 대본 생성과 이미지 생성 프롬프트까지 전달된다.
+            RunResult.Instance.Record(entry.ToOutcome(false));
             RunResult.Instance.MarkEarlyEnding(entry.era.ToKorean(), entry.eventLabel, entry.failureMeaning);
             onGameEnding.Invoke();
             BeginEndingTransition();
