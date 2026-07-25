@@ -47,6 +47,19 @@ public abstract class MiniGame : MonoBehaviour
     public bool IsPlaying { get; private set; }
 
     /// <summary>
+    /// 제한 시간이 있어 타이머를 표시해야 하는 게임인지.
+    /// 씬의 공용 타이머 UI(<see cref="MiniGameTimerPresenter"/>)가 이 값을 보고 표시 여부를 정한다.
+    /// 시간제한이 없는 게임은 재정의하지 않는다.
+    /// </summary>
+    public virtual bool HasTimer => false;
+
+    /// <summary>
+    /// 0에서 1로 차오르는 제한 시간 진행도. 타이머가 없으면 0.
+    /// 매 프레임 조회되므로 계산이 가벼워야 한다.
+    /// </summary>
+    public virtual float TimerRatio => 0f;
+
+    /// <summary>
     /// 파생 게임이나 실패 패널티가 자체 카메라 임팩트를 재생하는지 여부.
     /// 중복 셰이크를 피해야 하는 게임만 재정의한다.
     /// </summary>

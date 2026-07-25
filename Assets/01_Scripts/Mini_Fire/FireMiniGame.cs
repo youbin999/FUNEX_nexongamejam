@@ -64,8 +64,11 @@ public class FireMiniGame : MiniGame
     /// <summary>0에서 1로 차오르는 진행도.</summary>
     public float Progress => clearCount > 0 ? Mathf.Clamp01((float)hitCount / clearCount) : 0f;
 
+    /// <summary>제한 시간이 잡혀 있으면 씬 공용 타이머 UI에 표시한다.</summary>
+    public override bool HasTimer => timeLimit > 0f;
+
     /// <summary>0에서 1로 차오르는 타이머 값.</summary>
-    public float TimerRatio => timeLimit > 0f ? Mathf.Clamp01(elapsed / timeLimit) : 0f;
+    public override float TimerRatio => timeLimit > 0f ? Mathf.Clamp01(elapsed / timeLimit) : 0f;
 
     private void Awake()
     {
