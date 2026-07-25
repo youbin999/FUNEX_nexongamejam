@@ -2549,6 +2549,7 @@ Transform:
   - {fileID: 8800000012}
   - {fileID: 3735279297051747559}
   - {fileID: 8840000102}
+  - {fileID: 8840000202}
   - {fileID: 170993664363235712}
   - {fileID: 5647806314688670427}
   - {fileID: 1481669506060356378}
@@ -2656,7 +2657,19 @@ MonoBehaviour:
         m_CallState: 2
   onFail:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8840000203}
+        m_TargetAssemblyTypeName: SfxPlayer, Assembly-CSharp
+        m_MethodName: Play
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument:
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &2928477960277675127
 GameObject:
   m_ObjectHideFlags: 0
@@ -7646,6 +7659,60 @@ MonoBehaviour:
   volume: 1
   pitch: 1
   pitchJitter: 0.02
+  minInterval: 0.05
+  stepPitchRise: 0.03
+  stepPitchCap: 0.5
+  stopOnDisable: 1
+  stopFadeDuration: 0.08
+--- !u!1 &8840000201
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8840000202}
+  - component: {fileID: 8840000203}
+  m_Layer: 0
+  m_Name: Sfx_Fail
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8840000202
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8840000201}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 118820455176514959}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8840000203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8840000201}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d3a92c7b18f4e5480a2c93de17f4b60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SfxPlayer
+  clips:
+  - {fileID: 8300000, guid: 297c69d52a57e2748bbc0a096eced825, type: 3}
+  volume: 1
+  pitch: 1
+  pitchJitter: 0
   minInterval: 0.05
   stepPitchRise: 0.03
   stepPitchCap: 0.5
