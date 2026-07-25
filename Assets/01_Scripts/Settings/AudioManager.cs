@@ -57,6 +57,11 @@ public class AudioManager : MonoBehaviour
 
     private int nextChannel;
 
+    // BGM 위에 곱해지는 일시 감쇠 계수. 1 이면 감쇠 없음.
+    // 게이지를 움직여도 유지돼야 하므로 ApplyBgmVolume 안에서 함께 곱한다.
+    private float bgmDuck = 1f;
+    private Coroutine duckRoutine;
+
     // BGM 채널 두 개. active 가 지금 곡, fading 이 물러나는 중인 곡이다.
     // bgmAltSource 는 크로스페이드용으로 런타임에 만드는 두 번째 채널.
     private AudioSource bgmAltSource;
@@ -195,6 +200,67 @@ public class AudioManager : MonoBehaviour
     }
 
     /// <summary>
+    /// BGM 을 끊지 않고 볼륨만 잠시 낮춘다. 미니게임이 자체 배경음을 까는 동안 쓴다.
+    /// 곡을 멈췄다 다시 트는 방식과 달리 재생 위치가 유지되므로, 판이 바뀔 때마다
+    /// 곡이 처음부터 다시 시작하지 않는다.
+    ///
+    /// 반드시 <see cref="RestoreBgm"/> 로 되돌려야 한다 — 안 되돌리면 BGM 이 작은 채로 남는다.
+    /// </summary>
+    /// <param name="factor">감쇠 계수(0~1). 0.15 면 원래 크기의 15%.</param>
+    /// <param name="fadeDuration">감쇠에 걸리는 시간(초). 0이면 즉시.</param>
+    public void DuckBgm(float factor, float fadeDuration = 0.15f)
+        => SetDuck(Mathf.Clamp01(factor), fadeDuration);
+
+    /// <summary>감쇠를 풀어 원래 크기로 되돌린다. 감쇠 중이 아닐 때 불러도 안전하다(멱등).</summary>
+    public void RestoreBgm(float fadeDuration = 0.25f)
+        => SetDuck(1f, fadeDuration);
+
+    private void SetDuck(float target, float fadeDuration)
+    {
+        if (duckRoutine != null)
+        {
+            StopCoroutine(duckRoutine);
+            duckRoutine = null;
+        }
+
+        if (Mathf.Approximately(bgmDuck, target))
+            return;
+
+        if (fadeDuration <= 0f || !isActiveAndEnabled)
+        {
+            bgmDuck = target;
+            ApplyBgmVolume(GameSettings.BgmVolume);
+            return;
+        }
+
+        duckRoutine = StartCoroutine(DuckRoutine(target, fadeDuration));
+    }
+
+    /// <summary>
+    /// 감쇠 계수를 서서히 옮긴다.
+    /// 크로스페이드가 도는 중이면 <see cref="ApplyBgmVolume"/> 이 물러나므로 볼륨을 직접 건드리지 않는다 —
+    /// 그쪽 코루틴이 매 프레임 <see cref="TargetBgmVolume"/> 을 다시 읽어 가므로 감쇠는 그대로 반영된다.
+    /// </summary>
+    private IEnumerator DuckRoutine(float target, float duration)
+    {
+        float start = bgmDuck;
+        float time = 0f;
+
+        while (time < duration)
+        {
+            // 설정 창이 열려 게임이 멈춰 있어도 감쇠는 진행돼야 한다.
+            time += Time.unscaledDeltaTime;
+            bgmDuck = Mathf.Lerp(start, target, Mathf.Clamp01(time / duration));
+            ApplyBgmVolume(GameSettings.BgmVolume);
+            yield return null;
+        }
+
+        bgmDuck = target;
+        ApplyBgmVolume(GameSettings.BgmVolume);
+        duckRoutine = null;
+    }
+
+    /// <summary>
     /// 새 곡을 받을 준비를 한다. 지금 곡이 있으면 물러나는 쪽으로 밀고 빈 채널을 앞에 세운다.
     /// 처음 트는 곡이면 채널을 바꾸지 않는다 — 인스펙터에서 잡아둔 AudioSource 를 그대로 쓴다.
     /// </summary>
@@ -253,7 +319,7 @@ public class AudioManager : MonoBehaviour
                 activeBgm.volume = TargetBgmVolume() * t;
 
             if (fadingBgm != null)
-                fadingBgm.volume = GameSettings.BgmVolume * bgmBaseVolume * fadingTrackVolume * (1f - t);
+                fadingBgm.volume = GameSettings.BgmVolume * bgmBaseVolume * fadingTrackVolume * bgmDuck * (1f - t);
 
             yield return null;
         }
@@ -277,8 +343,8 @@ public class AudioManager : MonoBehaviour
         source.volume = 0f;
     }
 
-    /// <summary>지금 곡이 최종적으로 가져야 할 볼륨.</summary>
-    private float TargetBgmVolume() => GameSettings.BgmVolume * bgmBaseVolume * bgmTrackVolume;
+    /// <summary>지금 곡이 최종적으로 가져야 할 볼륨. 일시 감쇠(<see cref="DuckBgm"/>)까지 반영한다.</summary>
+    private float TargetBgmVolume() => GameSettings.BgmVolume * bgmBaseVolume * bgmTrackVolume * bgmDuck;
 
     /// <summary>효과음을 한 번 재생한다. volumeScale 로 이 소리만 크게/작게 낼 수 있다.</summary>
     public AudioSource PlaySfx(AudioClip clip, float volumeScale = 1f, float pitch = 1f)
@@ -417,7 +483,7 @@ public class AudioManager : MonoBehaviour
             return;
 
         if (activeBgm != null)
-            activeBgm.volume = volume * bgmBaseVolume * bgmTrackVolume;
+            activeBgm.volume = volume * bgmBaseVolume * bgmTrackVolume * bgmDuck;
     }
 
     private void ApplySfxVolume(float volume)
