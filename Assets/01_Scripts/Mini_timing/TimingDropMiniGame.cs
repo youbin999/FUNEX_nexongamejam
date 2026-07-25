@@ -54,11 +54,15 @@ public class TimingDropMiniGame : TimedMiniGame
     [SerializeField] private bool randomizeSway = true;
 
     [Header("판정 (문 가운데)")]
-    [Tooltip("문 가운데 기준 좌우 허용 오차(월드 유닛). 흔들림 폭보다 훨씬 작아야 판정이 의미 있다")]
-    [SerializeField] private float hitToleranceX = 0.35f;
+    [Tooltip("판정 영역의 좌우 반폭(월드 유닛). 풍선이 이 영역 '안에 완전히' 들어와야 성공한다")]
+    [SerializeField] private float hitToleranceX = 1.8f;
 
-    [Tooltip("문 가운데 기준 위아래 허용 오차(월드 유닛). 이만큼 지나치면 놓친 것으로 본다")]
-    [SerializeField] private float hitToleranceY = 0.6f;
+    [Tooltip("판정 영역의 위아래 반높이(월드 유닛). 풍선이 이 영역 '안에 완전히' 들어와야 성공한다")]
+    [SerializeField] private float hitToleranceY = 2.1f;
+
+    [Tooltip("풍선 스프라이트에서 실제 풍선이 차지하는 비율(가로, 세로). " +
+        "이미지 가장자리의 투명 여백을 판정에서 빼기 위한 값이다. 1이면 이미지 전체를 풍선으로 친다")]
+    [SerializeField] private Vector2 balloonHitboxScale = new Vector2(0.7f, 0.9f);
 
     [Tooltip("판정 밖에서 눌렀을 때 즉시 실패시킬지. 끄면 문이 다시 열려 재시도할 수 있다")]
     [SerializeField] private bool failOnMistimedPress = true;
@@ -83,6 +87,13 @@ public class TimingDropMiniGame : TimedMiniGame
     [Tooltip("닫힌 문. Rythmgame2")]
     [SerializeField] private Sprite pressedSprite;
 
+    [Header("문 오브젝트 전환")]
+    [Tooltip("열린 문 오브젝트(miss_game_assets_open). 문이 닫히면 비활성화된다")]
+    [SerializeField] private GameObject doorOpenObject;
+
+    [Tooltip("닫힌 문 오브젝트(Rythmgame2). 문이 닫히면 활성화된다")]
+    [SerializeField] private GameObject doorClosedObject;
+
     [Header("성공 연출")]
     [Tooltip("풍선이 터지듯 부풀어 오르는 시간(초). 끝나면 풍선이 사라진다")]
     [SerializeField] private float hitPopDuration = 0.15f;
@@ -93,10 +104,43 @@ public class TimingDropMiniGame : TimedMiniGame
     [Tooltip("성공 시 켜줄 연출 오브젝트(터짐 효과 등). 없으면 비워둔다")]
     [SerializeField] private GameObject hitEffect;
 
+    [Tooltip("성공 시 커지면서 흔들릴 Pow! 이미지들. 배치해 둔 위치·크기가 최종 모습이 된다")]
+    [SerializeField] private SpriteRenderer[] powImages;
+
+    [Tooltip("Pow! 가 커지는 데 걸리는 시간(초). 이 동안 같이 흔들린다")]
+    [SerializeField] private float powGrowDuration = 0.35f;
+
+    [Tooltip("Pow! 가 튀어나오기 시작할 때의 크기 배율. 여기서 제 크기까지 커진다")]
+    [SerializeField] private float powStartScale = 0.2f;
+
+    [Tooltip("Pow! 가 커지는 동안 흔들리는 세기(월드 유닛)")]
+    [SerializeField] private float powShakeMagnitude = 0.25f;
+
+    [Tooltip("두 번째 Pow! 부터 늦게 터지는 간격(초). 0이면 동시에 터진다")]
+    [SerializeField] private float powStagger = 0.1f;
+
+    [Tooltip("성공 시 화면이 흔들리는 시간(초). 0이면 흔들지 않는다")]
+    [SerializeField] private float successShakeDuration = 0.35f;
+
+    [Tooltip("성공 시 화면 흔들림 세기(월드 유닛)")]
+    [SerializeField] private float successShakeMagnitude = 0.4f;
+
     [Tooltip("성공 순간 풍선을 문 뒤로 보내 문에 삼켜지는 것처럼 보이게 한다")]
     [SerializeField] private bool hideBalloonBehindDoor = true;
 
     [Header("실패 연출")]
+    [Tooltip("실패 시 풍선이 날아가는 방향. 기본값은 왼쪽 위")]
+    [SerializeField] private Vector2 failFlyDirection = new Vector2(-1f, 0.25f);
+
+    [Tooltip("실패 시 풍선이 날아가는 속도(월드 유닛/초). 0이면 그 자리에 멈춘다")]
+    [SerializeField] private float failFlySpeed = 14f;
+
+    [Tooltip("날아가면서 점점 빨라지는 가속도(월드 유닛/초²). 슉 하고 빠져나가는 느낌을 준다")]
+    [SerializeField] private float failFlyAcceleration = 30f;
+
+    [Tooltip("날아가면서 도는 속도(도/초). 0이면 돌지 않고 그대로 날아간다")]
+    [SerializeField] private float failFlySpin = 0f;
+
     [Tooltip("실패 시 닫힌 문을 보여주는 시간(초). 이 시간이 지나면 화면이 어두워지기 시작한다")]
     [SerializeField] private float failDoorHold = 0.4f;
 
@@ -133,8 +177,19 @@ public class TimingDropMiniGame : TimedMiniGame
     private bool failing;
 
     private Vector3 originalScale = Vector3.one;
+    private Quaternion originalRotation = Quaternion.identity;
     private Coroutine hitRoutine;
     private Coroutine failRoutine;
+    private Coroutine flyAwayRoutine;
+
+    // Pow! 가 배치돼 있던 원래 위치·크기. 연출이 끝나면 여기로 수렴하고, 리셋 때 되돌린다.
+    private Vector3[] powRestPositions;
+    private Vector3[] powRestScales;
+
+    // 화면 흔들기 전 카메라 원위치. 카메라는 호스트 씬 공용이라 반드시 되돌려야 한다.
+    private Coroutine shakeRoutine;
+    private Vector3 cameraRestorePos;
+    private bool cameraShaking;
 
     // 성공 시 풍선을 문 뒤로 보내기 위해 원래 정렬 순서를 기억해 둔다.
     private SpriteRenderer[] balloonRenderers;
@@ -150,7 +205,29 @@ public class TimingDropMiniGame : TimedMiniGame
         if (fallingObject != null)
         {
             originalScale = fallingObject.localScale;
+            originalRotation = fallingObject.localRotation;
             CacheBalloonSorting();
+        }
+
+        CachePowPoses();
+    }
+
+    /// <summary>Pow! 들이 배치된 위치·크기를 기억해 둔다. 연출은 이 값을 목표로 삼는다.</summary>
+    private void CachePowPoses()
+    {
+        if (powImages == null)
+            return;
+
+        powRestPositions = new Vector3[powImages.Length];
+        powRestScales = new Vector3[powImages.Length];
+
+        for (int i = 0; i < powImages.Length; i++)
+        {
+            if (powImages[i] == null)
+                continue;
+
+            powRestPositions[i] = powImages[i].transform.localPosition;
+            powRestScales[i] = powImages[i].transform.localScale;
         }
     }
 
@@ -176,13 +253,18 @@ public class TimingDropMiniGame : TimedMiniGame
     {
         ResetInternal();
 
-        // 스페이스를 눌러도 문이 안 닫히는 흔한 원인 — 참조가 비어 있으면 미리 알려준다.
-        if (pressRenderer == null || idleSprite == null || pressedSprite == null)
+        // 스페이스를 눌러도 문이 안 닫히는 흔한 원인 — 두 방식 모두 비어 있으면 미리 알려준다.
+        // 문 전환은 오브젝트 켜고 끄기(doorOpenObject/doorClosedObject) 또는
+        // 스프라이트 교체(pressRenderer + idle/pressed) 중 하나만 설정돼 있으면 된다.
+        bool objectToggleReady = doorOpenObject != null || doorClosedObject != null;
+        bool spriteSwapReady = pressRenderer != null && idleSprite != null && pressedSprite != null;
+
+        if (!objectToggleReady && !spriteSwapReady)
         {
             Debug.LogWarning(
-                $"[{name}] Press Renderer / Idle Sprite / Pressed Sprite 중 비어 있는 게 있어 " +
-                "스페이스를 눌러도 문 그림이 바뀌지 않는다. 인스펙터에서 문 SpriteRenderer 와 " +
-                "열린 문 / 닫힌 문 스프라이트를 연결하라.", this);
+                $"[{name}] 문 전환 설정이 비어 있어 스페이스를 눌러도 문이 바뀌지 않는다. " +
+                "Door Open Object / Door Closed Object 를 연결하거나, " +
+                "Press Renderer 와 열린 문 / 닫힌 문 스프라이트를 연결하라.", this);
         }
 
         if (timeLimit < fallDuration)
@@ -192,11 +274,20 @@ public class TimingDropMiniGame : TimedMiniGame
                 "풍선이 문에 닿기도 전에 시간이 끝난다.", this);
         }
 
-        if (swayAmplitude > 0f && hitToleranceX >= swayAmplitude)
+        // 풍선이 판정 영역보다 크면 아무리 잘 눌러도 "완전히 안에" 들어올 수 없다.
+        GetBalloonHitbox(out _, out Vector2 hitboxExtents);
+        if (hitboxExtents.x > hitToleranceX || hitboxExtents.y > hitToleranceY)
         {
             Debug.LogWarning(
-                $"[{name}] 좌우 허용 오차({hitToleranceX})가 흔들림 폭({swayAmplitude}) 이상이라 " +
-                "아무 때나 눌러도 가운데로 판정된다.", this);
+                $"[{name}] 판정 영역({hitToleranceX} x {hitToleranceY})이 풍선 반크기" +
+                $"({hitboxExtents.x:F2} x {hitboxExtents.y:F2})보다 작아 절대 성공할 수 없다. " +
+                "Hit Tolerance 를 키우거나 풍선 스케일 / Balloon Hitbox Scale 을 줄여라.", this);
+        }
+        else if (swayAmplitude > 0f && hitToleranceX - hitboxExtents.x >= swayAmplitude)
+        {
+            Debug.LogWarning(
+                $"[{name}] 가로 여유({hitToleranceX - hitboxExtents.x:F2})가 흔들림 폭({swayAmplitude}) 이상이라 " +
+                "아무 때나 눌러도 성공한다.", this);
         }
     }
 
@@ -212,6 +303,18 @@ public class TimingDropMiniGame : TimedMiniGame
         {
             StopCoroutine(failRoutine);
             failRoutine = null;
+        }
+
+        if (shakeRoutine != null)
+        {
+            StopCoroutine(shakeRoutine);
+            shakeRoutine = null;
+        }
+
+        if (flyAwayRoutine != null)
+        {
+            StopCoroutine(flyAwayRoutine);
+            flyAwayRoutine = null;
         }
 
         ResetInternal();
@@ -243,9 +346,13 @@ public class TimingDropMiniGame : TimedMiniGame
             return;
         }
 
-        // 문 가운데를 아래로 지나쳐 버렸다 — 놓쳤다.
-        if (fallingObject != null && fallingObject.position.y < goalPosition.y - hitToleranceY)
-            Miss();
+        // 풍선이 판정 영역 아래로 완전히 빠져나갔다 — 더는 들어올 수 없으니 놓친 것.
+        if (fallingObject != null)
+        {
+            GetBalloonHitbox(out Vector3 center, out Vector2 extents);
+            if (center.y + extents.y < goalPosition.y - hitToleranceY)
+                Miss();
+        }
     }
 
     /// <summary>낙하 시간, 위치, 스케일, 문 그림, 연출 오브젝트를 처음 상태로 되돌린다.</summary>
@@ -255,8 +362,26 @@ public class TimingDropMiniGame : TimedMiniGame
         reopenTimer = 0f;
         failing = false;
 
+        // 흔들리던 중에 중단됐다면 카메라를 원위치로 되돌린다(카메라는 호스트 씬 공용이다).
+        if (cameraShaking)
+        {
+            Camera cam = targetCamera != null ? targetCamera : Camera.main;
+            if (cam != null)
+                cam.transform.localPosition = cameraRestorePos;
+
+            cameraShaking = false;
+        }
+
         // 흔들림 위상: 랜덤이면 매 판마다 문에 도착하는 순간의 좌우 위치가 달라진다.
         swayPhase = randomizeSway ? UnityEngine.Random.Range(0f, Mathf.PI * 2f) : 0f;
+
+        // 날아가면서 돌았을 수 있으니 자세도 처음으로 되돌린다.
+        if (fallingObject != null)
+        {
+            fallingObject.localRotation = originalRotation;
+            fallingObject.localScale = originalScale;
+            fallingObject.gameObject.SetActive(true);
+        }
 
         ResolvePoints();
         ApplyFallPosition();
@@ -269,6 +394,29 @@ public class TimingDropMiniGame : TimedMiniGame
 
         if (hitEffect != null)
             hitEffect.SetActive(false);
+
+        HidePowImages();
+    }
+
+    /// <summary>Pow! 들을 숨기고 원래 위치·크기로 되돌린다. 멱등.</summary>
+    private void HidePowImages()
+    {
+        if (powImages == null)
+            return;
+
+        for (int i = 0; i < powImages.Length; i++)
+        {
+            if (powImages[i] == null)
+                continue;
+
+            if (powRestPositions != null && i < powRestPositions.Length)
+            {
+                powImages[i].transform.localPosition = powRestPositions[i];
+                powImages[i].transform.localScale = powRestScales[i];
+            }
+
+            powImages[i].gameObject.SetActive(false);
+        }
     }
 
     /// <summary>출발/문 지점을 확정하고 낙하 속도를 계산한다. Transform 이 비어 있으면 카메라 화면 기준으로 자동 계산.</summary>
@@ -380,25 +528,77 @@ public class TimingDropMiniGame : TimedMiniGame
             return;
         }
 
-        Vector3 position = fallingObject.position;
-        float dx = Mathf.Abs(position.x - goalPosition.x);
-        float dy = Mathf.Abs(position.y - goalPosition.y);
+        // 풍선의 '중심'이 아니라 '전체'가 판정 영역 안에 들어와야 성공이다.
+        // 남은 여유(margin)가 0 이상이면 삐져나가지 않고 완전히 들어온 것.
+        GetBalloonHitbox(out Vector3 center, out Vector2 extents);
 
-        if (dx <= hitToleranceX && dy <= hitToleranceY)
-            Hit(dx, dy);
+        float dx = Mathf.Abs(center.x - goalPosition.x);
+        float dy = Mathf.Abs(center.y - goalPosition.y);
+
+        float marginX = hitToleranceX - (dx + extents.x);
+        float marginY = hitToleranceY - (dy + extents.y);
+
+        if (marginX >= 0f && marginY >= 0f)
+            Hit(marginX, marginY);
         else
             Mistimed();
     }
 
-    /// <summary>문 가운데에서 풍선을 터뜨렸다. 성공 연출을 재생한다.</summary>
-    private void Hit(float dx, float dy)
+    /// <summary>
+    /// 판정에 쓸 풍선의 중심과 반크기를 구한다.
+    /// 스프라이트 렌더러의 실제 크기에 <see cref="balloonHitboxScale"/> 을 곱해 투명 여백을 덜어낸다.
+    /// </summary>
+    private void GetBalloonHitbox(out Vector3 center, out Vector2 extents)
     {
-        // 가로/세로 중 더 많이 빗나간 쪽을 정확도로 삼는다. 문 정중앙이면 1.
-        float errorX = hitToleranceX > 0f ? dx / hitToleranceX : 0f;
-        float errorY = hitToleranceY > 0f ? dy / hitToleranceY : 0f;
-        float accuracy = 1f - Mathf.Clamp01(Mathf.Max(errorX, errorY));
+        center = fallingObject != null ? fallingObject.position : goalPosition;
+        extents = Vector2.zero;
 
-        onJudged.Invoke(accuracy);
+        if (balloonRenderers == null || balloonRenderers.Length == 0)
+            return;
+
+        bool found = false;
+        Bounds bounds = default;
+
+        foreach (SpriteRenderer renderer in balloonRenderers)
+        {
+            if (renderer == null || !renderer.enabled)
+                continue;
+
+            if (!found)
+            {
+                bounds = renderer.bounds;
+                found = true;
+            }
+            else
+            {
+                bounds.Encapsulate(renderer.bounds);
+            }
+        }
+
+        if (!found)
+            return;
+
+        center = bounds.center;
+        extents = new Vector2(
+            bounds.extents.x * Mathf.Max(0f, balloonHitboxScale.x),
+            bounds.extents.y * Mathf.Max(0f, balloonHitboxScale.y));
+    }
+
+    /// <summary>풍선이 판정 영역 안에 완전히 들어온 상태에서 문을 닫았다. 성공 연출을 재생한다.</summary>
+    /// <param name="marginX">가로로 남은 여유(월드 유닛). 0이면 딱 걸친 것.</param>
+    /// <param name="marginY">세로로 남은 여유(월드 유닛).</param>
+    private void Hit(float marginX, float marginY)
+    {
+        Debug.Log($"[{name}] 클리어! 풍선이 판정 영역 안에 완전히 들어왔다 " +
+            $"(남은 여유 가로 {marginX:F2} / 세로 {marginY:F2})", this);
+
+        // 판정은 들어왔나/아닌가 뿐이므로 통지 값은 항상 1로 고정한다.
+        onJudged.Invoke(1f);
+
+        // 터뜨린 손맛 — 화면을 짧게 흔든다. 풍선/Pow 연출과 겹쳐서 재생된다.
+        Camera cam = targetCamera != null ? targetCamera : Camera.main;
+        if (cam != null && successShakeDuration > 0f)
+            shakeRoutine = StartCoroutine(ShakeCameraRoutine(cam));
 
         // 문이 닫히면서 풍선을 삼키도록 정렬 순서를 문 뒤로 내린다.
         if (hideBalloonBehindDoor)
@@ -414,9 +614,11 @@ public class TimingDropMiniGame : TimedMiniGame
     {
         if (failOnMistimedPress)
         {
-            BeginFail();
+            BeginFail("헛닫힘 — 판정 영역 밖에서 눌렀다");
             return;
         }
+
+        Debug.Log($"[{name}] 헛닫힘 — 문이 다시 열린다(재시도 가능)", this);
 
         // 실패시키지 않는 설정이면 문만 잠깐 닫혔다가 다시 열린다.
         reopenTimer = Mathf.Max(doorReopenDelay, Mathf.Epsilon);
@@ -425,7 +627,7 @@ public class TimingDropMiniGame : TimedMiniGame
     /// <summary>문 가운데를 지나칠 때까지 누르지 못했다.</summary>
     private void Miss()
     {
-        BeginFail();
+        BeginFail("놓침 — 풍선이 문을 지나쳐 내려갔다");
     }
 
     /// <summary>제한 시간을 다 썼다. 즉시 통지하지 않고 실패 연출을 거친다.</summary>
@@ -435,25 +637,65 @@ public class TimingDropMiniGame : TimedMiniGame
         if (failing)
             return;
 
-        BeginFail();
+        BeginFail("시간 초과");
     }
 
     /// <summary>
     /// 실패 연출을 시작한다. 문이 닫힌 채로 잠시 멈췄다가 화면이 까매지고, 그 뒤에 실패로 통지된다.
     /// 연출 중에는 <see cref="failing"/> 로 입력과 낙하를 막는다.
     /// </summary>
-    private void BeginFail()
+    /// <param name="reason">로그에 남길 실패 원인.</param>
+    private void BeginFail(string reason)
     {
         if (failing)
             return;
 
         failing = true;
 
+        Debug.Log($"[{name}] 실패! {reason}", this);
+
         // 실패한 순간에도 문은 닫힌 그림으로 보여준다.
         ApplyDoorClosed(true);
         onFail.Invoke();
 
+        // 놓친 풍선은 왼쪽으로 날아가 버린다.
+        if (fallingObject != null && failFlySpeed > 0f)
+            flyAwayRoutine = StartCoroutine(FlyAwayRoutine());
+
         failRoutine = StartCoroutine(FailRoutine());
+    }
+
+    /// <summary>
+    /// 실패한 풍선이 화면 밖으로 날아간다. 실패 연출(문 유지 → 암전) 동안 계속 움직이고,
+    /// 화면 밖으로 충분히 벗어나면 스스로 멈춘다.
+    /// </summary>
+    private IEnumerator FlyAwayRoutine()
+    {
+        Vector2 direction = failFlyDirection.sqrMagnitude > 0.0001f
+            ? failFlyDirection.normalized
+            : Vector2.left;
+
+        // 실패 연출이 다 끝날 때까지는 확실히 날아가도록 넉넉히 잡는다.
+        float duration = failDoorHold + failFadeDuration + failBlackHold + 0.5f;
+        float time = 0f;
+        float speed = failFlySpeed;
+
+        while (time < duration && fallingObject != null)
+        {
+            float dt = Time.deltaTime;
+            time += dt;
+
+            // 갈수록 빨라져서 슉 하고 화면 밖으로 빠져나간다.
+            speed += failFlyAcceleration * dt;
+            fallingObject.position += (Vector3)(direction * (speed * dt));
+
+            if (!Mathf.Approximately(failFlySpin, 0f))
+                fallingObject.Rotate(0f, 0f, failFlySpin * dt);
+
+            yield return null;
+        }
+
+        flyAwayRoutine = null;
     }
 
     /// <summary>실패 연출: 닫힌 문을 잠깐 보여주고 화면을 검게 덮은 뒤 실패를 통지한다.</summary>
@@ -516,8 +758,104 @@ public class TimingDropMiniGame : TimedMiniGame
         if (hitEffect != null)
             hitEffect.SetActive(true);
 
+        // Pow! 들이 작게 튀어나와 커지면서 부르르 흔들린다.
+        yield return PopPowRoutine();
+
         hitRoutine = null;
         onClear.Invoke();
+    }
+
+    /// <summary>Pow! 이미지들을 순서대로 터뜨린다. 각자 작게 시작해 제 크기까지 커지며 흔들린다.</summary>
+    private IEnumerator PopPowRoutine()
+    {
+        if (powImages == null || powImages.Length == 0)
+            yield break;
+
+        for (int i = 0; i < powImages.Length; i++)
+        {
+            if (powImages[i] == null)
+                continue;
+
+            StartCoroutine(PopOnePowRoutine(i));
+
+            if (powStagger > 0f && i < powImages.Length - 1)
+                yield return new WaitForSeconds(powStagger);
+        }
+
+        // 마지막으로 터진 것까지 다 커질 때까지 기다린다.
+        if (powGrowDuration > 0f)
+            yield return new WaitForSeconds(powGrowDuration);
+    }
+
+    /// <summary>Pow! 하나를 작게 띄워 제 크기까지 키우면서 흔든다.</summary>
+    private IEnumerator PopOnePowRoutine(int index)
+    {
+        SpriteRenderer pow = powImages[index];
+        Transform t = pow.transform;
+
+        Vector3 restPos = powRestPositions != null && index < powRestPositions.Length
+            ? powRestPositions[index]
+            : t.localPosition;
+        Vector3 restScale = powRestScales != null && index < powRestScales.Length
+            ? powRestScales[index]
+            : t.localScale;
+
+        t.localPosition = restPos;
+        t.localScale = restScale * powStartScale;
+        pow.gameObject.SetActive(true);
+
+        float time = 0f;
+        while (time < powGrowDuration)
+        {
+            time += Time.deltaTime;
+            float k = Mathf.Clamp01(powGrowDuration > 0f ? time / powGrowDuration : 1f);
+
+            // 커지는 건 끝에서 살짝 넘쳤다 수렴하고, 흔들림은 갈수록 잦아든다.
+            t.localScale = Vector3.LerpUnclamped(restScale * powStartScale, restScale, EaseOutBack(k));
+
+            float damper = 1f - k;
+            float angle = UnityEngine.Random.value * Mathf.PI * 2f;
+            t.localPosition = restPos + new Vector3(
+                Mathf.Cos(angle), Mathf.Sin(angle), 0f) * (powShakeMagnitude * damper);
+
+            yield return null;
+        }
+
+        t.localPosition = restPos;
+        t.localScale = restScale;
+    }
+
+    /// <summary>카메라를 흔들었다가 원위치로 되돌린다. 시간이 지날수록 잦아든다.</summary>
+    private IEnumerator ShakeCameraRoutine(Camera cam)
+    {
+        Transform t = cam.transform;
+        cameraRestorePos = t.localPosition;
+        cameraShaking = true;
+
+        float time = 0f;
+        while (time < successShakeDuration)
+        {
+            time += Time.deltaTime;
+            float damper = 1f - Mathf.Clamp01(time / successShakeDuration);
+            float angle = UnityEngine.Random.value * Mathf.PI * 2f;
+            t.localPosition = cameraRestorePos + new Vector3(
+                Mathf.Cos(angle), Mathf.Sin(angle), 0f) * (successShakeMagnitude * damper);
+
+            yield return null;
+        }
+
+        t.localPosition = cameraRestorePos;
+        cameraShaking = false;
+        shakeRoutine = null;
+    }
+
+    /// <summary>끝에서 살짝 넘쳤다가 제자리로 돌아오는 이징(통통 튀는 느낌).</summary>
+    private static float EaseOutBack(float x)
+    {
+        const float c1 = 1.70158f;
+        const float c3 = c1 + 1f;
+        float p = x - 1f;
+        return 1f + c3 * p * p * p + c1 * p * p;
     }
 
     /// <summary>
@@ -526,6 +864,13 @@ public class TimingDropMiniGame : TimedMiniGame
     /// </summary>
     private void ApplyDoorClosed(bool closed)
     {
+        // 오브젝트를 통째로 켜고 끄는 방식. 스페이스를 누르면 열린 문이 꺼지고 닫힌 문이 켜진다.
+        if (doorOpenObject != null)
+            doorOpenObject.SetActive(!closed);
+
+        if (doorClosedObject != null)
+            doorClosedObject.SetActive(closed);
+
         if (pressRenderer == null)
             return;
 
@@ -653,9 +998,17 @@ public class TimingDropMiniGame : TimedMiniGame
 
         ResolvePoints();
 
-        // 판정 영역(초록) — 이 안에서 스페이스를 눌러야 성공.
+        // 판정 영역(초록) — 풍선 상자가 이 안에 완전히 들어와야 성공.
         Gizmos.color = Color.green;
         Gizmos.DrawWireCube(goalPosition, new Vector3(hitToleranceX * 2f, hitToleranceY * 2f, 0f));
+
+        // 풍선 판정 상자(하늘색) — 초록 상자 안에 통째로 들어가야 한다.
+        if (balloonRenderers == null || balloonRenderers.Length == 0)
+            CacheBalloonSorting();
+
+        GetBalloonHitbox(out Vector3 balloonCenter, out Vector2 balloonExtents);
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireCube(balloonCenter, new Vector3(balloonExtents.x * 2f, balloonExtents.y * 2f, 0f));
 
         // 흔들림 폭(노랑) — 풍선이 좌우로 오가는 범위.
         Gizmos.color = Color.yellow;
