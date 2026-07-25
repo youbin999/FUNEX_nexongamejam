@@ -3,7 +3,17 @@
 변화 미니게임의 성공/실패 조합에 따라 엔딩 크레딧 텍스트와 엔딩 이미지를 **런타임에 생성**한다.
 조합이 2^N 가지라 사전 제작이 불가능하므로, 매 판 생성하고 조합 키로 캐시한다.
 
-프로바이더는 **Google Gemini** 단일. 텍스트와 이미지를 같은 키로 처리한다.
+프로바이더는 둘로 나뉜다. 둘 다 무료다.
+
+| 용도 | 프로바이더 | 키 | 비고 |
+|---|---|---|---|
+| 크레딧 텍스트 | **Gemini** `gemini-3.6-flash` | 필요 | 무료 티어로 동작 확인 완료 |
+| 엔딩 이미지 | **Pollinations** (flux) | 불필요 | 무료, 동작 확인 완료 |
+
+> **Gemini 이미지 모델은 무료 티어에서 쓸 수 없다.** 2026-07-25 실측 결과, `gemini-2.5-flash-image` /
+> `gemini-3.1-flash-image` / `gemini-3-pro-image` / `nano-banana-pro-preview` 전부 **첫 요청부터**
+> `GenerateRequestsPerDayPerProjectPerModel-FreeTier` 위반으로 429 를 반환한다(일일 한도 0).
+> 결제를 활성화하면 `imageProvider = Gemini` 로 전환할 수 있게 코드에 경로를 남겨뒀다.
 
 ## 전체 흐름
 
@@ -101,7 +111,8 @@ AIza...
 
 ## 3. 엔딩 씬 구성
 
-`Assets/00_Scenes/99_Ending.unity` 를 만들고 아래 구조를 배치한다.
+`Assets/00_Scenes/99_Ending.unity` 는 **이미 구성돼 있고 빌드 설정에도 등록돼 있다**(index 3).
+아래는 실제 배치된 구조 — 다시 만들 필요는 없고, 손볼 때 참고용이다.
 
 ```
 Canvas (Screen Space - Overlay)
@@ -119,6 +130,17 @@ EndingController [EndingCreditController]
 
 `CreditText` 의 `RectTransform` 은 **높이를 내용에 맞게 늘어나게** 두고(Content Size Fitter: Vertical = Preferred), 앵커는 상하 stretch 가 아닌 중앙 고정으로 둔다. 컨트롤러가 `anchoredPosition.y` 를 직접 움직인다.
 
+폰트는 프로젝트의 한글 폰트 `KMU80TTFSungkokSerif SDF` 를 쓴다.
+**기본 LiberationSans SDF 로 바꾸면 한글이 전부 네모로 깨진다.**
+
+실측 레이아웃(폴백 대본 12줄 기준): 뷰포트 1080px, 콘텐츠 620px,
+스크롤 -850 → 850, `scrollSpeed = 60` 에서 롤 시간 약 28초.
+이미지 생성이 10~30초 걸리므로, 이미지를 더 오래 보여주고 싶으면 `scrollSpeed` 를 45 정도로 낮춘다(약 38초).
+
+> ⚠️ **인스펙터 값은 코드 기본값과 별개로 직렬화된다.** `narratorModel` / `imageModel` 의
+> 코드 기본값을 바꿔도 이미 씬에 저장된 컴포넌트는 옛 값을 유지한다. 모델명을 바꿀 때는
+> 씬의 `EndingController` 인스펙터도 같이 확인할 것.
+
 ### 연출 파라미터
 
 | 필드 | 기본값 | 설명 |
@@ -128,6 +150,8 @@ EndingController [EndingCreditController]
 | `epilogueDelay` | 1초 | 롤 종료 후 에필로그까지 |
 | `imageFadeDuration` | 2초 | 배경 페이드인 |
 | `narratorTimeout` | 20초 | 초과 시 폴백 텍스트 |
+| `narratorModel` | `gemini-3.6-flash` | **`gemini-2.5-flash` 는 쓰지 말 것** — 신규 사용자에게 404 |
+| `imageProvider` | `Pollinations` | 키 불필요·무료. `Gemini` 는 결제 활성화 시에만 |
 | `imageTimeout` | 60초 | 초과 시 이미지 생략 |
 | `forceFallback` | false | **켜면 API 호출 없이 폴백만 사용.** 연출만 손볼 때 유용 |
 
@@ -154,8 +178,26 @@ EndingController [EndingCreditController]
 
 **어떤 경우에도 엔딩은 완주된다.** 이게 이 설계의 최우선 요구사항이다.
 
+## 실측 검증 결과 (2026-07-25)
+
+실제 API 호출로 확인한 내용이다.
+
+| 항목 | 결과 |
+|---|---|
+| API 키 (`AQ.A…` 형식) | ✅ 동작 |
+| `gemini-2.5-flash` | ❌ **404** — "no longer available to new users" |
+| `gemini-3.6-flash` / `3.5-flash` / `flash-latest` | ✅ 200 |
+| `responseSchema` structured output | ✅ 스키마대로 `credit_lines` / `epilogue` / `image_prompt` 반환 |
+| Gemini 이미지 모델 (4종) | ❌ **429** — 무료 티어 일일 한도 0 |
+| Pollinations (flux) | ✅ 200, JPEG 1024×576 |
+
+최신 Gemini 모델은 답변 앞에 `thoughtSignature` 를 가진 사고 파트를 끼워 넣기도 한다.
+`GeminiEndingNarrator.ParseScript` 는 파트를 순회하며 JSON 으로 파싱되는 첫 파트를 채택하고,
+파싱 실패는 파트 단위로 삼켜 다음 파트로 넘어간다.
+
 ## 알려진 제약
 
-- **무료 티어 한도**는 변동된다. 제출 전 실제 호출로 한 번 확인할 것. 한도 초과 시 429 가 오고 폴백으로 넘어간다.
-- **엔드포인트/필드명**(`gemini-2.5-flash`, `gemini-2.5-flash-image`, `responseModalities`)은 현행 문서 기준으로 재확인하는 편이 안전하다. 실패 시 응답 본문이 그대로 로그에 남으므로 디버깅은 어렵지 않다.
+- **무료 티어 한도는 변동된다.** 텍스트 모델도 분당/일일 제한이 있어 반복 테스트 중 429 가 날 수 있다. 그때는 폴백 텍스트로 넘어가므로 게임이 멈추지는 않는다.
+- **모델 가용성은 계정/프로젝트마다 다를 수 있다.** 위 결과는 이 프로젝트의 키 기준이다. 팀원이 다른 키를 쓰면 `narratorModel` 을 다시 확인해야 할 수 있다.
+- **Pollinations 는 무료 공개 서비스라 가용성 보장이 없다.** 심사 당일 느리거나 죽을 수 있으므로 폴백은 그대로 필수다. 조합 캐시가 있으니 미리 주요 조합을 한 번씩 돌려 캐시를 채워두면 안전하다.
 - **요소 6개 이상**이면 단일 장면 합성이 무너진다. 그때는 디에게틱 콜라주(박물관 전시 벽 / 신문 1면)로 아트 디렉션을 바꾸고 요소별로 나눠 생성해야 한다.

@@ -49,14 +49,19 @@ public class EndingCreditController : MonoBehaviour
     [SerializeField] private float imageFadeDuration = 2f;
 
     [Header("생성기 설정")]
-    [Tooltip("대본 생성에 쓸 Gemini 텍스트 모델")]
-    [SerializeField] private string narratorModel = "gemini-2.5-flash";
+    [Tooltip("대본 생성에 쓸 Gemini 텍스트 모델. gemini-2.5-flash 는 신규 사용자에게 제공되지 않으므로 쓰지 말 것")]
+    [SerializeField] private string narratorModel = "gemini-3.6-flash";
 
     [Tooltip("대본 생성 타임아웃(초). 초과하면 폴백 텍스트로 진행한다")]
     [SerializeField] private int narratorTimeout = 20;
 
-    [Tooltip("이미지 생성에 쓸 Gemini 이미지 모델")]
-    [SerializeField] private string imageModel = "gemini-2.5-flash-image";
+    [Tooltip("엔딩 이미지 생성처.\n" +
+        "Pollinations: 키 불필요·무료 (기본)\n" +
+        "Gemini: 결제를 활성화한 프로젝트에서만 동작 (무료 티어 일일 한도 0)")]
+    [SerializeField] private EndingImageProvider imageProvider = EndingImageProvider.Pollinations;
+
+    [Tooltip("imageProvider 가 Gemini 일 때 쓸 이미지 모델")]
+    [SerializeField] private string imageModel = "gemini-3.1-flash-image";
 
     [Tooltip("이미지 생성 타임아웃(초)")]
     [SerializeField] private int imageTimeout = 60;
@@ -149,7 +154,7 @@ public class EndingCreditController : MonoBehaviour
         if (forceFallback || backgroundImage == null)
             yield break;
 
-        var generator = new EndingImageGenerator(imageModel, imageTimeout);
+        var generator = new EndingImageGenerator(imageProvider, imageModel, imageTimeout);
         Texture2D texture = null;
 
         yield return generator.GetOrCreate(result.CombinationKey, imagePrompt, t => texture = t);

@@ -17,7 +17,8 @@ public class GeminiEndingNarrator : IEndingNarrator
     private readonly string model;
     private readonly int timeoutSeconds;
 
-    public GeminiEndingNarrator(string model = "gemini-2.5-flash", int timeoutSeconds = 20)
+    // gemini-2.5-flash 는 신규 사용자에게 더 이상 제공되지 않는다(404). 3.6-flash 로 실호출 검증 완료.
+    public GeminiEndingNarrator(string model = "gemini-3.6-flash", int timeoutSeconds = 20)
     {
         this.model = model;
         this.timeoutSeconds = timeoutSeconds;
@@ -142,9 +143,19 @@ public class GeminiEndingNarrator : IEndingNarrator
             if (string.IsNullOrWhiteSpace(part.text))
                 continue;
 
-            var script = JsonUtility.FromJson<EndingScript>(part.text);
-            if (script != null && script.IsValid)
-                return script;
+            // 최신 모델은 답변 앞에 사고(thought) 파트를 끼워 넣기도 한다.
+            // JSON 이 아닌 파트에서 FromJson 이 던지는 예외로 전체 파싱이 중단되지 않도록
+            // 파트 단위로 예외를 삼키고 다음 파트를 계속 시도한다.
+            try
+            {
+                var script = JsonUtility.FromJson<EndingScript>(part.text);
+                if (script != null && script.IsValid)
+                    return script;
+            }
+            catch (Exception)
+            {
+                // 이 파트는 대본이 아니다 — 다음 파트로.
+            }
         }
 
         return null;

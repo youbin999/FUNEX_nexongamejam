@@ -15,15 +15,23 @@ using UnityEngine.Networking;
 /// </summary>
 public class EndingImageGenerator
 {
-    private const string Endpoint =
+    private const string GeminiEndpoint =
         "https://generativelanguage.googleapis.com/v1beta/models/{0}:generateContent";
 
-    private readonly string model;
+    private const string PollinationsEndpoint =
+        "https://image.pollinations.ai/prompt/{0}?width=1280&height=720&nologo=true&model=flux&seed={1}";
+
+    private readonly EndingImageProvider provider;
+    private readonly string geminiModel;
     private readonly int timeoutSeconds;
 
-    public EndingImageGenerator(string model = "gemini-2.5-flash-image", int timeoutSeconds = 60)
+    public EndingImageGenerator(
+        EndingImageProvider provider = EndingImageProvider.Pollinations,
+        string geminiModel = "gemini-3.1-flash-image",
+        int timeoutSeconds = 60)
     {
-        this.model = model;
+        this.provider = provider;
+        this.geminiModel = geminiModel;
         this.timeoutSeconds = timeoutSeconds;
     }
 
@@ -49,13 +57,6 @@ public class EndingImageGenerator
         }
 
         // 2) 생성.
-        if (!GeminiApiConfig.HasKey)
-        {
-            Debug.LogWarning("EndingImageGenerator: API 키가 없어 이미지 생성을 건너뜁니다.");
-            onDone(null);
-            yield break;
-        }
-
         if (string.IsNullOrWhiteSpace(imagePrompt))
         {
             Debug.LogWarning("EndingImageGenerator: 이미지 프롬프트가 비어 있습니다.");
@@ -63,8 +64,20 @@ public class EndingImageGenerator
             yield break;
         }
 
+        if (provider == EndingImageProvider.Gemini && !GeminiApiConfig.HasKey)
+        {
+            Debug.LogWarning("EndingImageGenerator: API 키가 없어 이미지 생성을 건너뜁니다.");
+            onDone(null);
+            yield break;
+        }
+
         Texture2D generated = null;
-        yield return Request(imagePrompt, tex => generated = tex);
+
+        // 같은 조합이면 같은 그림이 나오도록 조합 키를 시드로 쓴다(캐시가 지워져도 재현된다).
+        if (provider == EndingImageProvider.Pollinations)
+            yield return RequestPollinations(imagePrompt, StableSeed(combinationKey), tex => generated = tex);
+        else
+            yield return RequestGemini(imagePrompt, tex => generated = tex);
 
         if (generated != null)
             TrySaveCache(combinationKey, generated);
@@ -72,10 +85,37 @@ public class EndingImageGenerator
         onDone(generated);
     }
 
-    /// <summary>Gemini 이미지 모델을 호출해 Texture2D 를 만든다. 실패하면 null.</summary>
-    private IEnumerator Request(string imagePrompt, Action<Texture2D> onDone)
+    /// <summary>
+    /// Pollinations 로 이미지를 생성한다. API 키가 필요 없고 무료다 — 잼 기본 경로.
+    /// 응답이 곧 이미지 바이트라 UnityWebRequestTexture 로 바로 받는다.
+    /// </summary>
+    private IEnumerator RequestPollinations(string imagePrompt, int seed, Action<Texture2D> onDone)
     {
-        string url = string.Format(Endpoint, model);
+        string url = string.Format(PollinationsEndpoint, UnityWebRequest.EscapeURL(imagePrompt), seed);
+
+        using (UnityWebRequest req = UnityWebRequestTexture.GetTexture(url))
+        {
+            req.timeout = timeoutSeconds;
+            yield return req.SendWebRequest();
+
+            if (req.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogWarning($"EndingImageGenerator: Pollinations 실패 HTTP {req.responseCode} {req.error}");
+                onDone(null);
+                yield break;
+            }
+
+            onDone(DownloadHandlerTexture.GetContent(req));
+        }
+    }
+
+    /// <summary>
+    /// Gemini 이미지 모델을 호출한다. 실패하면 null.
+    /// 주의: 이미지 생성은 무료 티어 일일 할당량이 0이라 결제를 켜지 않으면 429 가 온다.
+    /// </summary>
+    private IEnumerator RequestGemini(string imagePrompt, Action<Texture2D> onDone)
+    {
+        string url = string.Format(GeminiEndpoint, geminiModel);
         string json =
             "{" +
               "\"contents\":[{\"role\":\"user\",\"parts\":[{\"text\":\"" + JsonText.Escape(imagePrompt) + "\"}]}]," +
@@ -186,6 +226,38 @@ public class EndingImageGenerator
         }
     }
 
+    /// <summary>
+    /// 조합 키를 안정적인 양수 시드로 바꾼다.
+    /// string.GetHashCode 는 실행마다 값이 달라질 수 있어 직접 계산한다(FNV-1a).
+    /// </summary>
+    private static int StableSeed(string key)
+    {
+        unchecked
+        {
+            const uint offset = 2166136261;
+            const uint prime = 16777619;
+
+            uint hash = offset;
+            foreach (char c in key ?? string.Empty)
+            {
+                hash ^= c;
+                hash *= prime;
+            }
+
+            return (int)(hash & 0x7FFFFFFF);
+        }
+    }
+
     private static string Truncate(string s, int max)
         => string.IsNullOrEmpty(s) ? string.Empty : (s.Length <= max ? s : s.Substring(0, max) + "…");
+}
+
+/// <summary>엔딩 이미지를 어디서 생성할지.</summary>
+public enum EndingImageProvider
+{
+    /// <summary>키 불필요, 무료. 기본값.</summary>
+    Pollinations,
+
+    /// <summary>Gemini 이미지 모델. 무료 티어로는 쓸 수 없고 결제 활성화가 필요하다.</summary>
+    Gemini,
 }
