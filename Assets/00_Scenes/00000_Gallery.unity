@@ -1085,7 +1085,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1905204412}
   m_HandleRect: {fileID: 1905204411}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -1186,7 +1186,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Back
+  m_text: TITLE
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 2ffcc6a664dbc7946bcc2c6e3f509000, type: 2}
   m_sharedMaterial: {fileID: 3280642254698710165, guid: 2ffcc6a664dbc7946bcc2c6e3f509000, type: 2}
@@ -2730,6 +2730,8 @@ MonoBehaviour:
   audioSource: {fileID: 0}
   hoverSound: {fileID: 0}
   clickSound: {fileID: 8300000, guid: d95c101bd68942e48b3c3f014e872c73, type: 3}
+  hoverVolume: 1
+  clickVolume: 2
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

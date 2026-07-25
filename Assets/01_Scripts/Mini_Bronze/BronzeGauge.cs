@@ -76,7 +76,28 @@ public class BronzeGauge : MonoBehaviour
         }
 
         if (fill != null)
+            ApplyFill(value);
+    }
+
+    /// <summary>
+    /// 눈금 아래를 채운다.
+    /// Image 에 스프라이트가 없거나 타입이 Filled 가 아니면 Unity 가 fillAmount 를 통째로 무시하므로,
+    /// 그 경우엔 앵커를 늘려 바닥부터 채운다 — 어떤 설정이든 게이지는 차오른다.
+    /// </summary>
+    private void ApplyFill(float value)
+    {
+        if (fill.sprite != null && fill.type == Image.Type.Filled)
+        {
             fill.fillAmount = value;
+            return;
+        }
+
+        RectTransform rect = fill.rectTransform;
+
+        rect.anchorMin = new Vector2(rect.anchorMin.x, 0f);
+        rect.anchorMax = new Vector2(rect.anchorMax.x, value);
+        rect.offsetMin = new Vector2(rect.offsetMin.x, 0f);
+        rect.offsetMax = new Vector2(rect.offsetMax.x, 0f);
     }
 
     /// <summary>게이지 영역. 인스펙터에서 비워두면 자기 자신을 쓴다.</summary>
