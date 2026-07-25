@@ -91,6 +91,111 @@ ffprobe -v error -select_streams v:0 -show_entries frame=key_frame -of csv=p=0 �
 > 파일을 교체할 때는 `Assets/04_Video/BigBang.mp4`를 **덮어쓰기**한다. `.meta`가 유지되어
 > GUID가 그대로이므로 프리팹의 참조가 깨지지 않는다.
 
+## 2-2. 효과음도 같이 왔다갔다 — PCM 스크럽
+
+효과음(`(Audio) BigBang.wav`, 3.755초)은 영상에서 추출한 것이라 영상(3.767초)과 1:1로 대응한다.
+그래서 **영상과 똑같은 위치 값을 받아 같이 앞뒤로 움직인다.** 테이프를 손으로 돌리는 것과 같아서,
+W를 누르면 정방향으로 흐르고 떼면 역재생되며, 온도가 멈추면 소리도 멈춘다.
+
+### `AudioSource.time` 대입은 쓸 수 없다
+
+영상에는 `videoPlayer.frame` 이라는 임의 탐색 API가 있지만 오디오에는 그에 대응하는 게 없다.
+`audioSource.time` 을 매 프레임 대입하는 방식은 세 가지 이유로 실패한다.
+
+- seek 할 때마다 파형이 불연속이 되어 팝 노이즈가 난다. 초당 60번이면 노이즈가 곧 효과음이 된다.
+- 압축 오디오의 seek 은 인코딩 프레임 경계로 스냅되므로 정밀도가 20ms 단위다.
+- 역재생은 아예 표현되지 않는다.
+
+그래서 `BigBangAudio` 는 원본 PCM 전체를 `AudioClip.GetData` 로 메모리에 올린 뒤,
+`OnAudioFilterRead` 에서 재생 헤드를 직접 움직여 출력 버퍼를 채운다. 3.7초짜리라 전부 올려도
+720KB 남짓이다.
+
+```
+[메인 스레드] 속도 = (이번 위치 - 지난 위치) / Time.deltaTime      (1차 필터로 평활화)
+               배속 = 속도 * (frameCount - 1) / sampleRate
+[오디오 스레드] 샘플당 증분 = 배속 + (목표 - 헤드) * 따라잡기계수
+               출력 = lerp(samples[floor(head)], samples[floor(head)+1], frac) * gain
+```
+
+증분이 음수면 자연히 역재생이 된다. 헤드가 샘플 사이에 걸치므로 **선형 보간이 필수**다.
+그냥 반올림하면 지직거린다.
+
+### 소리가 뚝뚝 끊겼던 이유 — 두 번 밟은 지뢰
+
+**1차 시도 (실패): 배속을 콜백 간 목표 변화량에서 뽑음.** 오디오 스레드에서
+`(목표 - 헤드) / 버퍼길이` 로 계산했다. "이 버퍼 안에서 목표까지 정확히 도달한다"는 뜻이라
+언뜻 맞아 보이지만, 콜백이 실시간과 1:1로 페이싱된다는 가정이 깔려 있다. 목표 위치는
+`Update` 에서 60Hz로 갱신되는데 오디오 버퍼는 1024샘플 @48kHz = 46.9Hz라, 대략 4번에 1번꼴로
+목표가 갱신되지 않은 채 콜백이 들어온다. 그때 배속이 0이 되어 21ms짜리 무음이 초당 10여 번
+끼어들었다.
+
+→ **배속은 메인 스레드에서 `Time.deltaTime` 기준으로 계산해 넘긴다.** 그러면 콜백이 언제 몇 번
+불리든 샘플당 증분이 같다.
+
+**2차 시도 (실패): 훅이 `AudioClip.Create(..., stream: true)` 의 리더 콜백이었음.** 배속을
+고쳤는데도 끊겼다. 결정적 단서는 가상 클립 길이를 4096샘플(85ms)에서 1초로 늘렸더니 **더
+심해졌다**는 것. 이 콜백은 호출 시점이 실제 재생 위치와 묶여 있지 않고, FMOD 가 스트림 버퍼를
+채우려고 **클립 길이만큼 통째로 미리 읽어 간다.** 즉 한순간의 배속 값으로 생성된 긴 구간이
+그대로 재생되고 다음 읽기에서 점프한다. 클립을 길게 잡을수록 아티팩트가 거칠어진다.
+
+→ **`OnAudioFilterRead` 로 교체.** DSP 블록당 정확히 한 번, 출력과 실시간 락스텝으로 호출되는
+것이 보장되는 유일한 훅이다.
+
+위치 오차(헤드와 목표의 차이)는 배속에 직접 반영하지 않고 `catchUpSeconds` 에 걸쳐 천천히
+흡수한다. 이 항을 세게 잡으면 다시 배속이 요동친다.
+
+### `Pan2D` 는 "2D 모드"가 아니다
+
+AudioSource 프리팹 YAML 의 `Pan2D` 는 `AudioSource.panStereo`(-1 왼쪽 ~ +1 오른쪽)다.
+2D/3D 설정이 아니다(그건 `panLevelCustomCurve` = `spatialBlend`). 여기에 `1` 을 넣으면
+**오른쪽 채널에서만 소리가 난다.** 한 번 이걸로 삽질했으므로 `BigBangAudio.Awake` 에서
+`panStereo = 0` / `spatialBlend = 0` 을 코드로도 강제해 둔다.
+
+`OnAudioFilterRead` 는 AudioSource 가 재생 중일 때만 호출되므로, 내용을 덮어쓸 무음 클립을
+하나 물려 두고 루프로 돌린다(전부 0이라 루프 이음매가 없다). 이 필터는 **원본이 아니라 출력
+스트림 위에서** 돌기 때문에, 배속·따라잡기 계수·게인 페이드는 모두 원본 클립이 아닌
+`AudioSettings.outputSampleRate` 기준으로 계산해야 한다. 출력 채널 수도 원본과 다를 수 있어
+콜백이 넘겨주는 `channels` 를 그대로 써야 한다.
+
+### 배속(피치)은 일부러 고정하지 않았다
+
+재생 배속이 곧 진행도 변화 속도이므로 피치가 함께 흔들린다. 이게 "우주가 팽창/수축하는" 연출과
+맞아떨어져서 그대로 뒀다. `progressCurve`(h^0.6)와 `startRatio = 0.25` 를 반영한 실제 배속은:
+
+| 상황 | heat 0.05 | 0.3 | 0.5 | 1.0 |
+| :--- | :--- | :--- | :--- | :--- |
+| W 누름 (+0.5/s) | 2.80x | 1.37x | 1.12x | 0.85x |
+| 뗌 (-0.15/s) | -0.84x | -0.41x | -0.33x | -0.25x |
+
+즉 **누르고 있으면 거의 원래 속도(0.85~1.4x)로 정방향 재생**되고, 떼면 그보다 느리게 되감긴다.
+`maxRate = 3` 은 저온 구간에서 배속이 튀는 것을 막는 안전장치다.
+
+heat 가 1에 닿을 때 위치도 클립 끝에 닿으므로, 클리어 순간에 잘려 나가는 소리는 사실상 없다
+(한 버퍼 분량인 20ms 남짓이 전부다). 별도의 꼬리 재생 처리를 두지 않은 이유다.
+
+### 위치 계산은 반드시 한 곳에서만
+
+`BigBangVisual.MapProgress()` 가 `startRatio` / `endRatio` / `progressCurve` 를 적용한 미디어
+위치를 계산하고, 영상과 효과음이 **둘 다 그 결과만** 받는다. 곡선을 다시 잡아도 소리가 저절로
+따라오게 하기 위함이다. `heat` 를 오디오에 그대로 넘기면 안 된다 — 보정이 빠져 영상과 다른
+지점을 가리킨다.
+
+오디오로 넘기는 호출은 `SetProgress()` 안, **프레임 중복 체크보다 앞**에 있어야 한다.
+`ApplyProgress()` 안쪽(중복 체크 뒤)에 두면 30fps 격자로 스냅된 위치가 넘어가 소리가
+계단처럼 끊긴다.
+
+### 오디오 임포트 설정 (필수)
+
+| 항목 | 값 | 이유 |
+| :--- | :--- | :--- |
+| Load Type | **Decompress On Load** | 다른 값이면 `GetData` 가 무음을 돌려준다 |
+| Preload Audio Data | **켬** | 꺼져 있으면 `Awake` 의 `GetData` 시점에 아직 로드 전이다 |
+| Compression Format | PCM | 3.7초짜리라 720KB. 재인코딩 패딩으로 영상과 어긋나는 것을 막는다 |
+| 3D | 끔 | 2D 효과음 (스크립트에서도 `spatialBlend = 0` 을 강제한다) |
+
+앞의 두 개는 틀리면 **소리가 아예 안 난다.** `BigBangAudio` 가 이 둘을 검사해서 경고 로그를
+남기므로, 무음이면 콘솔부터 볼 것.
+
 ## 3. 구성 요소
 
 ### 스크립트 (`Assets/01_Scripts/Mini_BigBang/`)
@@ -98,7 +203,8 @@ ffprobe -v error -select_streams v:0 -show_entries frame=key_frame -of csv=p=0 �
 | 파일 | 역할 |
 | :--- | :--- |
 | `BigBangMiniGame.cs` | `MiniGame` 상속. 온도 상태머신 + W 입력 + 클리어/실패 판정 |
-| `BigBangVisual.cs` | 진행도(0~1)를 받아 영상을 스크럽하는 연출 전담 컴포넌트 |
+| `BigBangVisual.cs` | 진행도(0~1)를 미디어 위치로 변환해 영상을 스크럽. 같은 값을 `BigBangAudio` 에도 넘긴다 |
+| `BigBangAudio.cs` | 미디어 위치를 받아 효과음을 스크럽하는 PCM 재생기 |
 | `BigBangSceneFlow.cs` | 씬 레벨 처리. 성공 시 씬 전환, 실패 시 실패 UI + 종료 |
 
 `BigBangMiniGame`은 씬 전환이나 `Application.Quit()`을 직접 호출하지 않는다. `ReportFinished`만
@@ -109,7 +215,8 @@ ffprobe -v error -select_streams v:0 -show_entries frame=key_frame -of csv=p=0 �
 
 | 경로 | 내용 |
 | :--- | :--- |
-| `Assets/04_Video/BigBang.mp4` | 빅뱅 영상 (1920x1080, 30fps, 113프레임, all-intra) |
+| `Assets/04_Video/BigBang.mp4` | 빅뱅 영상 (1920x1080, 30fps, 113프레임 = 3.767초, all-intra) |
+| `Assets/04_Video/(Audio) BigBang.wav` | 위 영상에서 추출한 효과음 (48kHz 스테레오 PCM, 3.755초) |
 | `Assets/04_Video/BigBangRT.renderTexture` | 영상 출력용 RenderTexture (1280x720) |
 | `Assets/03_Prefabs/BigBangGame.prefab` | 미니게임 프리팹 |
 | `Assets/00_Scenes/00_BigBang.unity` | 호스트 씬 (빌드 0번) |
@@ -118,6 +225,7 @@ ffprobe -v error -select_streams v:0 -show_entries frame=key_frame -of csv=p=0 �
 
 ```
 BigBangGame                     BigBangMiniGame / BigBangVisual / VideoPlayer
+                                + BigBangAudio / AudioSource
 └─ Canvas                       Screen Space - Overlay, 1920x1080 기준 스케일
    ├─ Background                검정 Image (영상 준비 전 화면 보호)
    ├─ Screen                    RawImage ← BigBangRT (영상 출력)
@@ -127,8 +235,9 @@ BigBangGame                     BigBangMiniGame / BigBangVisual / VideoPlayer
 ```
 
 `BigBangMiniGame.onHeatChanged` → `Fill`의 `Image.fillAmount`가 인스펙터에 연결돼 있다.
-온도계 외에 다른 연출(사운드, 파티클 등)을 붙이고 싶으면 `onHeatChanged` / `onClear` /
-`onFail`에 추가로 등록하면 된다.
+온도계 외에 다른 연출(파티클 등)을 붙이고 싶으면 `onHeatChanged` / `onClear` / `onFail`에
+추가로 등록하면 된다. 단 **효과음은 여기에 붙이지 않는다** — 스크럽 효과음은 보정이 적용된
+미디어 위치를 받아야 하므로 `BigBangVisual.audioScrub` 슬롯으로 연결돼 있다.
 
 ### 씬 구성 (`00_BigBang`)
 
@@ -200,6 +309,11 @@ Unity CLI로 에디터에 직접 붙어 플레이 모드에서 실측한 값이�
 현상의 정체였다. 전 프레임 키프레임으로 바꾼 뒤에는 양방향 모두 지연이 사실상 0이다.
 
 **콘솔 로그 0건** (에러/경고 없음).
+
+> **효과음 스크럽은 계측 검증 전이다.** 첫 구현은 플레이 모드에서 "소리가 뚝뚝 끊긴다"는
+> 문제가 나왔고, 원인(배속을 콜백 간 목표 변화량에서 뽑은 것)은 위 2-2 절에 적어 두었다.
+> 수정본은 컴파일과 프리팹 참조 해소까지만 확인했으며, 위 배속 표도 `progressCurve`(h^0.6)로
+> 계산한 값이지 측정값이 아니다.
 
 ## 6. 알려진 제약 / 손볼 만한 것
 

@@ -1,8 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 /// <summary>
 /// MiniGamePlayer 를 제어하여 인스펙터에 등록된 미니게임들을 순서대로 재생하는 게임 흐름 컨트롤러.
@@ -84,6 +86,28 @@ public class GameFlowController : MonoBehaviour
     [Tooltip("크리티컬 실패 또는 모든 미니게임 완료 시 전환할 엔딩 씬 이름")]
     [SerializeField] private string endingSceneName = "99_Ending";
 
+    [Header("엔딩 전환 연출")]
+    [Tooltip("엔딩 전환에 사용할 암전 오버레이 CanvasGroup. MiniGamePlayer 의 ScreenFade 를 그대로 재사용해도 된다")]
+    [SerializeField] private CanvasGroup endingFadeCanvasGroup;
+
+    [Tooltip("암전 색. 게임 간 전환용 오버레이를 공유하더라도 엔딩에서는 이 색으로 덮는다 (99_Ending 이 검게 시작하므로 검정 권장)")]
+    [SerializeField] private Color endingFadeColor = Color.black;
+
+    [Tooltip("암전 오버레이에 임시로 부여할 정렬 순서. 실패 패널티 오버레이(20~100)보다 커야 화면 전체가 덮인다")]
+    [SerializeField] private int endingFadeSortingOrder = 500;
+
+    [Tooltip("마지막 결과 연출과 카메라 셰이크를 보여 줄 시간(초)")]
+    [Min(0f)]
+    [SerializeField] private float endingPresentationHoldDuration = 0.5f;
+
+    [Tooltip("검은 화면으로 암전하는 시간(초)")]
+    [Min(0f)]
+    [SerializeField] private float endingFadeDuration = 0.6f;
+
+    [Tooltip("완전 암전 후 씬을 로드하기 전 유지 시간(초)")]
+    [Min(0f)]
+    [SerializeField] private float endingBlackHoldDuration = 0.1f;
+
     [Header("이벤트")]
     [Tooltip("크리티컬 게임 실패 시 발화. 게임 엔딩 씬 전환 등에 연결한다")]
     public UnityEvent onGameEnding;
@@ -93,6 +117,7 @@ public class GameFlowController : MonoBehaviour
 
     private int currentIndex = -1;
     private bool ended;
+    private Coroutine endingTransitionRoutine;
 
     /// <summary>현재 흐름이 진행 중인지 여부.</summary>
     public bool IsRunning => currentIndex >= 0 && currentIndex < games.Count && !ended;
@@ -170,7 +195,7 @@ public class GameFlowController : MonoBehaviour
         {
             ended = true;
             onAllGamesCleared.Invoke();
-            LoadEndingScene();
+            BeginEndingTransition();
             return;
         }
 
@@ -202,7 +227,7 @@ public class GameFlowController : MonoBehaviour
             ended = true;
             RunResult.Instance.MarkEarlyEnding(entry.era.ToKorean(), entry.eventLabel, entry.failureMeaning);
             onGameEnding.Invoke();
-            LoadEndingScene();
+            BeginEndingTransition();
             return;
         }
 
@@ -210,6 +235,86 @@ public class GameFlowController : MonoBehaviour
     }
 
     /// <summary>현재 판의 <see cref="RunResult"/>를 유지한 채 엔딩 씬으로 전환한다.</summary>
+    private void BeginEndingTransition()
+    {
+        if (endingTransitionRoutine != null)
+            return;
+
+        // 마지막 게임 인스턴스를 즉시 정리하면 화면이 툭 비어 버리고 실패 셰이크도 눈에 안 띈다.
+        // 암전이 끝날 때까지 정리를 미뤄 마지막 연출을 그대로 보여 준다.
+        if (player != null)
+            player.HoldFinishedInstance();
+
+        endingTransitionRoutine = StartCoroutine(EndingTransitionRoutine());
+    }
+
+    /// <summary>마지막 결과 연출을 보존한 뒤 암전하여 엔딩 씬으로 전환한다.</summary>
+    private IEnumerator EndingTransitionRoutine()
+    {
+        if (endingFadeCanvasGroup != null)
+        {
+            endingFadeCanvasGroup.alpha = 0f;
+            endingFadeCanvasGroup.blocksRaycasts = true;
+
+            // 공유 오버레이가 흰색일 수 있으므로 엔딩 직전에 암전 색으로 바꿔 둔다.
+            // 이 시점 이후로는 게임 간 전환이 더 없어서 원복할 필요가 없다.
+            var fadeGraphic = endingFadeCanvasGroup.GetComponent<Graphic>();
+            if (fadeGraphic != null)
+                fadeGraphic.color = endingFadeColor;
+
+            // 실패 패널티 오버레이들은 자체 Canvas 를 높은 sortingOrder 로 띄우므로,
+            // 오버레이에도 중첩 Canvas 를 붙여 정렬을 덮어써야 화면이 완전히 가려진다.
+            var fadeCanvas = endingFadeCanvasGroup.GetComponent<Canvas>();
+            if (fadeCanvas == null)
+                fadeCanvas = endingFadeCanvasGroup.gameObject.AddComponent<Canvas>();
+
+            fadeCanvas.overrideSorting = true;
+            fadeCanvas.sortingOrder = endingFadeSortingOrder;
+        }
+
+        if (endingPresentationHoldDuration > 0f)
+            yield return new WaitForSecondsRealtime(endingPresentationHoldDuration);
+
+        if (endingFadeCanvasGroup != null)
+        {
+            float duration = Mathf.Max(0f, endingFadeDuration);
+            if (duration <= 0f)
+            {
+                endingFadeCanvasGroup.alpha = 1f;
+            }
+            else
+            {
+                float elapsed = 0f;
+                float startAlpha = endingFadeCanvasGroup.alpha;
+
+                while (elapsed < duration)
+                {
+                    elapsed += Time.unscaledDeltaTime;
+                    endingFadeCanvasGroup.alpha =
+                        Mathf.Lerp(startAlpha, 1f, Mathf.Clamp01(elapsed / duration));
+                    yield return null;
+                }
+
+                endingFadeCanvasGroup.alpha = 1f;
+            }
+        }
+
+        // 완전히 덮인 뒤에 정리한다 — 화면이 검을 때 치워야 전환 티가 안 난다.
+        if (player != null)
+            player.ReleaseFinishedInstance();
+
+        if (player != null)
+            player.ClearFailurePenalties();
+
+        if (CameraEffectManager.TryGetInstance != null)
+            CameraEffectManager.TryGetInstance.StopAll();
+
+        if (endingBlackHoldDuration > 0f)
+            yield return new WaitForSecondsRealtime(endingBlackHoldDuration);
+
+        LoadEndingScene();
+    }
+
     private void LoadEndingScene()
     {
         if (string.IsNullOrWhiteSpace(endingSceneName))
