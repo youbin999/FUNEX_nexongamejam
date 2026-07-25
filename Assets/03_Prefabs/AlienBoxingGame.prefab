@@ -52,7 +52,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoxingMiniGame
   gameDescription: "\uB54C\uB824\uB77C!"
-  keyboardGuides: []
+  keyboardGuides:
+  - actionLabel: 
+    keys: 0f00000012000000
   timeLimit: 5
   onTimerChanged:
     m_PersistentCalls:
