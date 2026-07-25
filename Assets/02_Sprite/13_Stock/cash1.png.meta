@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: cf8b26f1d91694947ad4d5f457e31e0b
+guid: dfcdcf9e01917e14fb8c0f7750df410e
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8207380672740664011
-    second: steam_0
+      213: 9062607142165174483
+    second: cash_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: steam_0
+      name: cash_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 1024
-        height: 1024
+        x: 11
+        y: 3
+        width: 536
+        height: 333
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: bc22d1fbc3976e170800000000000000
-      internalID: 8207380672740664011
+      spriteID: 3d85ca71e29d4cd70800000000000000
+      internalID: 9062607142165174483
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      steam_0: 8207380672740664011
+      cash_0: 9062607142165174483
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
