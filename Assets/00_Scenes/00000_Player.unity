@@ -653,17 +653,6 @@ MonoBehaviour:
     successVisual: 
     failureVisual: nuclear war in global
     visualWeight: 7
-  - prefab: {fileID: 1793571473085594207, guid: 99c89240ed27a494ca10ae4b6d357444, type: 3}
-    kind: 0
-    era: 6
-    borderSprite: {fileID: -8945467959818111224, guid: 188115b7c96669846b360eec57dac7f7, type: 3}
-    eraYearText: "\uAE30\uC6D0\uD6C4 2200\uB144"
-    eventLabel: 
-    successMeaning: 
-    failureMeaning: 
-    successVisual: 
-    failureVisual: 
-    visualWeight: 5
   - prefab: {fileID: -4765541157340919056, guid: 8e1f5a3c7b2d49608c4a6e2f1b7d0359, type: 3}
     kind: 1
     era: 6
@@ -678,6 +667,30 @@ MonoBehaviour:
     successVisual: ailens are humans friend
     failureVisual: humans are submission of aliens
     visualWeight: 5
+  - prefab: {fileID: 1793571473085594207, guid: 99c89240ed27a494ca10ae4b6d357444, type: 3}
+    kind: 0
+    era: 6
+    borderSprite: {fileID: -8945467959818111224, guid: 188115b7c96669846b360eec57dac7f7, type: 3}
+    eraYearText: "\uAE30\uC6D0\uD6C4 2200\uB144"
+    eventLabel: 
+    successMeaning: 
+    failureMeaning: 
+    successVisual: 
+    failureVisual: 
+    visualWeight: 5
+  - prefab: {fileID: 9900000012, guid: 4d0c8b7e2f15493aa6b1e39d70c82f56, type: 3}
+    kind: 1
+    era: 6
+    borderSprite: {fileID: -8945467959818111224, guid: 188115b7c96669846b360eec57dac7f7, type: 3}
+    eraYearText: "\uAE30\uC6D0\uD6C4 2200\uB144"
+    eventLabel: 
+    successMeaning: "\uC9C0\uAD6C \uC4F0\uB808\uAE30\uB97C \uC131\uACF5\uC801\uC73C\uB85C
+      \uC6B0\uC8FC\uC5D0 \uBC84\uB838\uB2E4."
+    failureMeaning: "\uC9C0\uAD6C\uAC00 \uC4F0\uB808\uAE30\uB85C \uAC00\uB4DD\uCC3C\uC9C0\uB9CC
+      \uC6B0\uC8FC\uC5D0 \uBC30\uCD9C\uD558\uB294\uB370 \uC2E4\uD328\uD588\uB2E4."
+    successVisual: earth are clean
+    failureVisual: earth is fulled with trash
+    visualWeight: 4
   playOnStart: 1
   onGameEnding:
     m_PersistentCalls:
