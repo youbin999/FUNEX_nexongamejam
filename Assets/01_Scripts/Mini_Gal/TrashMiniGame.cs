@@ -83,6 +83,42 @@ public class TrashMiniGame : TimedMiniGame
     [Tooltip("실패 연출이 끝난 뒤 종료를 통지하기까지 기다리는 시간(초)")]
     [SerializeField] private float failHoldDuration = 0.4f;
 
+    [Header("사운드")]
+    [Tooltip("효과음을 재생할 AudioSource. 쓰레기가 아니라 이 오브젝트에 붙여야 " +
+        "버려질 때 오브젝트가 꺼져도 소리가 끊기지 않는다")]
+    [SerializeField] private AudioSource sfxSource;
+
+    [Tooltip("쓰레기를 집는 순간 나는 소리")]
+    [SerializeField] private AudioClip pickUpClip;
+
+    [Tooltip("쓰레기를 Point 에 넣어 빨려 들어갈 때 나는 소리. 실패 썸네일이 빨려들 때도 같이 쓴다")]
+    [SerializeField] private AudioClip suctionClip;
+
+    [Tooltip("클리어했을 때 나는 소리(박수)")]
+    [SerializeField] private AudioClip clearClip;
+
+    [Tooltip("실패했을 때 나는 소리(야유)")]
+    [SerializeField] private AudioClip failClip;
+
+    [Tooltip("집는 소리 크기. 자주 반복되므로 조금 작게 잡는다")]
+    [Range(0f, 1f)]
+    [SerializeField] private float pickUpVolume = 0.7f;
+
+    [Tooltip("빨려 들어가는 소리 크기")]
+    [Range(0f, 1f)]
+    [SerializeField] private float suctionVolume = 1f;
+
+    [Tooltip("클리어 소리 크기")]
+    [Range(0f, 1f)]
+    [SerializeField] private float clearVolume = 1f;
+
+    [Tooltip("실패 소리 크기")]
+    [Range(0f, 1f)]
+    [SerializeField] private float failVolume = 1f;
+
+    [Tooltip("재생할 때마다 이 범위 안에서 음높이를 무작위로 바꾼다. 같은 소리가 반복돼도 덜 기계적으로 들린다")]
+    [SerializeField] private Vector2 pitchRange = new Vector2(0.95f, 1.05f);
+
     [Header("이벤트")]
     [Tooltip("하나 버릴 때마다 지금까지 버린 개수를 넘긴다")]
     public TrashEvent onDisposed;
@@ -309,6 +345,28 @@ public class TrashMiniGame : TimedMiniGame
         held = best;
         held.Grab();
         grabOffset = world - (Vector2)held.transform.position;
+
+        PlaySfx(pickUpClip, pickUpVolume);
+    }
+
+    /// <summary>효과음을 한 번 재생한다. 매번 음높이를 살짝 달리해 반복돼도 지루하지 않게 한다.</summary>
+    private void PlaySfx(AudioClip clip, float volume)
+    {
+        if (sfxSource == null || clip == null)
+            return;
+
+        sfxSource.pitch = UnityEngine.Random.Range(pitchRange.x, pitchRange.y);
+        sfxSource.PlayOneShot(clip, volume);
+    }
+
+    /// <summary>결과음처럼 한 판에 한 번만 나는 소리를 원음 그대로 재생한다(음높이 변형 없음).</summary>
+    private void PlayResultSfx(AudioClip clip, float volume)
+    {
+        if (sfxSource == null || clip == null)
+            return;
+
+        sfxSource.pitch = 1f;
+        sfxSource.PlayOneShot(clip, volume);
     }
 
     /// <summary>잡고 있던 쓰레기를 놓는다. Point 안이면 버리고, 아니면 그 자리에서 다시 떠다닌다.</summary>
@@ -323,6 +381,7 @@ public class TrashMiniGame : TimedMiniGame
         if (IsOverPoint(trash))
         {
             trash.Dispose(pointArea != null ? pointArea.bounds.center : trash.transform.position);
+            PlaySfx(suctionClip, suctionVolume);
 
             disposedCount++;
             onDisposed.Invoke(disposedCount);
@@ -379,6 +438,8 @@ public class TrashMiniGame : TimedMiniGame
     /// <summary>성공 연출: Clear! 가 팝업으로 튀어나오고, 썸네일들이 밑에서 차례로 올라온다.</summary>
     private IEnumerator ClearRoutine()
     {
+        PlayResultSfx(clearClip, clearVolume);
+
         // 썸네일들은 화면 아래에서 시작해 제자리로 올라온다.
         StartCoroutine(RiseThumbsRoutine(riseThumbs, thumbRestPositions));
 
@@ -394,6 +455,9 @@ public class TrashMiniGame : TimedMiniGame
     private IEnumerator FailRoutine()
     {
         held = null;
+
+        // 야유는 썸네일이 올라오는 동안 깔린다.
+        PlayResultSfx(failClip, failVolume);
 
         // 실패한 순간 남은 쓰레기는 왼쪽으로 슉 날아가 버린다.
         FlyAwayRemainingTrash();
@@ -443,6 +507,9 @@ public class TrashMiniGame : TimedMiniGame
             yield break;
 
         Vector3 target = pointArea != null ? pointArea.bounds.center : transform.position;
+
+        // 쓰레기를 버릴 때와 같은 연출이므로 같은 소리를 쓴다.
+        PlaySfx(suctionClip, suctionVolume);
 
         for (int i = 0; i < failThumbs.Length; i++)
         {
