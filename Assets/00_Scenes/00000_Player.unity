@@ -487,7 +487,7 @@ MonoBehaviour:
     borderSprite: {fileID: 21300000, guid: 74eaa5d12046003439fb8d2225b9e40c, type: 3}
     eraYearText: "\uAE30\uC6D0\uC804 1500\uB144"
   - prefab: {fileID: 6600000012, guid: 5b2d8e1f4a6c47039d5e7a1b3c9f0e26, type: 3}
-    isCritical: 0
+    isCritical: 1
     borderSprite: {fileID: 0}
     eraYearText: 
   - prefab: {fileID: 72291910205155039, guid: e6f0bf9670e1982478561fdd3e743a6b, type: 3}
@@ -498,6 +498,10 @@ MonoBehaviour:
     isCritical: 0
     borderSprite: {fileID: 21300000, guid: 7827973d7db50d04ab783518ed8b9b3b, type: 3}
     eraYearText: "\uAE30\uC6D0\uD6C4 1500\uB144"
+  - prefab: {fileID: 2624045291354175195, guid: f9189fea3cd214b46bf960cf71c9966c, type: 3}
+    isCritical: 0
+    borderSprite: {fileID: 0}
+    eraYearText: 
   - prefab: {fileID: 7396776103939382718, guid: a346cefd652deac4facead9bd56e1350, type: 3}
     isCritical: 1
     borderSprite: {fileID: 0}
@@ -514,10 +518,14 @@ MonoBehaviour:
     isCritical: 1
     borderSprite: {fileID: 0}
     eraYearText: 
-  - prefab: {fileID: 5500000012, guid: f3a8c1b6d9e24705a1c8b3f6e9d02417, type: 3}
-    isCritical: 1
+  - prefab: {fileID: 1870836362585978639, guid: 8e988c43d299d9a4d9f90a75d3398e97, type: 3}
+    isCritical: 0
     borderSprite: {fileID: 21300000, guid: 7d1664222bd094e44b0a119186329ddb, type: 3}
     eraYearText: "\uAE30\uC6D0\uD6C4 2026\uB144, \uD604\uC7AC"
+  - prefab: {fileID: 5500000012, guid: f3a8c1b6d9e24705a1c8b3f6e9d02417, type: 3}
+    isCritical: 1
+    borderSprite: {fileID: 0}
+    eraYearText: 
   - prefab: {fileID: 1793571473085594207, guid: 99c89240ed27a494ca10ae4b6d357444, type: 3}
     isCritical: 0
     borderSprite: {fileID: -8945467959818111224, guid: 188115b7c96669846b360eec57dac7f7, type: 3}
