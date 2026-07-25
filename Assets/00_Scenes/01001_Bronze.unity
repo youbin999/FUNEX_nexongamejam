@@ -149,25 +149,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MiniGamePlayer
   gamePrefabs:
-  - {fileID: 72291910205155039, guid: e6f0bf9670e1982478561fdd3e743a6b, type: 3}
+  - {fileID: 4657186777680439362, guid: 0e5158902dad44f1896b9e200df9e1dd, type: 3}
   preloadOnAwake: 1
   playFirstOnStart: 1
   onGameFinished:
     m_PersistentCalls:
       m_Calls: []
-  descriptionCanvasGroup: {fileID: 0}
-  descriptionText: {fileID: 0}
-  descriptionRect: {fileID: 0}
-  descriptionTransitionDuration: 0.25
-  descriptionHoldDuration: 1.5
-  descriptionStartScale: 0.8
+  failurePenaltyController: {fileID: 0}
+  introPresenter: {fileID: 0}
   screenFadeCanvasGroup: {fileID: 0}
   fadeOutDuration: 0.3
   fadeInDuration: 0.3
   gameBorderRect: {fileID: 0}
   gameBorderImage: {fileID: 0}
+  gameBorderCanvasGroup: {fileID: 0}
+  borderSpriteFadeDuration: 0.15
   borderTransitionDuration: 0.35
   transitionHoldDuration: 0.6
+  eraYearText: {fileID: 0}
+  eraTransitionExtraHoldDuration: 1.5
+  eraTextScrambleDurationPerCharacter: 0.12
+  eraTextScrambleInterval: 0.035
+  eraTextRandomCharacterPool: ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*?
 --- !u!4 &1251370665
 Transform:
   m_ObjectHideFlags: 0
