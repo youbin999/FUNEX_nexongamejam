@@ -74,7 +74,7 @@ GalleryScreen (갤러리 씬)  ← 타이틀의 갤러리 버튼
 | [GalleryItemView.cs](../Assets/01_Scripts/Gallery/GalleryItemView.cs) | 목록의 칸 하나 |
 | [GalleryDetailView.cs](../Assets/01_Scripts/Gallery/GalleryDetailView.cs) | 상세 패널 |
 | [Editor/GallerySceneBuilder.cs](../Assets/01_Scripts/Gallery/Editor/GallerySceneBuilder.cs) | 갤러리 UI 를 한 번에 세워주는 에디터 도구 |
-| [SceneNavigator.cs](../Assets/01_Scripts/Core/SceneNavigator.cs) | 인스펙터에서 씬 이동을 걸기 위한 헬퍼 |
+| [TitleMenu.cs](../Assets/01_Scripts/Title/TitleMenu.cs) | 타이틀의 `Gallery()` — 갤러리 씬 진입 |
 
 ## 씬 구성
 
@@ -117,12 +117,16 @@ EventSystem [InputSystemUIInputModule]
 
 ### 2. 타이틀 진입 버튼
 
-타이틀의 버튼들은 UGUI Button 이 아니라 `HangingSprite` 로 매달린 그림 + `ButtonHover` 로 클릭을 받는다.
-`ButtonHover` 에 `onClick` (UnityEvent) 을 추가해 뒀으므로 기존 버튼들과 같은 방식으로 연결한다.
+타이틀 버튼은 Canvas 아래의 평범한 UGUI `Button` 이고, 동작은 `Title_Menu` 오브젝트의
+[TitleMenu](../Assets/01_Scripts/Title/TitleMenu.cs) 가 담당한다. `NEW_WORLD` 버튼과 같은 방식으로 연결한다.
 
-1. `NEW_WORLD` 같은 기존 버튼 오브젝트를 복제해 `GALLERY` 로 이름 변경
-2. `SceneNavigator` 컴포넌트 추가 → `Scene Name` 에 `00000_Gallery`
-3. `ButtonHover` 의 `On Click` 에 그 `SceneNavigator.Load()` 연결
+1. Hierarchy 에서 `NEW_WORLD` 버튼을 복제(Ctrl+D)해 `GALLERY` 로 이름 변경
+2. 자식 텍스트를 `GALLERY` 로 바꾸고 위치를 조정
+3. `Button` 의 `On Click ()` 에서
+   - 기존 항목의 대상은 이미 `Title_Menu` 로 들어가 있다
+   - 함수만 `TitleMenu > NewWorld ()` 에서 **`TitleMenu > Gallery ()`** 로 변경
+
+`gallerySceneName` 기본값은 `00000_Gallery` 이며 `Title_Menu` 인스펙터에서 바꿀 수 있다.
 
 ### 3. 빌드 설정
 
