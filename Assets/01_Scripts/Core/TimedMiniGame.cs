@@ -29,6 +29,12 @@ public abstract class TimedMiniGame : MiniGame
     /// <summary>경과 시간(초). 0 ~ <see cref="timeLimit"/> 범위로 클램프된다.</summary>
     protected float Elapsed => elapsed;
 
+    /// <summary>제한 시간이 잡혀 있으면 씬 공용 타이머 UI에 표시한다.</summary>
+    public override bool HasTimer => timeLimit > 0f;
+
+    /// <summary>0에서 1로 차오르는 제한 시간 진행도. <see cref="onTimerChanged"/> 가 넘기는 값과 같다.</summary>
+    public override float TimerRatio => timeLimit > 0f ? Mathf.Clamp01(elapsed / timeLimit) : 0f;
+
     /// <summary>성공/실패가 이미 확정되어 더 이상 입력을 받지 않는 상태인지.</summary>
     protected bool ResultLocked => resultLocked;
 

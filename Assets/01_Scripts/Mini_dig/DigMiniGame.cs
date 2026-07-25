@@ -111,8 +111,11 @@ public class DigMiniGame : MiniGame
     /// <summary>삽이 박힌 정도. 1이면 퍼올릴 준비가 됐다는 뜻.</summary>
     public float HoldRatio => requiredHold > 0f ? Mathf.Clamp01(holdTime / requiredHold) : 1f;
 
+    /// <summary>제한 시간을 쓰는 판에서만 씬 공용 타이머 UI에 표시한다.</summary>
+    public override bool HasTimer => useTimeLimit && timeLimit > 0f;
+
     /// <summary>0에서 1로 차오르는 제한 시간 값.</summary>
-    public float TimerRatio => useTimeLimit && timeLimit > 0f ? Mathf.Clamp01(elapsed / timeLimit) : 0f;
+    public override float TimerRatio => useTimeLimit && timeLimit > 0f ? Mathf.Clamp01(elapsed / timeLimit) : 0f;
 
     /// <summary>
     /// 실패 패널티가 강한 일렁임과 셰이크를 직접 재생하므로 공통 실패 셰이크는 생략한다.
