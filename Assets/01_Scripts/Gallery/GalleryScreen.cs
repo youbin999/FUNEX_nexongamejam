@@ -47,6 +47,10 @@ public sealed class GalleryScreen : MonoBehaviour
         if (keyboard == null || !keyboard.escapeKey.wasPressedThisFrame)
             return;
 
+        // 설정 창이 ESC 를 먼저 먹는다 — 타이틀에서 따라온 설정 창이 여기서도 살아 있다.
+        if (SettingsMenu.IsAnyOpen || SettingsMenu.EscapeConsumedThisFrame)
+            return;
+
         // ESC 는 한 겹씩 벗긴다 — 상세가 열려 있으면 상세만 닫고, 아니면 타이틀로.
         if (detail != null && detail.IsOpen)
             detail.Close();

@@ -12,8 +12,18 @@ using UnityEngine.UI;
 /// 프리팹으로 만들어 Resources 에 넣어두면 <see cref="SettingsBootstrap"/> 이
 /// 모든 씬에서 자동으로 하나 띄워준다. 씬에 직접 놓아도 동작한다.
 /// 참조는 비어 있어도 되므로 필요한 것만 연결하면 된다.
+///
+/// 타이틀 씬에 놓아둔 창이 플레이 씬까지 그대로 따라오게 하려면
+/// <see cref="dontDestroyOnLoad"/> 를 켜둔다. 다른 오브젝트의 자식으로 놓여 있어도
+/// <see cref="MakePersistent"/> 가 루트로 떼어내므로 그대로 살아남는다.
 /// </summary>
+/// <remarks>
+/// ESC 를 쓰는 다른 UI(<c>GalleryScreen</c> 등)보다 먼저 입력을 처리해야 하므로
+/// 실행 순서를 앞으로 당겨 둔다. 다른 스크립트는 <see cref="EscapeConsumedThisFrame"/> 로
+/// 이 프레임의 ESC 가 설정 창에 먹혔는지 확인하면 된다.
+/// </remarks>
 [DisallowMultipleComponent]
+[DefaultExecutionOrder(-100)]
 public class SettingsMenu : MonoBehaviour
 {
     private static SettingsMenu instance;
@@ -30,6 +40,9 @@ public class SettingsMenu : MonoBehaviour
 
     [Tooltip("씬이 바뀌어도 유지한다. 프리팹 하나로 모든 씬에서 쓸 때 켠다")]
     [SerializeField] private bool dontDestroyOnLoad = true;
+
+    [Tooltip("설정 창이 다른 UI 위에 그려지도록 Canvas 의 Sorting Order 를 이 값으로 올린다. 0 이하면 건드리지 않는다")]
+    [SerializeField] private int canvasSortingOrder = 1000;
 
     [Header("소리")]
     [SerializeField] private Slider bgmSlider;
@@ -58,6 +71,7 @@ public class SettingsMenu : MonoBehaviour
     private readonly List<Vector2Int> resolutions = new List<Vector2Int>();
     private float savedTimeScale = 1f;
     private bool isOpen;
+    private int escapeFrame = -1;
 
     /// <summary>지금 살아 있는 설정 창. 없으면 null.</summary>
     public static SettingsMenu Instance => instance;
@@ -65,10 +79,22 @@ public class SettingsMenu : MonoBehaviour
     /// <summary>설정 창이 열려 있는지 여부. 다른 스크립트에서 입력을 막을 때 쓰면 된다.</summary>
     public bool IsOpen => isOpen;
 
+    /// <summary>설정 창이 살아 있고 열려 있는지. 씬 어디서나 안전하게 물어볼 수 있다.</summary>
+    public static bool IsAnyOpen => instance != null && instance.isOpen;
+
+    /// <summary>
+    /// 이 프레임의 ESC 를 설정 창이 이미 먹었는지 여부.
+    /// ESC 를 쓰는 다른 UI 는 이 값이 true 면 그냥 넘겨야 한다 — 설정 창을 ESC 로 닫는 순간
+    /// <see cref="IsOpen"/> 은 이미 false 이므로 그것만 보고 판단하면 입력이 두 번 먹힌다.
+    /// </summary>
+    public static bool EscapeConsumedThisFrame =>
+        instance != null && instance.escapeFrame == Time.frameCount;
+
     private void Awake()
     {
         if (instance != null && instance != this)
         {
+            // 타이틀로 되돌아온 경우 — 이미 따라온 창이 있으니 씬에 놓인 쪽을 버린다.
             Destroy(gameObject);
             return;
         }
@@ -76,7 +102,9 @@ public class SettingsMenu : MonoBehaviour
         instance = this;
 
         if (dontDestroyOnLoad)
-            DontDestroyOnLoad(gameObject);
+            MakePersistent();
+
+        ApplyCanvasSortingOrder();
 
         GameSettings.EnsureLoaded();
         BuildResolutions();
@@ -107,8 +135,45 @@ public class SettingsMenu : MonoBehaviour
         if (keyboard == null)
             return;
 
-        if (keyboard.escapeKey.wasPressedThisFrame)
-            Toggle();
+        if (!keyboard.escapeKey.wasPressedThisFrame)
+            return;
+
+        escapeFrame = Time.frameCount;
+        Toggle();
+    }
+
+    /// <summary>
+    /// 씬이 바뀌어도 살아남게 만든다.
+    /// <c>DontDestroyOnLoad</c> 는 루트 오브젝트에만 통하므로(자식에 걸면 경고만 뜨고
+    /// 씬과 함께 사라진다) 부모가 있으면 먼저 루트로 떼어낸다.
+    /// 타이틀 씬의 <c>Setting_manager</c> 밑에 놓인 <c>Setting_Canvas</c> 가 이 경우다.
+    /// </summary>
+    private void MakePersistent()
+    {
+        if (transform.parent != null)
+            transform.SetParent(null, worldPositionStays: true);
+
+        DontDestroyOnLoad(gameObject);
+    }
+
+    /// <summary>
+    /// 설정 창 Canvas 를 다른 UI 위로 올린다.
+    /// 플레이 씬의 공용 UI Canvas 는 Sorting Order 가 100 이라 기본값(1)으로는 가려진다.
+    /// </summary>
+    private void ApplyCanvasSortingOrder()
+    {
+        if (canvasSortingOrder <= 0)
+            return;
+
+        var canvas = GetComponentInParent<Canvas>();
+        if (canvas == null)
+            return;
+
+        // 중첩 Canvas 라면 스스로 정렬을 결정하게 만들어야 값이 먹는다.
+        if (!canvas.isRootCanvas)
+            canvas.overrideSorting = true;
+
+        canvas.sortingOrder = canvasSortingOrder;
     }
 
     /// <summary>설정 창을 연다.</summary>
