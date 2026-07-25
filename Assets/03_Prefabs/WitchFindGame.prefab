@@ -2373,10 +2373,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WitchFindMiniGame
   gameDescription: "\uB9C8\uB140\uB97C \uCC3E\uC544\uB77C!"
   keyboardGuides:
-  - actionLabel: ''
+  - actionLabel: 
     keys: 250000000f0000002100000012000000
-  - actionLabel: ''
+  - actionLabel: 
     keys: 01000000
+  failurePenaltyPrefab: {fileID: 4410023845812301015, guid: 5a1e7c93b6d24f4bb1d0e83f27c95a41, type: 3}
   timeLimit: 3
   onTimerChanged:
     m_PersistentCalls:
