@@ -1,0 +1,2379 @@
+fileFormatVersion: 2
+guid: 8ce01edd9fc4d2c43a517ab9dc5fa467
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -5956061874751471173
+    second: lensdirt_0
+  - first:
+      213: 3898791639068825099
+    second: lensdirt_1
+  - first:
+      213: 8441542045335525331
+    second: lensdirt_2
+  - first:
+      213: 1220100509597430274
+    second: lensdirt_3
+  - first:
+      213: -5670136898639781231
+    second: lensdirt_4
+  - first:
+      213: -7055714077147583354
+    second: lensdirt_5
+  - first:
+      213: 1278642369489719457
+    second: lensdirt_6
+  - first:
+      213: 4072919887618149742
+    second: lensdirt_7
+  - first:
+      213: -3067341484081220480
+    second: lensdirt_8
+  - first:
+      213: -414763641240371804
+    second: lensdirt_9
+  - first:
+      213: -5497026889434548785
+    second: lensdirt_10
+  - first:
+      213: -6587022175938976331
+    second: lensdirt_11
+  - first:
+      213: 2780173529336916059
+    second: lensdirt_12
+  - first:
+      213: 5609135732007024550
+    second: lensdirt_13
+  - first:
+      213: 414033618220715272
+    second: lensdirt_14
+  - first:
+      213: -817735240247774786
+    second: lensdirt_15
+  - first:
+      213: 7608808245837314054
+    second: lensdirt_16
+  - first:
+      213: 5935305519550373905
+    second: lensdirt_17
+  - first:
+      213: -1479071198533537254
+    second: lensdirt_18
+  - first:
+      213: 5783713322012706079
+    second: lensdirt_19
+  - first:
+      213: 70010432240185391
+    second: lensdirt_20
+  - first:
+      213: 8829366558892671321
+    second: lensdirt_21
+  - first:
+      213: 3652991876707179986
+    second: lensdirt_22
+  - first:
+      213: -2501446077557598072
+    second: lensdirt_23
+  - first:
+      213: -8377838523479810956
+    second: lensdirt_24
+  - first:
+      213: 1144628966474856718
+    second: lensdirt_25
+  - first:
+      213: 695186277157135447
+    second: lensdirt_26
+  - first:
+      213: -5181634587112709560
+    second: lensdirt_27
+  - first:
+      213: -5818371922093003450
+    second: lensdirt_28
+  - first:
+      213: -5576225563311420812
+    second: lensdirt_29
+  - first:
+      213: -6859837099865987296
+    second: lensdirt_30
+  - first:
+      213: -6094777342794684444
+    second: lensdirt_31
+  - first:
+      213: 9039684608135018950
+    second: lensdirt_32
+  - first:
+      213: 7688704067352396954
+    second: lensdirt_33
+  - first:
+      213: 3218855969706201295
+    second: lensdirt_34
+  - first:
+      213: 8653425854853344898
+    second: lensdirt_35
+  - first:
+      213: 5779358219882448035
+    second: lensdirt_36
+  - first:
+      213: 7701480065513189577
+    second: lensdirt_37
+  - first:
+      213: 8887959134734271707
+    second: lensdirt_38
+  - first:
+      213: -1867358627450395234
+    second: lensdirt_39
+  - first:
+      213: 8947669531263414749
+    second: lensdirt_40
+  - first:
+      213: 5993004694718380978
+    second: lensdirt_41
+  - first:
+      213: 5370597528789189720
+    second: lensdirt_42
+  - first:
+      213: 7059108988697007595
+    second: lensdirt_43
+  - first:
+      213: 6790974060918194583
+    second: lensdirt_44
+  - first:
+      213: 6813311621007482437
+    second: lensdirt_45
+  - first:
+      213: -2077571115887536224
+    second: lensdirt_46
+  - first:
+      213: 5675180027180621709
+    second: lensdirt_47
+  - first:
+      213: 4136768849943529338
+    second: lensdirt_48
+  - first:
+      213: 7737238858122190977
+    second: lensdirt_49
+  - first:
+      213: -2445858556537239471
+    second: lensdirt_50
+  - first:
+      213: -3844042619932789254
+    second: lensdirt_51
+  - first:
+      213: 2481160135483018495
+    second: lensdirt_52
+  - first:
+      213: 5178216235027241112
+    second: lensdirt_53
+  - first:
+      213: 26382898645637605
+    second: lensdirt_54
+  - first:
+      213: 5635801837729673187
+    second: lensdirt_55
+  - first:
+      213: 8336829546907459159
+    second: lensdirt_56
+  - first:
+      213: 7176483855624380850
+    second: lensdirt_57
+  - first:
+      213: -843102739080158078
+    second: lensdirt_58
+  - first:
+      213: -219397769187290688
+    second: lensdirt_59
+  - first:
+      213: -2102856118649087297
+    second: lensdirt_60
+  - first:
+      213: -8656331962054127354
+    second: lensdirt_61
+  - first:
+      213: -2290955466200886957
+    second: lensdirt_62
+  - first:
+      213: -1853226267450737054
+    second: lensdirt_63
+  - first:
+      213: -90425609584677318
+    second: lensdirt_64
+  - first:
+      213: 6843913495559837894
+    second: lensdirt_65
+  - first:
+      213: -8163771024516123465
+    second: lensdirt_66
+  - first:
+      213: -7367629336287356532
+    second: lensdirt_67
+  - first:
+      213: 2389746136282005685
+    second: lensdirt_68
+  - first:
+      213: 2423308716162138859
+    second: lensdirt_69
+  - first:
+      213: -3476800620538534222
+    second: lensdirt_70
+  - first:
+      213: -6632560499666852150
+    second: lensdirt_71
+  - first:
+      213: 2553663257740946411
+    second: lensdirt_72
+  - first:
+      213: 1049750151605006090
+    second: lensdirt_73
+  - first:
+      213: -5749950996530062634
+    second: lensdirt_74
+  - first:
+      213: -4847165827316187056
+    second: lensdirt_75
+  - first:
+      213: -7392120808216234557
+    second: lensdirt_76
+  - first:
+      213: -5232810927379622228
+    second: lensdirt_77
+  - first:
+      213: 6193245063463709623
+    second: lensdirt_78
+  - first:
+      213: -8053167912528756968
+    second: lensdirt_79
+  - first:
+      213: 6888425521359658248
+    second: lensdirt_80
+  - first:
+      213: -2340492433773526361
+    second: lensdirt_81
+  - first:
+      213: -5545653178588212428
+    second: lensdirt_82
+  - first:
+      213: 8346118842626682380
+    second: lensdirt_83
+  - first:
+      213: 2779517253439192377
+    second: lensdirt_84
+  - first:
+      213: 2846654504438486659
+    second: lensdirt_85
+  - first:
+      213: -8391957960643467604
+    second: lensdirt_86
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: lensdirt_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 360
+        width: 681
+        height: 664
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bb1013f0841d75da0800000000000000
+      internalID: -5956061874751471173
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_1
+      rect:
+        serializedVersion: 2
+        x: 700
+        y: 439
+        width: 836
+        height: 585
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b06d5fbc65a4b1630800000000000000
+      internalID: 3898791639068825099
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_2
+      rect:
+        serializedVersion: 2
+        x: 995
+        y: 962
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3d79fb8d3c1662570800000000000000
+      internalID: 8441542045335525331
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_3
+      rect:
+        serializedVersion: 2
+        x: 1098
+        y: 960
+        width: 25
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 202f3d8f2faaee010800000000000000
+      internalID: 1220100509597430274
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_4
+      rect:
+        serializedVersion: 2
+        x: 995
+        y: 954
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 192adb84880af41b0800000000000000
+      internalID: -5670136898639781231
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_5
+      rect:
+        serializedVersion: 2
+        x: 471
+        y: 755
+        width: 11
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 68c25eafd61151e90800000000000000
+      internalID: -7055714077147583354
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_6
+      rect:
+        serializedVersion: 2
+        x: 1258
+        y: 485
+        width: 132
+        height: 294
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1a0d234e576aeb110800000000000000
+      internalID: 1278642369489719457
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_7
+      rect:
+        serializedVersion: 2
+        x: 82
+        y: 736
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e6d8a1cfe0be58830800000000000000
+      internalID: 4072919887618149742
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_8
+      rect:
+        serializedVersion: 2
+        x: 122
+        y: 735
+        width: 15
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 084f484fb2d9e65d0800000000000000
+      internalID: -3067341484081220480
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_9
+      rect:
+        serializedVersion: 2
+        x: 454
+        y: 728
+        width: 12
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4adbe127aa67e3af0800000000000000
+      internalID: -414763641240371804
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_10
+      rect:
+        serializedVersion: 2
+        x: 471
+        y: 727
+        width: 10
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fc5bb762b23a6b3b0800000000000000
+      internalID: -5497026889434548785
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_11
+      rect:
+        serializedVersion: 2
+        x: 458
+        y: 715
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5b569830b323694a0800000000000000
+      internalID: -6587022175938976331
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_12
+      rect:
+        serializedVersion: 2
+        x: 518
+        y: 695
+        width: 11
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b58221e4819259620800000000000000
+      internalID: 2780173529336916059
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_13
+      rect:
+        serializedVersion: 2
+        x: 79
+        y: 671
+        width: 10
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6a7ba33da37a7dd40800000000000000
+      internalID: 5609135732007024550
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_14
+      rect:
+        serializedVersion: 2
+        x: 1230
+        y: 641
+        width: 27
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 80d8d13d161feb500800000000000000
+      internalID: 414033618220715272
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_15
+      rect:
+        serializedVersion: 2
+        x: 81
+        y: 656
+        width: 7
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eb176bca122d6a4f0800000000000000
+      internalID: -817735240247774786
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_16
+      rect:
+        serializedVersion: 2
+        x: 81
+        y: 646
+        width: 8
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 608323159cae79960800000000000000
+      internalID: 7608808245837314054
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_17
+      rect:
+        serializedVersion: 2
+        x: 532
+        y: 0
+        width: 1004
+        height: 658
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 11027366ce07e5250800000000000000
+      internalID: 5935305519550373905
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_18
+      rect:
+        serializedVersion: 2
+        x: 28
+        y: 479
+        width: 125
+        height: 169
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a12b5e5d498497be0800000000000000
+      internalID: -1479071198533537254
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_19
+      rect:
+        serializedVersion: 2
+        x: 38
+        y: 637
+        width: 15
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f1503497f90e34050800000000000000
+      internalID: 5783713322012706079
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_20
+      rect:
+        serializedVersion: 2
+        x: 193
+        y: 611
+        width: 29
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f207f300e1ab8f000800000000000000
+      internalID: 70010432240185391
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_21
+      rect:
+        serializedVersion: 2
+        x: 505
+        y: 633
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 951c286fa16388a70800000000000000
+      internalID: 8829366558892671321
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_22
+      rect:
+        serializedVersion: 2
+        x: 474
+        y: 613
+        width: 15
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2ddd48ae1c802b230800000000000000
+      internalID: 3652991876707179986
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_23
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 623
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8889262bb04194dd0800000000000000
+      internalID: -2501446077557598072
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_24
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 611
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 47c17662040fbbb80800000000000000
+      internalID: -8377838523479810956
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_25
+      rect:
+        serializedVersion: 2
+        x: 445
+        y: 598
+        width: 36
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e093b520bf982ef00800000000000000
+      internalID: 1144628966474856718
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_26
+      rect:
+        serializedVersion: 2
+        x: 149
+        y: 560
+        width: 28
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7546dae5c3cc5a900800000000000000
+      internalID: 695186277157135447
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_27
+      rect:
+        serializedVersion: 2
+        x: 161
+        y: 379
+        width: 186
+        height: 209
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 842e447ebc22718b0800000000000000
+      internalID: -5181634587112709560
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_28
+      rect:
+        serializedVersion: 2
+        x: 152
+        y: 544
+        width: 9
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 64d2a8c509df04fa0800000000000000
+      internalID: -5818371922093003450
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_29
+      rect:
+        serializedVersion: 2
+        x: 152
+        y: 528
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 47ace5fe4644d92b0800000000000000
+      internalID: -5576225563311420812
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_30
+      rect:
+        serializedVersion: 2
+        x: 507
+        y: 537
+        width: 6
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 027217da086fcc0a0800000000000000
+      internalID: -6859837099865987296
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_31
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 519
+        width: 10
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4e7af995c400b6ba0800000000000000
+      internalID: -6094777342794684444
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_32
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 490
+        width: 17
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6c9347db149637d70800000000000000
+      internalID: 9039684608135018950
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_33
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 480
+        width: 7
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a9404addc93c3ba60800000000000000
+      internalID: 7688704067352396954
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_34
+      rect:
+        serializedVersion: 2
+        x: 12
+        y: 398
+        width: 62
+        height: 112
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fc0db71437cabac20800000000000000
+      internalID: 3218855969706201295
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_35
+      rect:
+        serializedVersion: 2
+        x: 79
+        y: 445
+        width: 10
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 28ee6b897f4271870800000000000000
+      internalID: 8653425854853344898
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_36
+      rect:
+        serializedVersion: 2
+        x: 93
+        y: 471
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3a4c3dd3ea7643050800000000000000
+      internalID: 5779358219882448035
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_37
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 448
+        width: 9
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9c07aadb05721ea60800000000000000
+      internalID: 7701480065513189577
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_38
+      rect:
+        serializedVersion: 2
+        x: 478
+        y: 455
+        width: 16
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bd4460c1ebf585b70800000000000000
+      internalID: 8887959134734271707
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_39
+      rect:
+        serializedVersion: 2
+        x: 10
+        y: 424
+        width: 8
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e95ee86d83fc516e0800000000000000
+      internalID: -1867358627450395234
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_40
+      rect:
+        serializedVersion: 2
+        x: 12
+        y: 435
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dd1ba8a28028c2c70800000000000000
+      internalID: 8947669531263414749
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_41
+      rect:
+        serializedVersion: 2
+        x: 78
+        y: 422
+        width: 11
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2bbffed740e6b2350800000000000000
+      internalID: 5993004694718380978
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_42
+      rect:
+        serializedVersion: 2
+        x: 322
+        y: 415
+        width: 32
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 854021f6ff1388a40800000000000000
+      internalID: 5370597528789189720
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_43
+      rect:
+        serializedVersion: 2
+        x: 10
+        y: 408
+        width: 7
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: be55d06793ef6f160800000000000000
+      internalID: 7059108988697007595
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_44
+      rect:
+        serializedVersion: 2
+        x: 49
+        y: 395
+        width: 24
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 791cbe3ade26e3e50800000000000000
+      internalID: 6790974060918194583
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_45
+      rect:
+        serializedVersion: 2
+        x: 71
+        y: 368
+        width: 22
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 54e113222debd8e50800000000000000
+      internalID: 6813311621007482437
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_46
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 405
+        width: 18
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0a759e9d31cfa23e0800000000000000
+      internalID: -2077571115887536224
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_47
+      rect:
+        serializedVersion: 2
+        x: 105
+        y: 400
+        width: 27
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d8f1e749a2a42ce40800000000000000
+      internalID: 5675180027180621709
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_48
+      rect:
+        serializedVersion: 2
+        x: 123
+        y: 416
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a7709caf951c86930800000000000000
+      internalID: 4136768849943529338
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_49
+      rect:
+        serializedVersion: 2
+        x: 127
+        y: 415
+        width: 10
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 180e8b07fb1306b60800000000000000
+      internalID: 7737238858122190977
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_50
+      rect:
+        serializedVersion: 2
+        x: 139
+        y: 368
+        width: 26
+        height: 57
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1588fbef9909e0ed0800000000000000
+      internalID: -2445858556537239471
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_51
+      rect:
+        serializedVersion: 2
+        x: 347
+        y: 415
+        width: 6
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: af5b1719a9737aac0800000000000000
+      internalID: -3844042619932789254
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_52
+      rect:
+        serializedVersion: 2
+        x: 382
+        y: 392
+        width: 20
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ffc435a5ff9de6220800000000000000
+      internalID: 2481160135483018495
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_53
+      rect:
+        serializedVersion: 2
+        x: 525
+        y: 407
+        width: 18
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 89895fafa38bcd740800000000000000
+      internalID: 5178216235027241112
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_54
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 320
+        width: 47
+        height: 87
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5e91be54b1bbd5000800000000000000
+      internalID: 26382898645637605
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_55
+      rect:
+        serializedVersion: 2
+        x: 63
+        y: 391
+        width: 10
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3efee5269e3663e40800000000000000
+      internalID: 5635801837729673187
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_56
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 401
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 75e56607d4e52b370800000000000000
+      internalID: 8336829546907459159
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_57
+      rect:
+        serializedVersion: 2
+        x: 175
+        y: 388
+        width: 10
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b121d64b0ef79360800000000000000
+      internalID: 7176483855624380850
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_58
+      rect:
+        serializedVersion: 2
+        x: 372
+        y: 400
+        width: 12
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 284e7f79682bc44f0800000000000000
+      internalID: -843102739080158078
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_59
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 381
+        width: 14
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0c1141f24ea84fcf0800000000000000
+      internalID: -219397769187290688
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_60
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 379
+        width: 15
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fba1a22608721d2e0800000000000000
+      internalID: -2102856118649087297
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_61
+      rect:
+        serializedVersion: 2
+        x: 126
+        y: 386
+        width: 9
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 60157e791f78ed780800000000000000
+      internalID: -8656331962054127354
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_62
+      rect:
+        serializedVersion: 2
+        x: 207
+        y: 392
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3515bd83424e430e0800000000000000
+      internalID: -2290955466200886957
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_63
+      rect:
+        serializedVersion: 2
+        x: 225
+        y: 386
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 26efc2057840846e0800000000000000
+      internalID: -1853226267450737054
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_64
+      rect:
+        serializedVersion: 2
+        x: 243
+        y: 389
+        width: 10
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a3e6b1e136ebebef0800000000000000
+      internalID: -90425609584677318
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_65
+      rect:
+        serializedVersion: 2
+        x: 291
+        y: 343
+        width: 59
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6c8985840177afe50800000000000000
+      internalID: 6843913495559837894
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_66
+      rect:
+        serializedVersion: 2
+        x: 360
+        y: 390
+        width: 9
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7b4f618b18574be80800000000000000
+      internalID: -8163771024516123465
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_67
+      rect:
+        serializedVersion: 2
+        x: 373
+        y: 387
+        width: 10
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c8958dd672ce0c990800000000000000
+      internalID: -7367629336287356532
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_68
+      rect:
+        serializedVersion: 2
+        x: 127
+        y: 375
+        width: 11
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5b0837413751a2120800000000000000
+      internalID: 2389746136282005685
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_69
+      rect:
+        serializedVersion: 2
+        x: 129
+        y: 383
+        width: 9
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: be2c3f7207251a120800000000000000
+      internalID: 2423308716162138859
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_70
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 384
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b661f9a14cefbfc0800000000000000
+      internalID: -3476800620538534222
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_71
+      rect:
+        serializedVersion: 2
+        x: 169
+        y: 376
+        width: 9
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ac6e11acd5964f3a0800000000000000
+      internalID: -6632560499666852150
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_72
+      rect:
+        serializedVersion: 2
+        x: 350
+        y: 375
+        width: 11
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bebad99f33f607320800000000000000
+      internalID: 2553663257740946411
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_73
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 359
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a0f24597336719e00800000000000000
+      internalID: 1049750151605006090
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_74
+      rect:
+        serializedVersion: 2
+        x: 78
+        y: 350
+        width: 11
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6da1cef78021430b0800000000000000
+      internalID: -5749950996530062634
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_75
+      rect:
+        serializedVersion: 2
+        x: 126
+        y: 359
+        width: 19
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 05008678c586bbcb0800000000000000
+      internalID: -4847165827316187056
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_76
+      rect:
+        serializedVersion: 2
+        x: 259
+        y: 367
+        width: 16
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3c57f714a49e96990800000000000000
+      internalID: -7392120808216234557
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_77
+      rect:
+        serializedVersion: 2
+        x: 491
+        y: 361
+        width: 6
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca651c8af225167b0800000000000000
+      internalID: -5232810927379622228
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_78
+      rect:
+        serializedVersion: 2
+        x: 507
+        y: 361
+        width: 9
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7bb22be6293d2f550800000000000000
+      internalID: 6193245063463709623
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_79
+      rect:
+        serializedVersion: 2
+        x: 515
+        y: 357
+        width: 22
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 81f362973766d3090800000000000000
+      internalID: -8053167912528756968
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_80
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 626
+        height: 364
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 80d9066e38a989f50800000000000000
+      internalID: 6888425521359658248
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_81
+      rect:
+        serializedVersion: 2
+        x: 243
+        y: 357
+        width: 6
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7a2807d2886e48fd0800000000000000
+      internalID: -2340492433773526361
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_82
+      rect:
+        serializedVersion: 2
+        x: 347
+        y: 360
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 433dbb2f0d1e903b0800000000000000
+      internalID: -5545653178588212428
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_83
+      rect:
+        serializedVersion: 2
+        x: 516
+        y: 354
+        width: 6
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c0e25f32ede53d370800000000000000
+      internalID: 8346118842626682380
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_84
+      rect:
+        serializedVersion: 2
+        x: 1017
+        y: 0
+        width: 164
+        height: 90
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 93dff4a2734d29620800000000000000
+      internalID: 2779517253439192377
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_85
+      rect:
+        serializedVersion: 2
+        x: 1182
+        y: 0
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 38652578039518720800000000000000
+      internalID: 2846654504438486659
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lensdirt_86
+      rect:
+        serializedVersion: 2
+        x: 1346
+        y: 0
+        width: 7
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca6a5d182b6c98b80800000000000000
+      internalID: -8391957960643467604
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      lensdirt_0: -5956061874751471173
+      lensdirt_1: 3898791639068825099
+      lensdirt_10: -5497026889434548785
+      lensdirt_11: -6587022175938976331
+      lensdirt_12: 2780173529336916059
+      lensdirt_13: 5609135732007024550
+      lensdirt_14: 414033618220715272
+      lensdirt_15: -817735240247774786
+      lensdirt_16: 7608808245837314054
+      lensdirt_17: 5935305519550373905
+      lensdirt_18: -1479071198533537254
+      lensdirt_19: 5783713322012706079
+      lensdirt_2: 8441542045335525331
+      lensdirt_20: 70010432240185391
+      lensdirt_21: 8829366558892671321
+      lensdirt_22: 3652991876707179986
+      lensdirt_23: -2501446077557598072
+      lensdirt_24: -8377838523479810956
+      lensdirt_25: 1144628966474856718
+      lensdirt_26: 695186277157135447
+      lensdirt_27: -5181634587112709560
+      lensdirt_28: -5818371922093003450
+      lensdirt_29: -5576225563311420812
+      lensdirt_3: 1220100509597430274
+      lensdirt_30: -6859837099865987296
+      lensdirt_31: -6094777342794684444
+      lensdirt_32: 9039684608135018950
+      lensdirt_33: 7688704067352396954
+      lensdirt_34: 3218855969706201295
+      lensdirt_35: 8653425854853344898
+      lensdirt_36: 5779358219882448035
+      lensdirt_37: 7701480065513189577
+      lensdirt_38: 8887959134734271707
+      lensdirt_39: -1867358627450395234
+      lensdirt_4: -5670136898639781231
+      lensdirt_40: 8947669531263414749
+      lensdirt_41: 5993004694718380978
+      lensdirt_42: 5370597528789189720
+      lensdirt_43: 7059108988697007595
+      lensdirt_44: 6790974060918194583
+      lensdirt_45: 6813311621007482437
+      lensdirt_46: -2077571115887536224
+      lensdirt_47: 5675180027180621709
+      lensdirt_48: 4136768849943529338
+      lensdirt_49: 7737238858122190977
+      lensdirt_5: -7055714077147583354
+      lensdirt_50: -2445858556537239471
+      lensdirt_51: -3844042619932789254
+      lensdirt_52: 2481160135483018495
+      lensdirt_53: 5178216235027241112
+      lensdirt_54: 26382898645637605
+      lensdirt_55: 5635801837729673187
+      lensdirt_56: 8336829546907459159
+      lensdirt_57: 7176483855624380850
+      lensdirt_58: -843102739080158078
+      lensdirt_59: -219397769187290688
+      lensdirt_6: 1278642369489719457
+      lensdirt_60: -2102856118649087297
+      lensdirt_61: -8656331962054127354
+      lensdirt_62: -2290955466200886957
+      lensdirt_63: -1853226267450737054
+      lensdirt_64: -90425609584677318
+      lensdirt_65: 6843913495559837894
+      lensdirt_66: -8163771024516123465
+      lensdirt_67: -7367629336287356532
+      lensdirt_68: 2389746136282005685
+      lensdirt_69: 2423308716162138859
+      lensdirt_7: 4072919887618149742
+      lensdirt_70: -3476800620538534222
+      lensdirt_71: -6632560499666852150
+      lensdirt_72: 2553663257740946411
+      lensdirt_73: 1049750151605006090
+      lensdirt_74: -5749950996530062634
+      lensdirt_75: -4847165827316187056
+      lensdirt_76: -7392120808216234557
+      lensdirt_77: -5232810927379622228
+      lensdirt_78: 6193245063463709623
+      lensdirt_79: -8053167912528756968
+      lensdirt_8: -3067341484081220480
+      lensdirt_80: 6888425521359658248
+      lensdirt_81: -2340492433773526361
+      lensdirt_82: -5545653178588212428
+      lensdirt_83: 8346118842626682380
+      lensdirt_84: 2779517253439192377
+      lensdirt_85: 2846654504438486659
+      lensdirt_86: -8391957960643467604
+      lensdirt_9: -414763641240371804
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

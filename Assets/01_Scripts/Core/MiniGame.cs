@@ -23,11 +23,18 @@ public abstract class MiniGame : MonoBehaviour
     [Tooltip("게임 시작 전에 표시할 키보드 조작 안내. 마우스 전용 게임은 비워 둔다")]
     [SerializeField] private List<KeyboardGuideEntry> keyboardGuides = new List<KeyboardGuideEntry>();
 
+    [Header("실패 패널티")]
+    [Tooltip("실패 시 생성해 현재 한 판 동안 유지할 패널티 프리팹. 비워두면 패널티 없이 종료한다.")]
+    [SerializeField] private FailurePenalty failurePenaltyPrefab;
+
     /// <summary>게임 시작 전 표시할 설명 문구. <see cref="MiniGamePlayer"/> 가 Play() 호출 전 연출에 사용한다.</summary>
     public string GameDescription => gameDescription;
 
     /// <summary>게임 시작 전에 표시할 키보드 조작 안내.</summary>
     public IReadOnlyList<KeyboardGuideEntry> KeyboardGuides => keyboardGuides;
+
+    /// <summary>실패 시 적용할 선택적 패널티 프리팹.</summary>
+    public FailurePenalty FailurePenaltyPrefab => failurePenaltyPrefab;
 
     /// <summary>현재 재생 중인지 여부.</summary>
     public bool IsPlaying { get; private set; }
