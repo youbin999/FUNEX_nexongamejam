@@ -7,6 +7,8 @@
       "Bash(awk '/^--- !u!20 /,/^--- !u!\\(4|1\\) /' Assets/00_Scenes/03001_Minigame_Chamho.unity)",
       "Bash(cd \"C:/Users/USER/AppData/Local/Unity/Editor\" && tail -60 Editor.log)",
       "Bash(awk '{o+=gsub\\(/{/,\"{\"\\); c+=gsub\\(/}/,\"}\"\\)} END{print \"braces:\",o,c}' Assets/01_Scripts/Mini_timing/TimingDropMiniGame.cs)"
+      "Bash(awk '{o+=gsub\\(/{/,\"{\"\\); c+=gsub\\(/}/,\"}\"\\)} END{print \"braces:\",o,c}' Assets/01_Scripts/Mini_timing/TimingDropMiniGame.cs)",
+      "Bash(gh pr *)"
     ]
   }
 }
