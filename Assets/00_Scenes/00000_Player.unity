@@ -471,69 +471,213 @@ MonoBehaviour:
   player: {fileID: 700000003}
   games:
   - prefab: {fileID: 3102439326765463788, guid: 4cd0269129acd204c9d63d2d4539c792, type: 3}
-    isCritical: 0
+    kind: 1
+    era: 1
     borderSprite: {fileID: 21300000, guid: 593a65498821e214ab53f9e91968141c, type: 3}
     eraYearText: "\uAE30\uC6D0\uC804 3000\uB144"
+    eventLabel: "\uACE0\uC778\uB3CC \uB9CC\uB4E4\uAE30"
+    successMeaning: "\uB108\uC758 \uC138\uACC4\uB294 \uACE0\uC778\uB3CC \uC720\uC801\uC9C0\uAC00
+      \uAD00\uAD11\uC790\uC6D0\uC73C\uB85C \uD65C\uBC1C\uD788 \uC0AC\uC6A9\uB418\uACE0
+      \uC788\uC73C\uBA70"
+    failureMeaning: "\uB108\uC758 \uC138\uACC4\uB294 \uACE0\uC778\uB3CC\uC774 \uBAA8\uB450
+      \uBD80\uC11C\uC838 \uC720\uC801\uC9C0\uAC00 \uBC1C\uACAC\uB418\uC9C0 \uC54A\uC558\uC73C\uBA70"
+    successVisual: a small dolmen in some part of world, corwded by tourlists
+    failureVisual: shattered dolmen, no one have attention
+    visualWeight: 2
   - prefab: {fileID: 562160154704496516, guid: c41684de35ac45ada326578c7c5a4e0a, type: 3}
-    isCritical: 0
+    kind: 1
+    era: 1
     borderSprite: {fileID: 0}
     eraYearText: 
+    eventLabel: 
+    successMeaning: "\uD55C\uB54C \uAE30\uC6B0\uC81C\uB97C \uC704\uC2DC\uD55C \uC0E4\uBA38\uB2C8\uC998\uC774
+      \uC720\uD589\uD558\uC600\uB2E4."
+    failureMeaning: "\uC2F9\uC2F9 \uBE4C\uB358 \uC0AC\uB78C\uB4E4\uC740 \uAD11\uC778
+      \uCDE8\uAE09\uC744 \uD53C\uD560 \uC218 \uC5C6\uB2E4."
+    successVisual: 
+    failureVisual: 
+    visualWeight: 5
   - prefab: {fileID: 1137410263306520644, guid: 3f387d812ed7d05438306a72d2949023, type: 3}
-    isCritical: 1
+    kind: 2
+    era: 1
     borderSprite: {fileID: 0}
     eraYearText: 
+    eventLabel: "\uBD88\uC744 \uBC1C\uACAC\uD558\uB2E4"
+    successMeaning: 
+    failureMeaning: "\uC778\uB958\uB294 \uC601\uC601 \uBD88\uC744 \uBC1C\uACAC\uD558\uC9C0
+      \uBABB\uD588\uB2E4."
+    successVisual: 
+    failureVisual: 
+    visualWeight: 5
   - prefab: {fileID: 3390688864203735000, guid: 142412d3334caa8408aa8b783eba0185, type: 3}
-    isCritical: 0
+    kind: 1
+    era: 2
     borderSprite: {fileID: 21300000, guid: 74eaa5d12046003439fb8d2225b9e40c, type: 3}
     eraYearText: "\uAE30\uC6D0\uC804 1500\uB144"
+    eventLabel: 
+    successMeaning: "\uBD80\uB825\uC744 \uBC1C\uACAC\uD558\uC5EC \uD574\uC0C1 \uC601\uC5ED\uC73C\uB85C
+      \uC778\uAC04\uC774 \uC9C4\uCD9C\uD588\uB2E4."
+    failureMeaning: "\uBD80\uB825\uC744 \uBC1C\uACAC\uD558\uC9C0 \uBABB\uD574 \uC778\uAC04\uC740
+      \uC721\uC9C0\uC5D0\uB9CC \uBA38\uBB3C\uB800\uB2E4."
+    successVisual: some ships are on the sea
+    failureVisual: some people afraid of waters
+    visualWeight: 2
   - prefab: {fileID: 6600000012, guid: 5b2d8e1f4a6c47039d5e7a1b3c9f0e26, type: 3}
-    isCritical: 1
+    kind: 2
+    era: 2
     borderSprite: {fileID: 0}
     eraYearText: 
+    eventLabel: "\uC0C1\uD615 \uBB38\uC790\uC758 \uBC1C\uBA85"
+    successMeaning: 
+    failureMeaning: "\uC778\uB958\uB294 \uC601\uC601 \uBB38\uC790\uB97C \uBC1C\uBA85\uD558\uC9C0
+      \uBABB\uD574 \uB354 \uC774\uC0C1\uC758 \uBC1C\uC804\uC744 \uC774\uB8E8\uC9C0
+      \uBABB\uD588\uB2E4."
+    successVisual: 
+    failureVisual: 
+    visualWeight: 5
   - prefab: {fileID: 72291910205155039, guid: e6f0bf9670e1982478561fdd3e743a6b, type: 3}
-    isCritical: 1
+    kind: 2
+    era: 2
     borderSprite: {fileID: 0}
     eraYearText: 
+    eventLabel: "\uCCAD\uB3D9\uC758 \uD65C\uC6A9"
+    successMeaning: 
+    failureMeaning: "\uC778\uB958\uB294 \uCCAD\uB3D9\uC744 \uD65C\uC6A9\uD558\uC9C0
+      \uBABB\uD574 \uBC1C\uC804\uC744 \uBA48\uCD94\uC5C8\uB2E4."
+    successVisual: 
+    failureVisual: 
+    visualWeight: 5
   - prefab: {fileID: 4657186777680439362, guid: 6e7c95e72c6956141abad54d4c53d242, type: 3}
-    isCritical: 0
+    kind: 1
+    era: 3
     borderSprite: {fileID: 21300000, guid: 7827973d7db50d04ab783518ed8b9b3b, type: 3}
     eraYearText: "\uAE30\uC6D0\uD6C4 1500\uB144"
+    eventLabel: "\uB9C8\uB140\uC0AC\uB0E5"
+    successMeaning: 
+    failureMeaning: "\uB9C8\uB140\uC0AC\uB0E5\uC73C\uB85C \uC5B5\uC6B8\uD55C \uD76C\uC0DD\uC591\uC774
+      \uBC1C\uC0DD\uD588\uB2E4."
+    successVisual: 
+    failureVisual: "few ghosts floating due to \uB9C8\uB140\uC0AC\uB0E5"
+    visualWeight: 2
   - prefab: {fileID: 2624045291354175195, guid: f9189fea3cd214b46bf960cf71c9966c, type: 3}
-    isCritical: 0
+    kind: 0
+    era: 3
     borderSprite: {fileID: 0}
     eraYearText: 
+    eventLabel: 
+    successMeaning: 
+    failureMeaning: 
+    successVisual: 
+    failureVisual: 
+    visualWeight: 5
   - prefab: {fileID: 7396776103939382718, guid: a346cefd652deac4facead9bd56e1350, type: 3}
-    isCritical: 1
+    kind: 2
+    era: 3
     borderSprite: {fileID: 0}
     eraYearText: 
+    eventLabel: "\uC99D\uAE30 \uAE30\uAD00\uC758 \uBC1C\uBA85"
+    successMeaning: 
+    failureMeaning: "\uC99D\uAE30 \uAE30\uAD00\uC744 \uBC1C\uBA85\uD558\uC9C0 \uBABB\uD574
+      \uC0B0\uC5C5\uC744 \uBC1C\uC804\uC2DC\uD0A4\uC9C0 \uBABB\uD588\uB2E4."
+    successVisual: 
+    failureVisual: 
+    visualWeight: 4
   - prefab: {fileID: 4700864808614509273, guid: d109eaaff3d885844a73d86db8d12dc2, type: 3}
-    isCritical: 0
+    kind: 0
+    era: 4
     borderSprite: {fileID: 21300000, guid: 25322d51181498745be0f4cb9ccb3611, type: 3}
     eraYearText: "\uAE30\uC6D0\uD6C4 1900\uB144"
+    eventLabel: 
+    successMeaning: 
+    failureMeaning: 
+    successVisual: 
+    failureVisual: 
+    visualWeight: 5
   - prefab: {fileID: 8796445717193832805, guid: 133e85cc3a50fcc48a57f374f8b9f011, type: 3}
-    isCritical: 0
+    kind: 0
+    era: 4
     borderSprite: {fileID: 0}
     eraYearText: 
+    eventLabel: 
+    successMeaning: 
+    failureMeaning: 
+    successVisual: 
+    failureVisual: 
+    visualWeight: 5
   - prefab: {fileID: 5533263401601251690, guid: 542f1ec7acbab974ebc3ad6b77fd5f9f, type: 3}
-    isCritical: 1
+    kind: 2
+    era: 4
     borderSprite: {fileID: 0}
-    eraYearText: 
+    eraYearText: "\uC804\uAD6C\uC758 \uBC1C\uBA85"
+    eventLabel: 
+    successMeaning: 
+    failureMeaning: "\uC804\uAD6C\uB97C \uBC1C\uBA85\uD558\uC9C0 \uBABB\uD574 \uC778\uB958\uB294
+      \uCE60\uD759\uAC19\uC740 \uBC24\uC744 \uC815\uBCF5\uD558\uC9C0 \uBABB\uD588\uB2E4."
+    successVisual: 
+    failureVisual: 
+    visualWeight: 5
   - prefab: {fileID: 1870836362585978639, guid: 8e988c43d299d9a4d9f90a75d3398e97, type: 3}
-    isCritical: 0
+    kind: 1
+    era: 5
     borderSprite: {fileID: 21300000, guid: 7d1664222bd094e44b0a119186329ddb, type: 3}
     eraYearText: "\uAE30\uC6D0\uD6C4 2026\uB144, \uD604\uC7AC"
+    eventLabel: 
+    successMeaning: "\uB125\uC2A8 \uC804\uC790\uC758 \uC8FC\uAC00\uAC00 \uBC31\uB9CC\uC6D0\uC744
+      \uCC0D\uC5C8\uB2E4."
+    failureMeaning: "\uB125\uC2A8 \uC804\uC790\uC758 \uC8FC\uAC00\uAC00 \uD3ED\uB77D\uD588\uB2E4."
+    successVisual: "a big company building named \"\uB125\uC2A8\uC804\uC790\""
+    failureVisual: "some homeless people are in front of \uB125\uC2A8\uC804\uC790
+      building"
+    visualWeight: 4
+  - prefab: {fileID: 7810906958207532481, guid: 7185235f0fea32140aebf20382bf89bb, type: 3}
+    kind: 1
+    era: 5
+    borderSprite: {fileID: 21300000, guid: 7d1664222bd094e44b0a119186329ddb, type: 3}
+    eraYearText: "\uAE30\uC6D0\uD6C4 2026\uB144, \uD604\uC7AC"
+    eventLabel: "\uC5D0\uC5B4\uCEE8\uC758 \uBC1C\uBA85"
+    successMeaning: "\uCE90\uB9AC\uC5B4\uAC00 \uC5D0\uC5B4\uCEE8\uC744 \uBC1C\uBA85\uD558\uC600\uB2E4."
+    failureMeaning: "\uCE90\uB9AC\uC5B4\uAC00 \uB354\uC704\uB97C \uB290\uB07C\uC9C0
+      \uBABB\uD574 \uC5D0\uC5B4\uCEE8\uC774 \uBC1C\uBA85\uB418\uC9C0 \uC54A\uC558\uB2E4."
+    successVisual: humans are stay cool in indoor thanks to airconditional
+    failureVisual: humans are very hot due to no aircon (no invented)
+    visualWeight: 2
   - prefab: {fileID: 5500000012, guid: f3a8c1b6d9e24705a1c8b3f6e9d02417, type: 3}
-    isCritical: 1
+    kind: 2
+    era: 5
     borderSprite: {fileID: 0}
     eraYearText: 
+    eventLabel: "\uD575\uC804\uC7C1 \uBC1C\uBC1C"
+    successMeaning: 
+    failureMeaning: "\uC778\uB958\uB294 \uC138\uACC4 \uD575\uC804\uC7C1\uC73C\uB85C
+      \uC790\uBA78\uD588\uB2E4."
+    successVisual: 
+    failureVisual: nuclear war in global
+    visualWeight: 7
   - prefab: {fileID: 1793571473085594207, guid: 99c89240ed27a494ca10ae4b6d357444, type: 3}
-    isCritical: 0
+    kind: 0
+    era: 6
     borderSprite: {fileID: -8945467959818111224, guid: 188115b7c96669846b360eec57dac7f7, type: 3}
     eraYearText: "\uAE30\uC6D0\uD6C4 2200\uB144"
+    eventLabel: 
+    successMeaning: 
+    failureMeaning: 
+    successVisual: 
+    failureVisual: 
+    visualWeight: 5
   - prefab: {fileID: -4765541157340919056, guid: 8e1f5a3c7b2d49608c4a6e2f1b7d0359, type: 3}
-    isCritical: 0
+    kind: 1
+    era: 6
     borderSprite: {fileID: 0}
     eraYearText: 
+    eventLabel: "\uC678\uACC4\uC778\uACFC\uC758 \uBCF5\uC2F1"
+    successMeaning: "\uC678\uACC4\uC778\uACFC 1:1 \uC57C\uCC28\uC5D0\uC11C \uC2B9\uB9AC\uD558\uC5EC
+      \uD3C9\uD654\uB86D\uAC8C \uACF5\uC874\uD558\uC600\uB2E4."
+    failureMeaning: "\uC678\uACC4\uC778\uACFC\uC758 \uC2F8\uC6C0\uC5D0\uC11C \uD328\uBC30\uD558\uC5EC
+      \uC778\uB958\uB294 \uC678\uACC4\uC778\uB4E4\uC758 \uD558\uC218\uC778\uC774
+      \uB418\uC5C8\uB2E4."
+    successVisual: ailens are humans friend
+    failureVisual: humans are submission of aliens
+    visualWeight: 5
   playOnStart: 1
   onGameEnding:
     m_PersistentCalls:

@@ -50,6 +50,10 @@ public class FallbackEndingNarrator : IEndingNarrator
         if (result.EndedEarly)
         {
             lines.Add($"그리고 인류는 {result.EndedAtEra}에서 걸음을 멈췄다.");
+
+            if (!string.IsNullOrWhiteSpace(result.EndedFailureMeaning))
+                lines.Add(result.EndedFailureMeaning);
+
             lines.Add("그 다음의 역사는, 끝내 쓰이지 않았다.");
             epilogue = "2026년. 인류는 아직 그곳에 있다.";
         }
