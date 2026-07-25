@@ -245,9 +245,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ArchimedesBathMiniGame
   gameDescription: "\uBAA9\uC695\uD0D5\uC5D0 \uB4E4\uC5B4\uAC00\uB77C!"
   keyboardGuides:
-  - actionLabel: ''
+  - actionLabel: 
     keys: 12000000
-  timeLimit: 5
+  timeLimit: 3.5
   onTimerChanged:
     m_PersistentCalls:
       m_Calls:
