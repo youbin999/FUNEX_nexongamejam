@@ -491,15 +491,15 @@ MonoBehaviour:
     kind: 1
     era: 1
     borderSprite: {fileID: 21300000, guid: 593a65498821e214ab53f9e91968141c, type: 3}
-    eraYearText: "\uAE30\uC6D0\uC804 3000\uB144"
+    eraYearText: "\uAE30\uC6D0\uC804 3000\uB144\uC804 \uCBE4..."
     eventLabel: "\uACE0\uC778\uB3CC \uB9CC\uB4E4\uAE30"
     successMeaning: "\uB108\uC758 \uC138\uACC4\uB294 \uACE0\uC778\uB3CC \uC720\uC801\uC9C0\uAC00
       \uAD00\uAD11\uC790\uC6D0\uC73C\uB85C \uD65C\uBC1C\uD788 \uC0AC\uC6A9\uB418\uACE0
       \uC788\uC73C\uBA70"
     failureMeaning: "\uB108\uC758 \uC138\uACC4\uB294 \uACE0\uC778\uB3CC\uC774 \uBAA8\uB450
       \uBD80\uC11C\uC838 \uC720\uC801\uC9C0\uAC00 \uBC1C\uACAC\uB418\uC9C0 \uC54A\uC558\uC73C\uBA70"
-    successVisual: a small dolmen in some part of world, corwded by tourlists
-    failureVisual: shattered dolmen, no one have attention
+    successVisual: a small dolmen,
+    failureVisual: shattered rock debris,
     visualWeight: 2
   - prefab: {fileID: 562160154704496516, guid: c41684de35ac45ada326578c7c5a4e0a, type: 3}
     kind: 1
@@ -511,8 +511,8 @@ MonoBehaviour:
       \uC720\uD589\uD558\uC600\uB2E4."
     failureMeaning: "\uC2F9\uC2F9 \uBE4C\uB358 \uC0AC\uB78C\uB4E4\uC740 \uAD11\uC778
       \uCDE8\uAE09\uC744 \uD53C\uD560 \uC218 \uC5C6\uB2E4."
-    successVisual: 
-    failureVisual: 
+    successVisual: Shamanism,
+    failureVisual: weirdo man,
     visualWeight: 5
   - prefab: {fileID: 1137410263306520644, guid: 3f387d812ed7d05438306a72d2949023, type: 3}
     kind: 2
@@ -574,7 +574,7 @@ MonoBehaviour:
     failureMeaning: "\uB9C8\uB140\uC0AC\uB0E5\uC73C\uB85C \uC5B5\uC6B8\uD55C \uD76C\uC0DD\uC591\uC774
       \uBC1C\uC0DD\uD588\uB2E4."
     successVisual: 
-    failureVisual: "few ghosts floating due to \uB9C8\uB140\uC0AC\uB0E5"
+    failureVisual: few ghosts floating
     visualWeight: 2
   - prefab: {fileID: 2624045291354175195, guid: f9189fea3cd214b46bf960cf71c9966c, type: 3}
     kind: 0
