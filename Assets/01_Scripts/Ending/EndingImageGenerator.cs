@@ -26,15 +26,18 @@ public class EndingImageGenerator
     private readonly EndingImageProvider provider;
     private readonly string geminiModel;
     private readonly int timeoutSeconds;
+    private readonly bool useCache;
 
     public EndingImageGenerator(
         EndingImageProvider provider = EndingImageProvider.Pollinations,
         string geminiModel = "gemini-3.1-flash-image",
-        int timeoutSeconds = 60)
+        int timeoutSeconds = 60,
+        bool useCache = false)
     {
         this.provider = provider;
         this.geminiModel = geminiModel;
         this.timeoutSeconds = timeoutSeconds;
+        this.useCache = useCache;
     }
 
     /// <summary>
@@ -53,12 +56,15 @@ public class EndingImageGenerator
     /// </summary>
     public IEnumerator GetOrCreate(string combinationKey, string imagePrompt, Action<Texture2D> onDone)
     {
-        // 1) 캐시 조회.
-        Texture2D cached = TryLoadCache(combinationKey);
-        if (cached != null)
+        // 1) 캐시를 사용하도록 설정한 경우에만 조회한다.
+        if (useCache)
         {
-            onDone(cached);
-            yield break;
+            Texture2D cached = TryLoadCache(combinationKey);
+            if (cached != null)
+            {
+                onDone(cached);
+                yield break;
+            }
         }
 
         // 2) 생성.
@@ -76,6 +82,10 @@ public class EndingImageGenerator
             yield break;
         }
 
+        Debug.Log(
+            "EndingImageGenerator: 이미지 생성 AI에 전달하는 최종 프롬프트\n" +
+            imagePrompt);
+
         Texture2D generated = null;
 
         // 조합 키를 시드로 쓴다. 같은 판이면 시드가 같아 결과가 크게 흔들리지 않는다.
@@ -85,7 +95,7 @@ public class EndingImageGenerator
         else
             yield return RequestGemini(imagePrompt, tex => generated = tex);
 
-        if (generated != null)
+        if (useCache && generated != null)
             TrySaveCache(combinationKey, generated);
 
         onDone(generated);

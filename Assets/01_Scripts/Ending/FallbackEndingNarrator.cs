@@ -55,13 +55,13 @@ public class FallbackEndingNarrator : IEndingNarrator
                 lines.Add(result.EndedFailureMeaning);
 
             lines.Add("그 다음의 역사는, 끝내 쓰이지 않았다.");
-            epilogue = "2026년. 인류는 아직 그곳에 있다.";
+            epilogue = "인류는 아직 그곳에 있다.";
         }
         else
         {
             lines.Add("그리하여 인류는 미래에 도달했다.");
             lines.Add("이것이 당신이 만든 역사다.");
-            epilogue = "2026년. 우리는 이런 세계에 살고 있다.";
+            epilogue = "우리는 이런 세계에 살고 있다.";
         }
 
         return new EndingScript
@@ -89,7 +89,7 @@ public class FallbackEndingNarrator : IEndingNarrator
         visuals.Sort((a, b) => b.visualWeight.CompareTo(a.visualWeight));
 
         var sb = new StringBuilder();
-        sb.Append("A single photorealistic cinematic scene of present-day 2026 that contains all of the following: ");
+        sb.Append("A single photorealistic cinematic scene that contains all of the following: ");
 
         for (int i = 0; i < visuals.Count; i++)
         {
@@ -112,5 +112,5 @@ public static class EndingImagePromptStyle
     public const string Suffix =
         "Photorealistic, cinematic wide shot, 16:9, single coherent location and time of day, " +
         "consistent natural lighting, muted desaturated color grade, film grain. " +
-        "No text, no watermark, no collage, no split panels. Avoid graphic violence or gore.";
+        "No text, no watermark, no collage";
 }
