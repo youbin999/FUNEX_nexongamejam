@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 /// <summary>
 /// 고인돌을 구성하는 물리 돌 하나.
@@ -15,6 +16,13 @@ public sealed class DolmenStone : MonoBehaviour
 
     [Tooltip("이 값보다 빨리 회전하면 아직 안정적으로 놓인 돌이 아니다.")]
     [SerializeField] private float stableAngularSpeed = 8f;
+
+    [Header("충돌 소리")]
+    [Tooltip("다른 돌과 이 속도 이상으로 부딪혀야 소리를 낸다. 살짝 스치는 접촉까지 울리지 않게 걸러준다.")]
+    [SerializeField] private float impactMinSpeed = 1.2f;
+
+    [Tooltip("돌끼리 부딪혔을 때 발화한다. SfxPlayer 의 Play 를 연결해서 쓴다.")]
+    public UnityEvent onStoneImpact;
 
     public Collider2D HitCollider => hitCollider;
 
@@ -82,6 +90,25 @@ public sealed class DolmenStone : MonoBehaviour
         float clampedMaxSpeed = Mathf.Max(0f, maxSpeed);
         if (clampedMaxSpeed > 0f && body.linearVelocity.sqrMagnitude > clampedMaxSpeed * clampedMaxSpeed)
             body.linearVelocity = body.linearVelocity.normalized * clampedMaxSpeed;
+    }
+
+    /// <summary>
+    /// 다른 돌과 부딪히면 소리 이벤트를 발화한다.
+    /// 바닥·경계처럼 <see cref="DolmenStone"/> 이 아닌 것과의 충돌은 무시하고,
+    /// 살짝 스치는 접촉은 <see cref="impactMinSpeed"/> 로 걸러낸다.
+    /// </summary>
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (!gameplayPhysicsActive)
+            return;
+
+        if (collision.collider == null || collision.collider.GetComponent<DolmenStone>() == null)
+            return;
+
+        if (collision.relativeVelocity.magnitude < impactMinSpeed)
+            return;
+
+        onStoneImpact.Invoke();
     }
 
     /// <summary>지정한 다른 돌과 실제 물리 접촉 중인지 반환한다.</summary>
