@@ -61,6 +61,12 @@ public sealed class WorldNamePrompt : MonoBehaviour
         {
             nameField.characterLimit = GalleryStore.MaxWorldNameLength;
             nameField.lineType = TMP_InputField.LineType.SingleLine;
+
+            // ESC 를 눌러도 쳐둔 이름은 남긴다. TMP 는 기본값이 "원래 값으로 되돌리기"라
+            // 그냥 두면 ESC 한 번에 이름이 통째로 날아간다. (포커스는 TMP 가 놓는다 —
+            // 그동안 SettingsMenu 는 ESC 를 무시하므로 설정 창이 대신 열리지도 않는다)
+            nameField.restoreOriginalTextOnEscape = false;
+
             nameField.onSubmit.AddListener(_ => Confirm());
             nameField.onValueChanged.AddListener(_ => RefreshConfirmButton());
         }
