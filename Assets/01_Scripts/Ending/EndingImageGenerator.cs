@@ -8,7 +8,9 @@ using UnityEngine.Networking;
 /// <summary>
 /// 엔딩 이미지를 런타임에 생성한다.
 /// 변화 미니게임 성공/실패 조합이 2^N 가지라 사전 제작이 불가능하므로 매 판 생성하고,
-/// 조합 키로 디스크에 캐시해 같은 조합을 다시 뽑으면 즉시 로드한다(= 갤러리 저장소이기도 하다).
+/// 조합 키로 디스크에 캐시해 완전히 같은 판을 다시 겪으면 재생성 비용 없이 로드한다.
+/// 조합 키에는 어떤 사건을 겪었는지가 들어가므로(RunResult.CombinationKey),
+/// 미니게임 구성이 달라진 판은 캐시를 공유하지 않고 새 그림을 뽑는다.
 ///
 /// 실패는 흔한 일로 취급한다 — 무료 티어 한도, 안전 필터, 네트워크 모두 실패 요인이다.
 /// 어떤 경우에도 예외를 던지지 않고 null 을 돌려주며, 호출 측이 폴백 배경으로 넘어간다.
@@ -35,7 +37,10 @@ public class EndingImageGenerator
         this.timeoutSeconds = timeoutSeconds;
     }
 
-    /// <summary>생성된 엔딩 이미지가 쌓이는 폴더. 갤러리 기능이 그대로 읽어 쓰면 된다.</summary>
+    /// <summary>
+    /// 생성된 엔딩 이미지의 캐시 폴더. 어디까지나 재생성을 아끼기 위한 임시 저장소라
+    /// 지워져도 무방하다 — 갤러리에 영구 보관할 이미지는 갤러리가 따로 복사해 간다.
+    /// </summary>
     public static string CacheDirectory => Path.Combine(Application.persistentDataPath, "endings");
 
     /// <summary>조합 키에 대응하는 캐시 파일 경로.</summary>
@@ -73,9 +78,10 @@ public class EndingImageGenerator
 
         Texture2D generated = null;
 
-        // 같은 조합이면 같은 그림이 나오도록 조합 키를 시드로 쓴다(캐시가 지워져도 재현된다).
+        // 조합 키를 시드로 쓴다. 같은 판이면 시드가 같아 결과가 크게 흔들리지 않는다.
+        // (대본을 매번 새로 쓰므로 프롬프트가 달라져 완전히 같은 그림이 나오지는 않는다.)
         if (provider == EndingImageProvider.Pollinations)
-            yield return RequestPollinations(imagePrompt, StableSeed(combinationKey), tex => generated = tex);
+            yield return RequestPollinations(imagePrompt, StableHash.Seed(combinationKey), tex => generated = tex);
         else
             yield return RequestGemini(imagePrompt, tex => generated = tex);
 
@@ -223,28 +229,6 @@ public class EndingImageGenerator
         {
             // 저장 실패는 치명적이지 않다 — 이번 판 이미지는 이미 메모리에 있다.
             Debug.LogWarning($"EndingImageGenerator: 캐시 저장 실패 — {e.Message}");
-        }
-    }
-
-    /// <summary>
-    /// 조합 키를 안정적인 양수 시드로 바꾼다.
-    /// string.GetHashCode 는 실행마다 값이 달라질 수 있어 직접 계산한다(FNV-1a).
-    /// </summary>
-    private static int StableSeed(string key)
-    {
-        unchecked
-        {
-            const uint offset = 2166136261;
-            const uint prime = 16777619;
-
-            uint hash = offset;
-            foreach (char c in key ?? string.Empty)
-            {
-                hash ^= c;
-                hash *= prime;
-            }
-
-            return (int)(hash & 0x7FFFFFFF);
         }
     }
 

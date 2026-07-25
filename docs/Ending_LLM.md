@@ -31,8 +31,10 @@ EndingCreditController (엔딩 씬)
    ├─ 크레딧 롤 시작 ─────────────┬─ 병렬: EndingImageGenerator
    │                              │        캐시 히트 → 즉시 / 미스 → 생성
    │                              ▼  도착 시 배경 페이드인
-   └─ 롤 종료 → 에필로그 → onCreditsFinished
+   └─ 롤 종료 → 에필로그 → (이미지 합류) → GalleryStore.Save → onCreditsFinished
 ```
+
+크레딧과 이미지가 모두 화면에 나온 뒤 갤러리에 한 쌍으로 저장된다 → [Gallery.md](Gallery.md)
 
 이미지가 0초에 있을 필요가 없다는 점을 이용해 생성 지연(10~30초)을 롤 시간에 흡수시킨다.
 
@@ -57,6 +59,7 @@ EndingCreditController (엔딩 씬)
 | [GeminiEndingNarrator.cs](../Assets/01_Scripts/Ending/GeminiEndingNarrator.cs) | Gemini 텍스트 생성 (structured output) |
 | [GeminiResponseDto.cs](../Assets/01_Scripts/Ending/GeminiResponseDto.cs) | 응답 파싱용 DTO |
 | [EndingImageGenerator.cs](../Assets/01_Scripts/Ending/EndingImageGenerator.cs) | 이미지 생성 + 디스크 캐시 |
+| [StableHash.cs](../Assets/01_Scripts/Ending/StableHash.cs) | 실행을 넘어 유지되는 문자열 해시(조합 키·이미지 시드용) |
 | [EndingCreditController.cs](../Assets/01_Scripts/Ending/EndingCreditController.cs) | 엔딩 씬 총괄 |
 
 ## 1. API 키 설정
@@ -153,19 +156,27 @@ EndingController [EndingCreditController]
 | `narratorModel` | `gemini-3.6-flash` | **`gemini-2.5-flash` 는 쓰지 말 것** — 신규 사용자에게 404 |
 | `imageProvider` | `Pollinations` | 키 불필요·무료. `Gemini` 는 결제 활성화 시에만 |
 | `imageTimeout` | 60초 | 초과 시 이미지 생략 |
-| `forceFallback` | false | **켜면 API 호출 없이 폴백만 사용.** 연출만 손볼 때 유용 |
+| `forceFallback` | false | **켜면 API 호출 없이 폴백만 사용.** 연출만 손볼 때 유용. 이미지도 건너뛰므로 갤러리에 저장되지 않는다 |
+| `saveToGallery` | true | 끄면 이번 엔딩을 갤러리에 남기지 않는다 |
 
-## 4. 캐시와 갤러리
+## 4. 조합 키와 캐시
 
-생성된 이미지는 조합 키로 저장된다.
+생성된 이미지는 조합 키로 캐시된다.
 
 ```
-{Application.persistentDataPath}/endings/ending_{결과개수}_{비트마스크}[_early].png
+{Application.persistentDataPath}/endings/ending_{결과개수}_{비트마스크}_{사건해시}[_early].png
 ```
 
-- 같은 조합을 다시 뽑으면 API 호출 없이 즉시 로드된다.
-- 이 폴더가 그대로 **갤러리 저장소**다. 기획서의 "판마다 수집한 결과를 영구 보존" 요구를 만족한다.
-- 갤러리 UI는 `EndingImageGenerator.CacheDirectory` 를 나열하면 된다.
+조합 키(`RunResult.CombinationKey`)에는 **어떤 사건을 어떤 순서로 겪었는지**까지 들어간다.
+개수와 성패 패턴만 쓰면, 시대마다 미니게임을 랜덤으로 뽑는 구조 탓에 전혀 다른 판이 같은 키를 갖게 되고
+이전 판의 그림이 그대로 재사용된다. 매 판 다른 그림을 남기는 게 갤러리의 목적이므로 사건 해시를 섞는다.
+
+- 완전히 같은 판을 다시 겪으면 API 호출 없이 즉시 로드된다.
+- 이 폴더는 **재생성을 아끼기 위한 임시 캐시**다. 지워져도 무방하다.
+- 영구 보관은 갤러리가 따로 한다 → [Gallery.md](Gallery.md)
+
+> 캐시가 없는 상태에서 같은 판을 다시 겪어도 **같은 그림이 나오지는 않는다.** 시드는 조합 키로 고정되지만
+> 대본을 매번 새로 쓰기 때문에 이미지 프롬프트가 달라진다.
 
 ## 5. 폴백 동작
 

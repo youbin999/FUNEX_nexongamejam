@@ -20,6 +20,8 @@ Assets/
   00_Scenes/          씬. 00000_Player.unity 가 미니게임 재생 호스트 씬, 00_BigBang.unity 가 시작 씬
   01_Scripts/
     Core/             미니게임 프레임워크 (MiniGame, MiniGamePlayer, GameFlowController)
+    Ending/           엔딩 크레딧·이미지 LLM 생성 (RunResult, EndingCreditController)
+    Gallery/          엔딩 영구 보관 & 열람 (GalleryStore, GalleryScreen)
     Mini_BigBang/     빅뱅 프롤로그 (W 홀드로 우주 팽창 + 영상 스크럽)
     Mini_Fire/        선사시대 불 붙이기
     Mini_sha/         비비기(Rub) 미니게임
@@ -32,6 +34,8 @@ docs/
   기획.md              게임 기획서 (원본)
   MiniGame_Contract.md 미니게임 개발 계약 — 새 미니게임을 만들기 전 반드시 읽을 것
   BigBang_MiniGame.md  빅뱅 미니게임 구현 문서 (영상 스크럽 방식, 씬/프리팹 구성)
+  Ending_LLM.md        엔딩 크레딧·이미지 런타임 생성 (API 키, 조합 키, 폴백)
+  Gallery.md           갤러리 저장 구조와 씬 구성
 ```
 
 ## 핵심 아키텍처
