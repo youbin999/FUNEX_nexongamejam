@@ -46,6 +46,10 @@ public class DosirakBombMiniGame : TimedMiniGame
     [SerializeField] private float snapBackDuration = 0.25f;
 
     [Header("이벤트")]
+    [Tooltip("폭발 스프라이트가 터져 나오는 순간 발화한다. 폭발음처럼 연출과 붙어야 하는 소리를 연결한다.\n" +
+        "onClear 는 페이드까지 다 끝난 뒤라 소리를 걸기엔 너무 늦다")]
+    public UnityEvent onExplode;
+
     public UnityEvent onClear;
     public UnityEvent onFail;
 
@@ -243,6 +247,9 @@ public class DosirakBombMiniGame : TimedMiniGame
 
     private IEnumerator ExplosionRoutine()
     {
+        // 터지는 순간에 맞춰 소리를 낸다. 연출이 다 끝난 뒤(onClear)면 너무 늦다.
+        onExplode.Invoke();
+
         if (explosionRenderer != null)
         {
             explosionRenderer.gameObject.SetActive(true);

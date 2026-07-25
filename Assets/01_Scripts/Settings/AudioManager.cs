@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -135,6 +136,49 @@ public class AudioManager : MonoBehaviour
     public void StopAllSfx()
     {
         foreach (AudioSource source in sfxSources)
+            source.Stop();
+    }
+
+    /// <summary>
+    /// <see cref="PlaySfx"/> 가 돌려준 채널 하나만 멈춘다.
+    /// 긴 클립이 미니게임 밖까지 이어지는 걸 끊을 때 쓴다.
+    /// fadeDuration 을 주면 그만큼 볼륨을 줄이며 끄므로 뚝 끊기는 느낌이 덜하다.
+    ///
+    /// 채널은 돌려 쓰기 때문에, 부르는 쪽이 재생시킨 클립이 아직 그 채널에 걸려 있을 때만 손댄다.
+    /// </summary>
+    public void StopSfx(AudioSource source, float fadeDuration = 0f)
+    {
+        if (source == null || !source.isPlaying || !sfxSources.Contains(source))
+            return;
+
+        if (fadeDuration <= 0f)
+        {
+            source.Stop();
+            return;
+        }
+
+        StartCoroutine(FadeOutRoutine(source, fadeDuration));
+    }
+
+    private IEnumerator FadeOutRoutine(AudioSource source, float duration)
+    {
+        AudioClip clip = source.clip;
+        float startVolume = source.volume;
+        float time = 0f;
+
+        while (time < duration)
+        {
+            // 페이드 도중 채널이 다른 소리에 넘어갔으면 그 소리를 죽이지 않고 물러난다.
+            if (source == null || source.clip != clip || !source.isPlaying)
+                yield break;
+
+            // 설정 창이 열려 게임이 멈춰 있어도 페이드는 진행돼야 한다.
+            time += Time.unscaledDeltaTime;
+            source.volume = Mathf.Lerp(startVolume, 0f, time / duration);
+            yield return null;
+        }
+
+        if (source != null && source.clip == clip)
             source.Stop();
     }
 

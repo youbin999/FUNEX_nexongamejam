@@ -3,6 +3,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -48,6 +49,9 @@ public class EndingCreditController : MonoBehaviour
 
     [Tooltip("크레딧이 초당 올라가는 픽셀 수")]
     [SerializeField] private float scrollSpeed = 60f;
+
+    [Tooltip("스페이스바나 마우스 좌클릭을 누르고 있는 동안 스크롤 속도에 곱해지는 배율. 1 이하면 빨리감기가 꺼진다")]
+    [SerializeField] private float fastForwardMultiplier = 5f;
 
     [Tooltip("롤 종료 후 에필로그가 나타나기까지의 간격(초)")]
     [SerializeField] private float epilogueDelay = 1f;
@@ -119,7 +123,7 @@ public class EndingCreditController : MonoBehaviour
 
         yield return ScrollCreditsRoutine(script);
 
-        yield return new WaitForSeconds(epilogueDelay);
+        yield return WaitSkippable(epilogueDelay);
         ShowEpilogue(script.epilogue);
 
         // 롤이 짧았거나 생성이 느렸으면 이미지가 아직 안 떠 있을 수 있다.
@@ -284,9 +288,34 @@ public class EndingCreditController : MonoBehaviour
 
         while (travelled < distance)
         {
-            travelled += speed * Time.deltaTime;
+            travelled += speed * CurrentScrollMultiplier * Time.deltaTime;
             pos.y = Mathf.Min(startY + travelled, endY);
             rect.anchoredPosition = pos;
+            yield return null;
+        }
+    }
+
+    /// <summary>빨리감기 입력(스페이스바 / 마우스 좌클릭)을 누르고 있으면 배율, 아니면 1.</summary>
+    private float CurrentScrollMultiplier =>
+        fastForwardMultiplier > 1f && IsFastForwardHeld() ? fastForwardMultiplier : 1f;
+
+    private static bool IsFastForwardHeld()
+    {
+        Keyboard keyboard = Keyboard.current;
+        if (keyboard != null && keyboard.spaceKey.isPressed)
+            return true;
+
+        Mouse mouse = Mouse.current;
+        return mouse != null && mouse.leftButton.isPressed;
+    }
+
+    /// <summary>대기 중에도 빨리감기가 먹히도록, 배율만큼 시간을 앞당겨 흘려보낸다.</summary>
+    private IEnumerator WaitSkippable(float seconds)
+    {
+        float remaining = seconds;
+        while (remaining > 0f)
+        {
+            remaining -= CurrentScrollMultiplier * Time.deltaTime;
             yield return null;
         }
     }
