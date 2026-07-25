@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -33,24 +32,9 @@ public class MiniGamePlayer : MonoBehaviour
     [Tooltip("게임이 끝나면 (인스턴스, 성공 여부) 를 넘긴다. 이 통지 이후 인스턴스는 자동으로 초기화·비활성화된다")]
     public GameFinishedEvent onGameFinished;
 
-    [Header("게임 설명 프롬프트")]
-    [Tooltip("설명 문구를 표시하는 CanvasGroup. 비워두면 설명 연출 없이 바로 게임을 시작한다")]
-    [SerializeField] private CanvasGroup descriptionCanvasGroup;
-
-    [Tooltip("설명 문구를 표시할 텍스트")]
-    [SerializeField] private TMP_Text descriptionText;
-
-    [Tooltip("스케일 애니메이션을 적용할 RectTransform. 비워두면 descriptionCanvasGroup 의 RectTransform 을 사용한다")]
-    [SerializeField] private RectTransform descriptionRect;
-
-    [Tooltip("등장/퇴장 애니메이션 시간(초)")]
-    [SerializeField] private float descriptionTransitionDuration = 0.25f;
-
-    [Tooltip("설명을 화면에 유지하는 시간(초). 등장/퇴장 애니메이션 시간은 별도")]
-    [SerializeField] private float descriptionHoldDuration = 1.5f;
-
-    [Tooltip("등장 시작/퇴장 종료 시점의 스케일 값")]
-    [SerializeField] private float descriptionStartScale = 0.8f;
+    [Header("게임 시작 프롬프트")]
+    [Tooltip("설명과 키 가이드 표시를 담당하는 Presenter. 비워두면 프롬프트 없이 바로 게임을 시작한다")]
+    [SerializeField] private MiniGameIntroPresenter introPresenter;
 
     [Header("화면 페이드")]
     [Tooltip("풀스크린 페이드 오버레이. 비워두면 페이드 연출 없이 보더 트랜지션만 진행한다")]
@@ -249,7 +233,13 @@ public class MiniGamePlayer : MonoBehaviour
         instance.Finished += OnGameFinished;
 
         StartCoroutine(FadeScreen(1f, 0f, fadeInDuration));
-        yield return ShowDescriptionThenPlayRoutine(instance);
+
+        if (introPresenter != null)
+            yield return introPresenter.Present(instance);
+
+        // 프롬프트 대기 중 StopCurrent() 등으로 이미 중단됐다면 재생하지 않는다.
+        if (Current == instance)
+            instance.Play();
 
         transitionRoutine = null;
     }
@@ -305,61 +295,6 @@ public class MiniGamePlayer : MonoBehaviour
     }
 
     /// <summary>
-    /// 설명 프롬프트를 등장 → 유지 → 퇴장 순서로 재생한 뒤 실제 게임을 시작한다.
-    /// 이 과정에서 instance.Play() 가 아직 호출되지 않으므로, 미니게임은
-    /// 계약(1.3)에 따라 입력도 받지 않고 타이머도 흘리지 않는다.
-    /// </summary>
-    private IEnumerator ShowDescriptionThenPlayRoutine(MiniGame instance)
-    {
-        if (descriptionCanvasGroup != null)
-        {
-            if (descriptionText != null)
-                descriptionText.text = instance.GameDescription;
-
-            RectTransform rect = descriptionRect != null ? descriptionRect : descriptionCanvasGroup.GetComponent<RectTransform>();
-
-            descriptionCanvasGroup.gameObject.SetActive(true);
-            yield return AnimateDescription(descriptionCanvasGroup, rect, 0f, 1f, descriptionStartScale, 1f);
-
-            yield return new WaitForSeconds(descriptionHoldDuration);
-
-            yield return AnimateDescription(descriptionCanvasGroup, rect, 1f, 0f, 1f, descriptionStartScale);
-            descriptionCanvasGroup.gameObject.SetActive(false);
-        }
-
-        // 코루틴 대기 중 StopCurrent() 등으로 이미 다른 게임으로 넘어갔다면 재생하지 않는다.
-        if (Current == instance)
-            instance.Play();
-    }
-
-    /// <summary>CanvasGroup 의 alpha 와 RectTransform 의 스케일을 함께 보간한다.</summary>
-    private IEnumerator AnimateDescription(CanvasGroup group, RectTransform rect, float fromAlpha, float toAlpha, float fromScale, float toScale)
-    {
-        if (descriptionTransitionDuration <= 0f)
-        {
-            group.alpha = toAlpha;
-            if (rect != null)
-                rect.localScale = Vector3.one * toScale;
-            yield break;
-        }
-
-        float t = 0f;
-        while (t < descriptionTransitionDuration)
-        {
-            t += Time.deltaTime;
-            float ratio = Mathf.Clamp01(t / descriptionTransitionDuration);
-            group.alpha = Mathf.Lerp(fromAlpha, toAlpha, ratio);
-            if (rect != null)
-                rect.localScale = Vector3.one * Mathf.Lerp(fromScale, toScale, ratio);
-            yield return null;
-        }
-
-        group.alpha = toAlpha;
-        if (rect != null)
-            rect.localScale = Vector3.one * toScale;
-    }
-
-    /// <summary>
     /// gamePrefabs 에 등록된 프리팹 에셋으로 게임을 재생한다. 내부적으로 인덱스를 찾아 PlayGame(int) 를 호출한다.
     /// 등록되지 않은 프리팹이면 false.
     /// </summary>
@@ -380,6 +315,9 @@ public class MiniGamePlayer : MonoBehaviour
             StopCoroutine(transitionRoutine);
             transitionRoutine = null;
         }
+
+        if (introPresenter != null)
+            introPresenter.HideImmediate();
 
         if (pendingCleanup != null)
         {

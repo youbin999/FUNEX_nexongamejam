@@ -2372,6 +2372,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WitchFindMiniGame
   gameDescription: "\uB9C8\uB140\uB97C \uCC3E\uC544\uB77C!"
+  keyboardGuides:
+  - actionLabel: ''
+    keys: 250000000f0000002100000012000000
+  - actionLabel: ''
+    keys: 01000000
   timeLimit: 3
   onTimerChanged:
     m_PersistentCalls:
