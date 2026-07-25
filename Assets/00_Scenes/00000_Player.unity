@@ -524,8 +524,8 @@ MonoBehaviour:
     failureMeaning: "\uC778\uB958\uB294 \uC601\uC601 \uBD88\uC744 \uBC1C\uACAC\uD558\uC9C0
       \uBABB\uD588\uB2E4."
     successVisual: 
-    failureVisual: 
-    visualWeight: 5
+    failureVisual: Prehistoric ancient humans, attacked by tiger, caves
+    visualWeight: 8
   - prefab: {fileID: 3390688864203735000, guid: 142412d3334caa8408aa8b783eba0185, type: 3}
     kind: 1
     era: 2

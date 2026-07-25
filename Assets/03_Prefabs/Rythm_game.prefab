@@ -501,7 +501,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TimingDropMiniGame
   gameDescription: "\uD130\uD2B8\uB824\uB77C!"
   keyboardGuides: []
-  failurePenaltyPrefab: {fileID: 0}
+  failurePenaltyPrefab: {fileID: 7008092060532276377, guid: 95496a10f77271f4fa2f5e350a76d39d, type: 3}
   failureShakeDuration: 0.4
   failureShakeAmplitude: 0.35
   timeLimit: 5
@@ -547,6 +547,9 @@ MonoBehaviour:
   failFlyAcceleration: 0
   failFlySpin: 0
   failDoorHold: 0.4
+  failLungeDuration: 0.28
+  failLungeScale: 2.8
+  failLungeHold: 0.12
   failFadeDuration: 0.5
   failBlackHold: 0.25
   blackoutRenderer: {fileID: 0}

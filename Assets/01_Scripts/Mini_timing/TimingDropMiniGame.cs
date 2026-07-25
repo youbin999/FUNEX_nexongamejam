@@ -144,6 +144,15 @@ public class TimingDropMiniGame : TimedMiniGame
     [Tooltip("실패 시 닫힌 문을 보여주는 시간(초). 이 시간이 지나면 화면이 어두워지기 시작한다")]
     [SerializeField] private float failDoorHold = 0.4f;
 
+    [Tooltip("실패 후 철의 처녀가 다시 열린 뒤 카메라 앞으로 급습하는 시간(초).")]
+    [SerializeField] private float failLungeDuration = 0.28f;
+
+    [Tooltip("급습이 끝났을 때 열린 철의 처녀의 크기 배율.")]
+    [SerializeField] private float failLungeScale = 2.8f;
+
+    [Tooltip("급습한 철의 처녀를 카메라 앞에서 유지하는 시간(초).")]
+    [SerializeField] private float failLungeHold = 0.12f;
+
     [Tooltip("화면이 새까맣게 어두워지는 데 걸리는 시간(초)")]
     [SerializeField] private float failFadeDuration = 0.5f;
 
@@ -181,6 +190,8 @@ public class TimingDropMiniGame : TimedMiniGame
     private Coroutine hitRoutine;
     private Coroutine failRoutine;
     private Coroutine flyAwayRoutine;
+    private Vector3 doorOpenOriginalPosition;
+    private Vector3 doorOpenOriginalScale = Vector3.one;
 
     // Pow! 가 배치돼 있던 원래 위치·크기. 연출이 끝나면 여기로 수렴하고, 리셋 때 되돌린다.
     private Vector3[] powRestPositions;
@@ -207,6 +218,12 @@ public class TimingDropMiniGame : TimedMiniGame
             originalScale = fallingObject.localScale;
             originalRotation = fallingObject.localRotation;
             CacheBalloonSorting();
+        }
+
+        if (doorOpenObject != null)
+        {
+            doorOpenOriginalPosition = doorOpenObject.transform.localPosition;
+            doorOpenOriginalScale = doorOpenObject.transform.localScale;
         }
 
         CachePowPoses();
@@ -381,6 +398,12 @@ public class TimingDropMiniGame : TimedMiniGame
             fallingObject.localRotation = originalRotation;
             fallingObject.localScale = originalScale;
             fallingObject.gameObject.SetActive(true);
+        }
+
+        if (doorOpenObject != null)
+        {
+            doorOpenObject.transform.localPosition = doorOpenOriginalPosition;
+            doorOpenObject.transform.localScale = doorOpenOriginalScale;
         }
 
         ResolvePoints();
@@ -704,6 +727,9 @@ public class TimingDropMiniGame : TimedMiniGame
         if (failDoorHold > 0f)
             yield return new WaitForSeconds(failDoorHold);
 
+        ApplyDoorClosed(false);
+        yield return LungeDoorTowardCamera();
+
         SpriteRenderer blackout = ResolveBlackout();
         if (blackout != null)
         {
@@ -732,6 +758,57 @@ public class TimingDropMiniGame : TimedMiniGame
 
         // 시간 초과로 이미 결과가 잠긴 경우 FailImmediately 는 무시되므로 직접 통지한다.
         ReportFinished(false);
+    }
+
+    /// <summary>열린 철의 처녀를 화면 중앙으로 당기면서 크게 키워 카메라를 덮치게 한다.</summary>
+    private IEnumerator LungeDoorTowardCamera()
+    {
+        if (doorOpenObject == null)
+            yield break;
+
+        Transform door = doorOpenObject.transform;
+        Vector3 targetWorldPosition = door.position;
+        Camera cam = targetCamera != null ? targetCamera : Camera.main;
+
+        if (cam != null)
+        {
+            float depth = Mathf.Abs(door.position.z - cam.transform.position.z);
+            targetWorldPosition = cam.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, depth));
+            targetWorldPosition.z = door.position.z;
+        }
+
+        Vector3 targetLocalPosition = door.parent != null
+            ? door.parent.InverseTransformPoint(targetWorldPosition)
+            : targetWorldPosition;
+        Vector3 targetScale = doorOpenOriginalScale * Mathf.Max(1f, failLungeScale);
+        float duration = Mathf.Max(0f, failLungeDuration);
+
+        if (duration <= 0f)
+        {
+            door.localPosition = targetLocalPosition;
+            door.localScale = targetScale;
+        }
+        else
+        {
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+                float eased = t * t * t;
+                door.localPosition = Vector3.LerpUnclamped(
+                    doorOpenOriginalPosition, targetLocalPosition, eased);
+                door.localScale = Vector3.LerpUnclamped(
+                    doorOpenOriginalScale, targetScale, eased);
+                yield return null;
+            }
+
+            door.localPosition = targetLocalPosition;
+            door.localScale = targetScale;
+        }
+
+        if (failLungeHold > 0f)
+            yield return new WaitForSeconds(failLungeHold);
     }
 
     /// <summary>성공 연출: 문에 낀 풍선이 부풀어 오르다가 터지듯 사라지고, 터짐 효과를 켠다.</summary>
