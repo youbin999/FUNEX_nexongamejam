@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SfxPlayer
   clips:
-  - {fileID: 8300000, guid: fa985551164130447bc008f7d190337a, type: 3}
+  - {fileID: 8300000, guid: 0cdcec567f2d65341bb93de8a89fba00, type: 3}
   volume: 1
   pitch: 1
   pitchJitter: 0.08
