@@ -130,6 +130,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DolmenCoverMiniGame
   gameDescription: "\uACE0\uC778\uB3CC\uC744 \uB36E\uC5B4\uB77C!"
+  keyboardGuides:
+  - actionLabel: ''
+    keys: 250000000f0000002100000012000000
   timeLimit: 8
   onTimerChanged:
     m_PersistentCalls:

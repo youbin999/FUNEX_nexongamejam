@@ -159,7 +159,8 @@ public class GameFlowController : MonoBehaviour
         }
 
         GameEntry entry = games[currentIndex];
-        if (entry.prefab == null || player == null || !player.PlayGame(entry.prefab, entry.borderSprite))
+        if (entry.prefab == null || player == null ||
+            !player.PlayGame(entry.prefab, entry.borderSprite, entry.eraYearText))
         {
             Debug.LogWarning($"GameFlowController: index {currentIndex} 게임을 재생할 수 없습니다.", this);
             PlayNext();

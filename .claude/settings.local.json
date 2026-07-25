@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "PowerShell(git check-ignore -v \"Assets/01_Scripts/Settings/GameSettings.cs\")",
-      "Bash(echo \"exit=$?\")"
-    ]
-  }
-}
