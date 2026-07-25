@@ -242,7 +242,7 @@ MonoBehaviour:
   gameDescription: "\uB36E\uC5B4\uB77C!"
   keyboardGuides:
   - actionLabel: 
-    keys: 250000000f0000002100000012000000
+    keys: 0f00000012000000
   failurePenaltyPrefab: {fileID: 2056246690226794063, guid: 8f72d278920e4d942965c6b5a6d687f5, type: 3}
   failureShakeDuration: 0.4
   failureShakeAmplitude: 0.35

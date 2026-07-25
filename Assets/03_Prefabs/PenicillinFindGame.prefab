@@ -2679,7 +2679,7 @@ MonoBehaviour:
     keys: 250000000f0000002100000012000000
   - actionLabel: 
     keys: 01000000
-  failurePenaltyPrefab: {fileID: 0}
+  failurePenaltyPrefab: {fileID: 7100000003, guid: 7c41a9d3e05b48f2ab6d1c72e934f8a5, type: 3}
   failureShakeDuration: 0.4
   failureShakeAmplitude: 0.35
   timeLimit: 3

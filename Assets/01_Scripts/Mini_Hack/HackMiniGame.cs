@@ -53,6 +53,17 @@ public class HackMiniGame : TimedMiniGame
     [Tooltip("경고들이 순차로 튀어나오는 간격(초). 0이면 동시에 튀어나온다")]
     [SerializeField] private float warningStagger = 0.06f;
 
+    [Header("진행 중 화면 흔들림")]
+    [Tooltip("게임이 시작되는 순간부터 성공/실패가 확정될 때까지 계속 이어지는 진동의 세기(월드 유닛).\n" +
+        "0이면 진동하지 않는다. 실패 순간의 강한 흔들림은 아래 '실패 연출' 쪽이 따로 담당한다")]
+    [SerializeField] private float tensionShakeMagnitude = 0.1f;
+
+    [Tooltip("진동의 빠르기(Hz). 높을수록 잘게 떤다")]
+    [SerializeField] private float tensionShakeFrequency = 12f;
+
+    [Tooltip("진동에 같이 실릴 화면 기울기(도). 0이면 위치만 흔들린다")]
+    [SerializeField] private float tensionShakeRotation = 0.4f;
+
     [Header("실패 연출 - 화면 흔들림")]
     [Tooltip("실패 시 카메라가 흔들리는 시간(초). 0이면 흔들지 않는다")]
     [SerializeField] private float shakeDuration = 0.3f;
@@ -96,6 +107,9 @@ public class HackMiniGame : TimedMiniGame
     private Vector3 cameraRestorePos;
     private bool cameraShaking;
 
+    // 진행 중 지속 진동의 핸들. 0이면 걸려 있지 않다(StartWobble 은 1부터 발급한다).
+    private int tensionShakeId;
+
     private void Awake()
     {
         if (targetCamera == null)
@@ -118,7 +132,53 @@ public class HackMiniGame : TimedMiniGame
     protected override void OnTimedPlay()
     {
         ResetInternal();
+        CacheCameraRestorePos();
+        StartTensionShake();
         StartBgm();
+    }
+
+    /// <summary>
+    /// 버튼을 참고 있는 동안 화면을 계속 떨게 한다. 결과가 확정되면 <see cref="StopTensionShake"/> 가 멈춘다.
+    ///
+    /// 직접 카메라 transform 을 만지지 않고 <see cref="CameraEffectManager"/> 를 거치는 이유는,
+    /// 앞선 게임에서 넘어온 실패 패널티(예: PtsdWobble)가 이미 카메라를 잡고 있을 수 있어서다.
+    /// 매니저는 걸려 있는 효과의 오프셋을 전부 합산하지만, transform 을 직접 쓰면 서로 덮어써서
+    /// 둘 중 하나가 통째로 사라진다. 매니저는 unscaledTime 을 쓰므로 설정 창(ESC)으로 멈춰도 진동이 이어진다.
+    /// </summary>
+    private void StartTensionShake()
+    {
+        if (tensionShakeMagnitude <= 0f)
+            return;
+
+        // 이미 걸려 있으면 겹쳐 걸지 않는다 — 진폭이 두 배가 된다.
+        StopTensionShake();
+
+        tensionShakeId = CameraEffectManager.Instance.StartWobble(
+            tensionShakeMagnitude, tensionShakeRotation, 0f, tensionShakeFrequency);
+    }
+
+    /// <summary>지속 진동을 멈춘다. 걸려 있지 않아도 안전하다(멱등).</summary>
+    private void StopTensionShake()
+    {
+        if (tensionShakeId == 0)
+            return;
+
+        // 정리 경로에서도 불리므로 매니저를 새로 만들지 않는다.
+        CameraEffectManager manager = CameraEffectManager.TryGetInstance;
+        if (manager != null)
+            manager.StopWobble(tensionShakeId);
+
+        tensionShakeId = 0;
+    }
+
+    /// <summary>
+    /// 실패 흔들림이 되돌아올 기준 위치를 재생 시작 시점에 잡아 둔다.
+    /// 지속 진동이 도는 중에 읽으면 흔들린 좌표가 기준이 되어 카메라가 제자리로 돌아오지 못한다.
+    /// </summary>
+    private void CacheCameraRestorePos()
+    {
+        if (targetCamera != null)
+            cameraRestorePos = targetCamera.transform.localPosition;
     }
 
     /// <summary>배경음을 처음부터 재생한다. 클립이 없으면 아무것도 하지 않는다.</summary>
@@ -158,17 +218,20 @@ public class HackMiniGame : TimedMiniGame
     }
 
     /// <summary>
-    /// 어떤 경로로 꺼지든 전역 BGM 은 반드시 되돌린다.
-    /// 감쇠를 걸어 둔 채 이 게임이 사라지면 남은 판 내내 BGM 이 작은 채로 남는다.
+    /// 어떤 경로로 꺼지든 전역 BGM 과 지속 진동은 반드시 되돌린다.
+    /// 둘 다 이 게임 바깥(AudioManager / CameraEffectManager)에 걸어 둔 상태라,
+    /// 걸어 놓은 채 사라지면 남은 판 내내 BGM 이 작고 화면이 떨린다.
     /// </summary>
     private void OnDisable()
     {
         StopBgm();
+        StopTensionShake();
     }
 
     protected override void OnTimedStopAndReset()
     {
         StopBgm();
+        StopTensionShake();
 
         if (resolveRoutine != null)
         {
@@ -244,6 +307,9 @@ public class HackMiniGame : TimedMiniGame
     private void BeginResolve(bool success)
     {
         resolving = true;
+
+        // 긴장 진동은 여기서 끝난다 — 결과 연출은 자기 흔들림을 따로 쓴다.
+        StopTensionShake();
 
         // 실패(버튼 누름)일 때만 눌린 이미지로 바꾸고 화면을 흔든다. 성공은 버튼을 안 눌렀으므로 그대로 둔다.
         if (!success)
@@ -360,11 +426,14 @@ public class HackMiniGame : TimedMiniGame
             rightThumb.transform.localPosition = rightThumbShownPos;
     }
 
-    /// <summary>카메라를 무작위로 흔들었다가 원위치로 되돌린다. 시간이 지날수록 세기가 잦아든다.</summary>
+    /// <summary>
+    /// 카메라를 무작위로 흔들었다가 원위치로 되돌린다. 시간이 지날수록 세기가 잦아든다.
+    /// 기준 위치는 재생 시작 시점에 잡아 둔 <see cref="cameraRestorePos"/> 다 —
+    /// 여기서 현재 좌표를 읽으면 직전까지 돌던 긴장 진동의 오프셋이 기준에 섞여 카메라가 밀린 채 남는다.
+    /// </summary>
     private IEnumerator ShakeCameraRoutine()
     {
         Transform cam = targetCamera.transform;
-        cameraRestorePos = cam.localPosition;
         cameraShaking = true;
 
         float time = 0f;
