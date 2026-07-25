@@ -57,12 +57,17 @@ public sealed class DolmenCoverMiniGame : TimedMiniGame
     [Tooltip("카메라가 없을 때 사용하는 아래쪽 실패 높이.")]
     [SerializeField] private float fallbackFailureHeight = -5f;
 
+    [Tooltip("각도 초과 또는 경계 이탈 상태가 이 시간 이상 연속으로 유지되면 실패한다.")]
+    [SerializeField] private float physicsFailureDelay = 0.5f;
+
     [Header("이벤트")]
     public UnityEvent onClear;
     public UnityEvent onFail;
 
     private Camera targetCamera;
     private float stableElapsed;
+    private float physicsFailureElapsed;
+    private bool controlLocked;
     private bool failureReported;
     private State state = State.Idle;
 
@@ -94,13 +99,23 @@ public sealed class DolmenCoverMiniGame : TimedMiniGame
         if (state != State.Playing)
             return;
 
-        ApplyCoverControl();
+        LockControlAfterFirstSupportContact();
+
+        if (!controlLocked)
+            ApplyCoverControl();
 
         if (HasFailedPhysicsState())
         {
-            FailForPhysicsState();
+            stableElapsed = 0f;
+            physicsFailureElapsed += Time.deltaTime;
+
+            if (physicsFailureElapsed >= Mathf.Max(0f, physicsFailureDelay))
+                FailForPhysicsState();
+
             return;
         }
+
+        physicsFailureElapsed = 0f;
 
         if (!IsFinalPlacementStable())
         {
@@ -125,6 +140,7 @@ public sealed class DolmenCoverMiniGame : TimedMiniGame
     protected override void OnTimeUp()
     {
         state = State.Failed;
+        controlLocked = true;
         ReportFailureEvent();
         base.OnTimeUp();
     }
@@ -132,6 +148,8 @@ public sealed class DolmenCoverMiniGame : TimedMiniGame
     private void ResetInternal(bool enablePhysics)
     {
         stableElapsed = 0f;
+        physicsFailureElapsed = 0f;
+        controlLocked = false;
         failureReported = false;
 
         if (allStones == null)
@@ -145,6 +163,26 @@ public sealed class DolmenCoverMiniGame : TimedMiniGame
 
             stone.SetGameplayPhysicsActive(enablePhysics);
             stone.ResetToStart();
+        }
+    }
+
+    /// <summary>
+    /// 윗돌이 어느 한 아랫돌에 처음 닿는 순간 배치를 확정하고 이후 조작을 잠근다.
+    /// 물리 시뮬레이션은 계속되어 돌이 안정되거나 무너지는 과정은 그대로 진행된다.
+    /// </summary>
+    private void LockControlAfterFirstSupportContact()
+    {
+        if (controlLocked || coverStone == null || supportStones == null)
+            return;
+
+        for (int i = 0; i < supportStones.Length; i++)
+        {
+            DolmenStone supportStone = supportStones[i];
+            if (supportStone != null && coverStone.IsRestingOn(supportStone))
+            {
+                controlLocked = true;
+                return;
+            }
         }
     }
 
@@ -258,6 +296,7 @@ public sealed class DolmenCoverMiniGame : TimedMiniGame
     private void FailForPhysicsState()
     {
         state = State.Failed;
+        controlLocked = true;
         ReportFailureEvent();
         FailImmediately();
     }

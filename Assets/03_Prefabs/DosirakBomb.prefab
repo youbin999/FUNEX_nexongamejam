@@ -154,6 +154,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DosirakBombMiniGame
   gameDescription: "\uB3C4\uC2DC\uB77D\uC744 \uAC74\uB0B4\uB77C!"
   keyboardGuides: []
+  failurePenaltyPrefab: {fileID: 6946364706358701069, guid: 3bf876d3355e7064ba3008bd84750dde, type: 3}
   timeLimit: 2
   onTimerChanged:
     m_PersistentCalls:

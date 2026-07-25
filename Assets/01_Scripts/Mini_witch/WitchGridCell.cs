@@ -17,6 +17,9 @@ public class WitchGridCell : MonoBehaviour
     [SerializeField] private Color correctColor = new Color(0.4f, 0.85f, 0.4f, 0.85f);
     [SerializeField] private Color wrongColor = new Color(0.85f, 0.3f, 0.3f, 0.85f);
 
+    /// <summary>현재 표시 중인 얼굴 스프라이트. 실패 패널티가 띄울 얼굴을 가져갈 때 쓴다.</summary>
+    public Sprite CurrentFace => faceImage != null ? faceImage.sprite : null;
+
     /// <summary>얼굴 스프라이트를 바꾼다. null 이면 바꾸지 않고 유지한다(플레이스홀더 대응).</summary>
     public void SetFace(Sprite sprite)
     {

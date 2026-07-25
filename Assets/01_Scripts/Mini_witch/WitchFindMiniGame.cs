@@ -206,6 +206,8 @@ public class WitchFindMiniGame : TimedMiniGame
         else
         {
             state = State.Failed;
+            // 잘못 고른 얼굴이 푸른 귀신이 되어 다음 미니게임까지 따라다닌다.
+            WitchGhostPenaltyRequest.Set(cells[index] != null ? cells[index].CurrentFace : null, true);
             onFail.Invoke();
             FailImmediately();
         }
@@ -215,7 +217,31 @@ public class WitchFindMiniGame : TimedMiniGame
     protected override void OnTimeUp()
     {
         state = State.Failed;
+        // 시간 초과는 놓친 마녀가 틴트 없이 반투명하게 따라다닌다.
+        WitchGhostPenaltyRequest.Set(FindRemainingWitchFace(), false);
         onFail.Invoke();
         base.OnTimeUp();
+    }
+
+    /// <summary>아직 못 찾은 마녀의 얼굴 스프라이트. 없으면 첫 마녀 얼굴을 돌려준다.</summary>
+    private Sprite FindRemainingWitchFace()
+    {
+        Sprite firstWitchFace = null;
+
+        for (int i = 0; i < witchIndices.Count; i++)
+        {
+            int index = witchIndices[i];
+            if (index < 0 || index >= cells.Length || cells[index] == null)
+                continue;
+
+            Sprite face = cells[index].CurrentFace;
+            if (firstWitchFace == null)
+                firstWitchFace = face;
+
+            if (index < marked.Length && !marked[index])
+                return face;
+        }
+
+        return firstWitchFace;
     }
 }

@@ -138,6 +138,12 @@ public class GameFlowController : MonoBehaviour
     /// <summary>처음부터 등록된 순서대로 게임 흐름을 시작한다.</summary>
     public void StartFlow()
     {
+        if (player != null)
+        {
+            player.StopCurrent();
+            player.ClearFailurePenalties();
+        }
+
         ended = false;
         currentIndex = -1;
 

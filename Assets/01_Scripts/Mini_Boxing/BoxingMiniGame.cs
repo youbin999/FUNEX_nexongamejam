@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 /// <summary>
 /// "때려라!" 외계인 복싱 미니게임.
@@ -56,9 +57,6 @@ public class BoxingMiniGame : TimedMiniGame
     [SerializeField] private Key rightKey = Key.D;
 
     [Header("결과 연출")]
-    [Tooltip("화면 흔들림에 쓸 카메라. 비워두면 Camera.main 을 쓴다")]
-    [SerializeField] private Camera targetCamera;
-
     [Tooltip("성공 시 나타나는 이미지(Alien_Clear). 이 이미지가 흔들린다")]
     [SerializeField] private SpriteRenderer clearImage;
 
@@ -80,6 +78,17 @@ public class BoxingMiniGame : TimedMiniGame
     [Tooltip("실패 시 화면 흔들림 세기(월드 유닛)")]
     [SerializeField] private float cameraShakeMagnitude = 0.6f;
 
+    [Header("실패 임팩트 플래시")]
+    [Tooltip("실패 순간 화면을 붉게 덮는 플래시 유지 시간(초)")]
+    [SerializeField] private float failureFlashDuration = 0.16f;
+
+    [Tooltip("실패 순간 붉은 플래시의 최대 불투명도")]
+    [Range(0f, 1f)]
+    [SerializeField] private float failureFlashAlpha = 0.55f;
+
+    [Tooltip("실패 순간 화면을 덮을 플래시 색상")]
+    [SerializeField] private Color failureFlashColor = new Color(0.72f, 0.015f, 0.015f, 1f);
+
     [Header("이벤트")]
     [Tooltip("한 대 때릴 때마다 현재 횟수를 넘긴다")]
     public PunchEvent onPunch;
@@ -94,23 +103,22 @@ public class BoxingMiniGame : TimedMiniGame
     private State state = State.Idle;
     private Coroutine ouchRoutine;
     private Coroutine resultRoutine;
+    private Coroutine failureFlashRoutine;
+    private CanvasGroup failureFlashCanvasGroup;
 
     // 외계인이 평소에 바라보던 방향. Ouch 미러링 후 되돌리기 위해 캐시한다.
     private bool alienDefaultFlipX;
 
-    // 흔들기 전 원위치. 연출이 끝나거나 중단되면 여기로 되돌린다.
-    private Vector3 cameraRestorePos;
-    private bool cameraShaking;
     private Vector3 clearImageRestorePos;
 
     /// <summary>지금까지 때린 횟수.</summary>
     public int PunchCount => punchCount;
 
+    /// <summary>실패 이미지가 나타나는 순간 자체 임팩트를 재생하므로 공통 종료 셰이크는 생략한다.</summary>
+    protected override bool HasOwnFailureCameraImpact => true;
+
     private void Awake()
     {
-        if (targetCamera == null)
-            targetCamera = Camera.main;
-
         if (alienRenderer != null)
         {
             alienDefaultFlipX = alienRenderer.flipX;
@@ -155,10 +163,17 @@ public class BoxingMiniGame : TimedMiniGame
             resultRoutine = null;
         }
 
-        // 흔들리던 중에 중단됐다면 카메라를 원위치로 되돌린다(카메라는 호스트 씬 공용이다).
-        if (cameraShaking && targetCamera != null)
-            targetCamera.transform.localPosition = cameraRestorePos;
-        cameraShaking = false;
+        if (failureFlashRoutine != null)
+        {
+            StopCoroutine(failureFlashRoutine);
+            failureFlashRoutine = null;
+        }
+
+        if (failureFlashCanvasGroup != null)
+        {
+            failureFlashCanvasGroup.alpha = 0f;
+            failureFlashCanvasGroup.gameObject.SetActive(false);
+        }
 
         punchCount = 0;
 
@@ -300,12 +315,11 @@ public class BoxingMiniGame : TimedMiniGame
         }
         else
         {
-            // 실패: 이미지가 나타나고 화면(카메라)이 흔들린다.
+            // 실패: 펀치 이미지로 바뀌는 바로 그 프레임에 셰이크와 붉은 플래시를 터뜨린다.
             if (failImage != null)
                 failImage.gameObject.SetActive(true);
 
-            if (targetCamera != null && cameraShakeDuration > 0f)
-                yield return ShakeCameraRoutine();
+            PlayFailureImpact();
         }
 
         if (resultHoldDuration > 0f)
@@ -338,25 +352,75 @@ public class BoxingMiniGame : TimedMiniGame
         t.localPosition = restore;
     }
 
-    /// <summary>카메라를 흔들었다가 원위치로 되돌린다. 시간이 지날수록 잦아든다.</summary>
-    private IEnumerator ShakeCameraRoutine()
+    /// <summary>실패 이미지 전환과 동시에 일회성 카메라 셰이크와 붉은 플래시를 재생한다.</summary>
+    private void PlayFailureImpact()
     {
-        Transform cam = targetCamera.transform;
-        cameraRestorePos = cam.localPosition;
-        cameraShaking = true;
+        if (cameraShakeDuration > 0f && cameraShakeMagnitude > 0f)
+            CameraEffectManager.Instance.Shake(cameraShakeDuration, cameraShakeMagnitude);
 
-        float time = 0f;
-        while (time < cameraShakeDuration)
+        if (failureFlashDuration <= 0f || failureFlashAlpha <= 0f)
+            return;
+
+        EnsureFailureFlash();
+        failureFlashRoutine = StartCoroutine(FailureFlashRoutine());
+    }
+
+    /// <summary>프리팹 연결 없이 사용할 수 있는 최상단 풀스크린 플래시를 준비한다.</summary>
+    private void EnsureFailureFlash()
+    {
+        if (failureFlashCanvasGroup != null)
+            return;
+
+        GameObject canvasObject = new GameObject(
+            "FailureImpactFlash",
+            typeof(RectTransform),
+            typeof(Canvas),
+            typeof(CanvasGroup));
+        canvasObject.transform.SetParent(transform, false);
+
+        Canvas canvas = canvasObject.GetComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = short.MaxValue;
+
+        failureFlashCanvasGroup = canvasObject.GetComponent<CanvasGroup>();
+        failureFlashCanvasGroup.interactable = false;
+        failureFlashCanvasGroup.blocksRaycasts = false;
+        failureFlashCanvasGroup.alpha = 0f;
+
+        GameObject imageObject = new GameObject("RedFlash", typeof(RectTransform), typeof(Image));
+        imageObject.transform.SetParent(canvasObject.transform, false);
+
+        RectTransform rect = imageObject.GetComponent<RectTransform>();
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.zero;
+
+        Image image = imageObject.GetComponent<Image>();
+        image.color = failureFlashColor;
+        image.raycastTarget = false;
+    }
+
+    /// <summary>첫 프레임에 강하게 나타난 뒤 빠르게 사라지는 붉은 타격 플래시.</summary>
+    private IEnumerator FailureFlashRoutine()
+    {
+        failureFlashCanvasGroup.gameObject.SetActive(true);
+
+        float duration = Mathf.Max(0.0001f, failureFlashDuration);
+        float peakAlpha = Mathf.Clamp01(failureFlashAlpha);
+        float elapsed = 0f;
+        failureFlashCanvasGroup.alpha = peakAlpha;
+
+        while (elapsed < duration)
         {
-            time += Time.deltaTime;
-            float damper = 1f - Mathf.Clamp01(time / cameraShakeDuration);
-            float angle = UnityEngine.Random.value * Mathf.PI * 2f;
-            Vector3 offset = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f) * (cameraShakeMagnitude * damper);
-            cam.localPosition = cameraRestorePos + offset;
+            elapsed += Time.unscaledDeltaTime;
+            float ratio = Mathf.Clamp01(elapsed / duration);
+            failureFlashCanvasGroup.alpha = Mathf.Lerp(peakAlpha, 0f, ratio * ratio);
             yield return null;
         }
 
-        cam.localPosition = cameraRestorePos;
-        cameraShaking = false;
+        failureFlashCanvasGroup.alpha = 0f;
+        failureFlashCanvasGroup.gameObject.SetActive(false);
+        failureFlashRoutine = null;
     }
 }
