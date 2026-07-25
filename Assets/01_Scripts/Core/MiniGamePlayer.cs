@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -60,6 +61,23 @@ public class MiniGamePlayer : MonoBehaviour
     [Tooltip("보더가 축소된 채로 대기하는 시간(초) — 게임 사이 쉬어가는 타임")]
     [SerializeField] private float transitionHoldDuration = 0.6f;
 
+    [Header("시대 전환 텍스트")]
+    [Tooltip("시대가 바뀔 때 연도 문구를 표시할 TextMeshPro 텍스트")]
+    [SerializeField] private TMP_Text eraYearText;
+
+    [Tooltip("시대 전환 시 보더가 축소된 상태로 추가 유지되는 시간(초)")]
+    [SerializeField] private float eraTransitionExtraHoldDuration = 1.5f;
+
+    [Tooltip("각 글자가 무작위 문자로 변하다 원래 글자로 확정되기까지 걸리는 시간(초)")]
+    [SerializeField] private float eraTextScrambleDurationPerCharacter = 0.12f;
+
+    [Tooltip("현재 글자의 무작위 문자를 교체하는 간격(초). 0 이하면 매 프레임 교체한다")]
+    [SerializeField] private float eraTextScrambleInterval = 0.035f;
+
+    [Tooltip("글리치 애니메이션에 사용할 무작위 문자 목록")]
+    [SerializeField] private string eraTextRandomCharacterPool =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*?";
+
     // 프리팹 인덱스 -> 프리로드된 인스턴스.
     private readonly Dictionary<int, MiniGame> instances = new Dictionary<int, MiniGame>();
     private bool preloaded;
@@ -101,8 +119,15 @@ public class MiniGamePlayer : MonoBehaviour
             borderExpandedSizeDelta = gameBorderRect.sizeDelta;
         }
 
+        HideEraYearTextImmediate();
+
         if (preloadOnAwake)
             Preload();
+    }
+
+    private void OnDisable()
+    {
+        HideEraYearTextImmediate();
     }
 
     private void Start()
@@ -174,7 +199,7 @@ public class MiniGamePlayer : MonoBehaviour
     /// 이미 재생 중이거나 인덱스 범위 밖이면 false.
     /// 프리로드가 안 돼 있으면 먼저 프리로드한다(지연 로드 허용).
     /// </summary>
-    public bool PlayGame(int index, Sprite borderSprite = null)
+    public bool PlayGame(int index, Sprite borderSprite = null, string eraYearLabel = null)
     {
         if (IsPlaying)
             return false;
@@ -192,7 +217,8 @@ public class MiniGamePlayer : MonoBehaviour
         // 먼저 채워 두는 이유는 트랜지션이 끝나기 전까지도 IsPlaying 가드로
         // 재진입(중복 PlayGame 호출)을 막기 위함이다.
         Current = instance;
-        transitionRoutine = StartCoroutine(TransitionThenPlayRoutine(instance, borderSprite));
+        transitionRoutine = StartCoroutine(
+            TransitionThenPlayRoutine(instance, borderSprite, eraYearLabel));
         return true;
     }
 
@@ -201,8 +227,11 @@ public class MiniGamePlayer : MonoBehaviour
     /// 화면 페이드인+설명 프롬프트 → 재생 순서로 진행하는 게임 사이 쉬어가는 타임 연출.
     /// 각 단계는 관련 필드가 비어 있으면 건너뛴다.
     /// </summary>
-    private IEnumerator TransitionThenPlayRoutine(MiniGame instance, Sprite borderSprite)
+    private IEnumerator TransitionThenPlayRoutine(
+        MiniGame instance, Sprite borderSprite, string eraYearLabel)
     {
+        HideEraYearTextImmediate();
+
         if (pendingCleanup != null)
         {
             MiniGame previous = pendingCleanup;
@@ -223,7 +252,12 @@ public class MiniGamePlayer : MonoBehaviour
         yield return AnimateBorder(borderExpandedAnchoredPosition, borderExpandedSizeDelta,
             BorderFramedAnchoredPosition, BorderFramedSizeDelta, borderTransitionDuration);
 
+        if (borderSprite != null)
+            yield return PresentEraYearText(eraYearLabel);
+
         yield return new WaitForSeconds(transitionHoldDuration);
+
+        HideEraYearTextImmediate();
 
         yield return AnimateBorder(BorderFramedAnchoredPosition, BorderFramedSizeDelta,
             borderExpandedAnchoredPosition, borderExpandedSizeDelta, borderTransitionDuration);
@@ -295,16 +329,100 @@ public class MiniGamePlayer : MonoBehaviour
     }
 
     /// <summary>
+    /// 시대 연도 문구를 왼쪽부터 한 글자씩 해독되는 것처럼 표시한다.
+    /// 현재 글자는 무작위 문자로 빠르게 교체하다 원래 글자로 확정한다.
+    /// </summary>
+    private IEnumerator PresentEraYearText(string label)
+    {
+        float elapsed = 0f;
+        bool canAnimate = eraYearText != null && !string.IsNullOrWhiteSpace(label);
+
+        if (canAnimate)
+        {
+            eraYearText.gameObject.SetActive(true);
+            SetEraYearTextProgress(label, 0);
+
+            for (int index = 0; index < label.Length; index++)
+            {
+                if (char.IsWhiteSpace(label[index]))
+                {
+                    SetEraYearTextProgress(label, index + 1);
+                    continue;
+                }
+
+                float characterElapsed = 0f;
+                float nextScrambleTime = 0f;
+
+                while (characterElapsed < eraTextScrambleDurationPerCharacter)
+                {
+                    if (eraTextScrambleInterval <= 0f || characterElapsed >= nextScrambleTime)
+                    {
+                        eraYearText.text = BuildScrambledEraText(
+                            label, index, PickRandomEraCharacter());
+                        nextScrambleTime += Mathf.Max(eraTextScrambleInterval, 0f);
+                    }
+
+                    float deltaTime = Time.deltaTime;
+                    characterElapsed += deltaTime;
+                    elapsed += deltaTime;
+                    yield return null;
+                }
+
+                SetEraYearTextProgress(label, index + 1);
+            }
+
+            eraYearText.text = label;
+        }
+
+        float remainingHold = eraTransitionExtraHoldDuration - elapsed;
+        if (remainingHold > 0f)
+            yield return new WaitForSeconds(remainingHold);
+    }
+
+    /// <summary>현재까지 확정된 접두사만 표시한다.</summary>
+    private void SetEraYearTextProgress(string label, int confirmedCharacterCount)
+    {
+        int confirmedCount = Mathf.Clamp(confirmedCharacterCount, 0, label.Length);
+        eraYearText.text = label.Substring(0, confirmedCount);
+    }
+
+    /// <summary>확정된 글자와 현재 무작위 글자만 표시한다.</summary>
+    private static string BuildScrambledEraText(string label, int currentIndex, char randomCharacter)
+    {
+        return label.Substring(0, currentIndex) + randomCharacter;
+    }
+
+    /// <summary>인스펙터에 지정된 풀에서 글리치용 문자를 하나 고른다.</summary>
+    private char PickRandomEraCharacter()
+    {
+        if (string.IsNullOrEmpty(eraTextRandomCharacterPool))
+            return '?';
+
+        int index = UnityEngine.Random.Range(0, eraTextRandomCharacterPool.Length);
+        return eraTextRandomCharacterPool[index];
+    }
+
+    /// <summary>시대 연도 텍스트를 즉시 숨기고 초기화한다.</summary>
+    private void HideEraYearTextImmediate()
+    {
+        if (eraYearText == null)
+            return;
+
+        eraYearText.text = string.Empty;
+        eraYearText.gameObject.SetActive(false);
+    }
+
+    /// <summary>
     /// gamePrefabs 에 등록된 프리팹 에셋으로 게임을 재생한다. 내부적으로 인덱스를 찾아 PlayGame(int) 를 호출한다.
     /// 등록되지 않은 프리팹이면 false.
     /// </summary>
-    public bool PlayGame(MiniGame prefab, Sprite borderSprite = null)
+    public bool PlayGame(MiniGame prefab, Sprite borderSprite = null, string eraYearLabel = null)
     {
         int index = gamePrefabs.IndexOf(prefab);
         if (index < 0)
             return false;
 
-        return PlayGame(index, borderSprite);
+        return PlayGame(index, borderSprite, eraYearLabel);
     }
 
     /// <summary>현재 게임을 강제로 중단·초기화하고 비활성화한다. (onGameFinished 는 발화하지 않는다)</summary>
@@ -315,6 +433,8 @@ public class MiniGamePlayer : MonoBehaviour
             StopCoroutine(transitionRoutine);
             transitionRoutine = null;
         }
+
+        HideEraYearTextImmediate();
 
         if (introPresenter != null)
             introPresenter.HideImmediate();
