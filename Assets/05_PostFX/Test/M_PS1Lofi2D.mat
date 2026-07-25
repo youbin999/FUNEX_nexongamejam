@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: M_PS1Lofi2D
+  m_Shader: {fileID: 4800000, guid: d6a26019425ebbe44a5ad013559e263f, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords:
+  - _DITHER_BAYER4
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs: []
+    m_Ints: []
+    m_Floats:
+    - _BarrelDistortion: 0.06
+    - _Brightness: 0.95
+    - _ChromaticAberration: 1
+    - _ColorBits: 5
+    - _Contrast: 1.15
+    - _Dither: 1
+    - _DitherScale: 1
+    - _DitherStrength: 1
+    - _FrameRate: 15
+    - _Intensity: 1
+    - _JitterAmount: 0.002
+    - _JitterDensity: 0.03
+    - _NoiseAmount: 0.05
+    - _PixelateAmount: 1
+    - _Saturation: 0.6
+    - _ScanlineIntensity: 0.12
+    - _TargetHeight: 240
+    - _TintStrength: 0.6
+    - _Vignette: 0.7
+    - _VignetteInner: 0.45
+    - _VignetteOuter: 1.05
+    m_Colors:
+    - _HighlightTint: {r: 1, g: 0.94, b: 0.8399999, a: 1}
+    - _ShadowTint: {r: 0.23999995, g: 0.32999998, b: 0.45, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
