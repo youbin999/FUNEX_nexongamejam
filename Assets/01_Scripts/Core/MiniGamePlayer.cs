@@ -101,6 +101,10 @@ public class MiniGamePlayer : MonoBehaviour
     // 화면 페이드아웃이 끝나기 전까지는 화면에 계속 보여야 하므로 정리를 미뤄둔다.
     private MiniGame pendingCleanup;
 
+    // 엔딩 전환처럼 "마지막 게임 화면을 암전이 끝날 때까지 그대로 보여줘야" 하는 경우,
+    // onGameFinished 통지 직후의 자동 정리를 막아 두는 플래그.
+    private bool holdPendingCleanup;
+
     // 현재 진행 중인 트랜지션(페이드/보더) 코루틴. StopCurrent() 로 중간에 취소할 수 있어야 한다.
     private Coroutine transitionRoutine;
 
@@ -499,6 +503,8 @@ public class MiniGamePlayer : MonoBehaviour
         if (introPresenter != null)
             introPresenter.HideImmediate();
 
+        holdPendingCleanup = false;
+
         if (pendingCleanup != null)
         {
             CleanupInstance(pendingCleanup);
@@ -567,11 +573,34 @@ public class MiniGamePlayer : MonoBehaviour
         pendingCleanup = instance;
         onGameFinished.Invoke(instance, success);
 
-        if (pendingCleanup == instance)
+        if (pendingCleanup == instance && !holdPendingCleanup)
         {
             CleanupInstance(instance);
             pendingCleanup = null;
         }
+    }
+
+    /// <summary>
+    /// 종료된 인스턴스의 자동 정리(StopAndReset/비활성화)를 보류한다.
+    /// 엔딩 전환처럼 마지막 게임 화면과 실패 연출을 암전이 끝날 때까지 유지해야 할 때
+    /// <see cref="onGameFinished"/> 콜백 안에서 호출한다.
+    /// 정리를 다시 진행하려면 <see cref="ReleaseFinishedInstance"/> 를 호출한다.
+    /// </summary>
+    public void HoldFinishedInstance()
+    {
+        holdPendingCleanup = true;
+    }
+
+    /// <summary>보류해 둔 인스턴스를 지금 정리한다. 보류 중이 아니어도 호출 가능하다(멱등).</summary>
+    public void ReleaseFinishedInstance()
+    {
+        holdPendingCleanup = false;
+
+        if (pendingCleanup == null)
+            return;
+
+        CleanupInstance(pendingCleanup);
+        pendingCleanup = null;
     }
 
     private void CancelPendingFinish()

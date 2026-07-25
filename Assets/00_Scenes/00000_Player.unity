@@ -553,7 +553,7 @@ MonoBehaviour:
     borderSprite: {fileID: 21300000, guid: 7827973d7db50d04ab783518ed8b9b3b, type: 3}
     eraYearText: "\uAE30\uC6D0\uD6C4 1500\uB144"
     eventLabel: "\uB9C8\uB140\uC0AC\uB0E5"
-    successMeaning: 
+    successMeaning: "\uB9C8\uB140\uC0AC\uB0E5\uC774 \uC131\uD589\uD588\uB2E4."
     failureMeaning: "\uB9C8\uB140\uC0AC\uB0E5\uC73C\uB85C \uC5B5\uC6B8\uD55C \uD76C\uC0DD\uC591\uC774
       \uBC1C\uC0DD\uD588\uB2E4."
     successVisual: 
@@ -583,13 +583,13 @@ MonoBehaviour:
     failureVisual: 
     visualWeight: 4
   - prefab: {fileID: 4700864808614509273, guid: d109eaaff3d885844a73d86db8d12dc2, type: 3}
-    kind: 0
+    kind: 1
     era: 4
     borderSprite: {fileID: 21300000, guid: 25322d51181498745be0f4cb9ccb3611, type: 3}
     eraYearText: "\uAE30\uC6D0\uD6C4 1900\uB144"
     eventLabel: 
-    successMeaning: 
-    failureMeaning: 
+    successMeaning: "\uC758\uAC70\uAC00 \uC131\uACF5\uD588\uB2E4."
+    failureMeaning: "\uC758\uAC70\uAC00 \uC218\uD3EC\uB85C \uB3CC\uC544\uAC14\uB2E4."
     successVisual: 
     failureVisual: 
     visualWeight: 5
@@ -632,8 +632,8 @@ MonoBehaviour:
   - prefab: {fileID: 7810906958207532481, guid: 7185235f0fea32140aebf20382bf89bb, type: 3}
     kind: 1
     era: 5
-    borderSprite: {fileID: 21300000, guid: 7d1664222bd094e44b0a119186329ddb, type: 3}
-    eraYearText: "\uAE30\uC6D0\uD6C4 2026\uB144, \uD604\uC7AC"
+    borderSprite: {fileID: 0}
+    eraYearText: 
     eventLabel: "\uC5D0\uC5B4\uCEE8\uC758 \uBC1C\uBA85"
     successMeaning: "\uCE90\uB9AC\uC5B4\uAC00 \uC5D0\uC5B4\uCEE8\uC744 \uBC1C\uBA85\uD558\uC600\uB2E4."
     failureMeaning: "\uCE90\uB9AC\uC5B4\uAC00 \uB354\uC704\uB97C \uB290\uB07C\uC9C0
@@ -656,8 +656,8 @@ MonoBehaviour:
   - prefab: {fileID: -4765541157340919056, guid: 8e1f5a3c7b2d49608c4a6e2f1b7d0359, type: 3}
     kind: 1
     era: 6
-    borderSprite: {fileID: 0}
-    eraYearText: 
+    borderSprite: {fileID: -8945467959818111224, guid: 188115b7c96669846b360eec57dac7f7, type: 3}
+    eraYearText: "\uAE30\uC6D0\uD6C4 2222\uB144"
     eventLabel: "\uC678\uACC4\uC778\uACFC\uC758 \uBCF5\uC2F1"
     successMeaning: "\uC678\uACC4\uC778\uACFC 1:1 \uC57C\uCC28\uC5D0\uC11C \uC2B9\uB9AC\uD558\uC5EC
       \uD3C9\uD654\uB86D\uAC8C \uACF5\uC874\uD558\uC600\uB2E4."
@@ -670,8 +670,8 @@ MonoBehaviour:
   - prefab: {fileID: 1793571473085594207, guid: 99c89240ed27a494ca10ae4b6d357444, type: 3}
     kind: 0
     era: 6
-    borderSprite: {fileID: -8945467959818111224, guid: 188115b7c96669846b360eec57dac7f7, type: 3}
-    eraYearText: "\uAE30\uC6D0\uD6C4 2200\uB144"
+    borderSprite: {fileID: 0}
+    eraYearText: 
     eventLabel: 
     successMeaning: 
     failureMeaning: 
@@ -681,8 +681,8 @@ MonoBehaviour:
   - prefab: {fileID: 9900000012, guid: 4d0c8b7e2f15493aa6b1e39d70c82f56, type: 3}
     kind: 1
     era: 6
-    borderSprite: {fileID: -8945467959818111224, guid: 188115b7c96669846b360eec57dac7f7, type: 3}
-    eraYearText: "\uAE30\uC6D0\uD6C4 2200\uB144"
+    borderSprite: {fileID: 0}
+    eraYearText: 
     eventLabel: 
     successMeaning: "\uC9C0\uAD6C \uC4F0\uB808\uAE30\uB97C \uC131\uACF5\uC801\uC73C\uB85C
       \uC6B0\uC8FC\uC5D0 \uBC84\uB838\uB2E4."
@@ -693,6 +693,12 @@ MonoBehaviour:
     visualWeight: 4
   playOnStart: 1
   endingSceneName: 99_Ending
+  endingFadeCanvasGroup: {fileID: 800000005}
+  endingFadeColor: {r: 0, g: 0, b: 0, a: 1}
+  endingFadeSortingOrder: 500
+  endingPresentationHoldDuration: 0.5
+  endingFadeDuration: 0.6
+  endingBlackHoldDuration: 0.1
   onGameEnding:
     m_PersistentCalls:
       m_Calls: []
@@ -1110,7 +1116,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -38, y: 0.000061035156}
+  m_AnchoredPosition: {x: -38, y: 0}
   m_SizeDelta: {x: 772.9373, y: 545.9241}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1630025802
@@ -1294,7 +1300,7 @@ Canvas:
   m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_Camera: {fileID: 57323318}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
