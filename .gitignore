@@ -108,4 +108,7 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
-.claude/
+
+# Gemini API 키 (엔딩 LLM). 절대 커밋하지 말 것 — docs/Ending_LLM.md 참고
+/[Aa]ssets/StreamingAssets/gemini_api_key.txt
+/[Aa]ssets/StreamingAssets/gemini_api_key.txt.meta

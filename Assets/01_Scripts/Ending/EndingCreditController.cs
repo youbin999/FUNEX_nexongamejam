@@ -1,0 +1,244 @@
+using System;
+using System.Collections;
+using TMPro;
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.UI;
+
+/// <summary>
+/// 엔딩 씬의 진행을 총괄한다.
+///
+/// 연출 순서:
+///   암전 여운(leadIn) ─┬─ (병렬) 대본 생성: Gemini → 실패 시 폴백
+///                      │
+///   대본 도착 → 크레딧 롤 시작 ─┬─ (병렬) 이미지 생성 → 도착 시 배경에 페이드인
+///                              │
+///   롤 종료 → 에필로그 표시 → onCreditsFinished
+///
+/// 이미지가 0초에 있을 필요가 없다는 점을 이용해, 생성 지연을 롤 시간에 흡수시킨다.
+/// </summary>
+public class EndingCreditController : MonoBehaviour
+{
+    [Header("참조")]
+    [Tooltip("크레딧 본문 텍스트. 이 오브젝트의 RectTransform 이 위로 스크롤된다")]
+    [SerializeField] private TMP_Text creditText;
+
+    [Tooltip("스크롤 대상 RectTransform. 비워두면 creditText 의 RectTransform 을 쓴다")]
+    [SerializeField] private RectTransform creditRect;
+
+    [Tooltip("롤이 끝난 뒤 화면 중앙에 표시할 마무리 문장")]
+    [SerializeField] private TMP_Text epilogueText;
+
+    [Tooltip("엔딩 이미지를 표시할 RawImage")]
+    [SerializeField] private RawImage backgroundImage;
+
+    [Tooltip("배경 이미지 페이드용 CanvasGroup. 비워두면 페이드 없이 즉시 표시된다")]
+    [SerializeField] private CanvasGroup backgroundGroup;
+
+    [Header("연출 타이밍")]
+    [Tooltip("크레딧이 시작되기 전 암전 상태로 머무는 최소 시간(초). 대본이 더 빨리 와도 이만큼은 기다린다")]
+    [SerializeField] private float leadInDuration = 3f;
+
+    [Tooltip("크레딧이 초당 올라가는 픽셀 수")]
+    [SerializeField] private float scrollSpeed = 60f;
+
+    [Tooltip("롤 종료 후 에필로그가 나타나기까지의 간격(초)")]
+    [SerializeField] private float epilogueDelay = 1f;
+
+    [Tooltip("배경 이미지 페이드인 시간(초)")]
+    [SerializeField] private float imageFadeDuration = 2f;
+
+    [Header("생성기 설정")]
+    [Tooltip("대본 생성에 쓸 Gemini 텍스트 모델")]
+    [SerializeField] private string narratorModel = "gemini-2.5-flash";
+
+    [Tooltip("대본 생성 타임아웃(초). 초과하면 폴백 텍스트로 진행한다")]
+    [SerializeField] private int narratorTimeout = 20;
+
+    [Tooltip("이미지 생성에 쓸 Gemini 이미지 모델")]
+    [SerializeField] private string imageModel = "gemini-2.5-flash-image";
+
+    [Tooltip("이미지 생성 타임아웃(초)")]
+    [SerializeField] private int imageTimeout = 60;
+
+    [Tooltip("체크하면 API 를 호출하지 않고 항상 폴백 텍스트를 쓴다. 연출만 손볼 때 켜면 편하다")]
+    [SerializeField] private bool forceFallback;
+
+    [Header("이벤트")]
+    [Tooltip("에필로그까지 끝나면 발화. 갤러리 표시나 타이틀 복귀에 연결한다")]
+    public UnityEvent onCreditsFinished;
+
+    private void Start()
+    {
+        StartCoroutine(RunEndingRoutine());
+    }
+
+    private IEnumerator RunEndingRoutine()
+    {
+        PrepareInitialState();
+
+        RunResult result = RunResult.Instance;
+
+        // 대본 생성과 암전 여운을 동시에 굴린다.
+        EndingScript script = null;
+        Coroutine narration = StartCoroutine(ResolveScriptRoutine(result, s => script = s));
+
+        yield return new WaitForSeconds(leadInDuration);
+        yield return narration;
+
+        // ResolveScriptRoutine 은 항상 유효한 대본을 채워 넣는다(최악의 경우 폴백).
+        // 방어적으로 한 번 더 확인해 엔딩이 멈추는 일만은 막는다.
+        if (script == null || !script.IsValid)
+            script = FallbackEndingNarrator.Build(result);
+
+        // 이미지는 롤과 병렬로 생성한다 — 롤이 끝나기 전에만 도착하면 된다.
+        StartCoroutine(ResolveImageRoutine(result, script.image_prompt));
+
+        yield return ScrollCreditsRoutine(script);
+
+        yield return new WaitForSeconds(epilogueDelay);
+        ShowEpilogue(script.epilogue);
+
+        onCreditsFinished.Invoke();
+    }
+
+    private void PrepareInitialState()
+    {
+        if (creditText != null)
+            creditText.text = string.Empty;
+
+        if (epilogueText != null)
+            epilogueText.gameObject.SetActive(false);
+
+        if (backgroundGroup != null)
+            backgroundGroup.alpha = 0f;
+
+        if (backgroundImage != null)
+            backgroundImage.enabled = false;
+    }
+
+    /// <summary>Gemini → 실패 시 폴백 순서로 대본을 확보한다. 반드시 유효한 대본을 넘긴다.</summary>
+    private IEnumerator ResolveScriptRoutine(RunResult result, Action<EndingScript> onResolved)
+    {
+        if (forceFallback)
+        {
+            onResolved(FallbackEndingNarrator.Build(result));
+            yield break;
+        }
+
+        yield return GeminiApiConfig.Load();
+
+        EndingScript script = null;
+        string failure = null;
+
+        IEndingNarrator narrator = new GeminiEndingNarrator(narratorModel, narratorTimeout);
+        yield return narrator.Generate(result, s => script = s, e => failure = e);
+
+        if (script == null || !script.IsValid)
+        {
+            Debug.LogWarning($"EndingCreditController: 대본 생성 실패 — 폴백으로 진행합니다. ({failure})");
+            script = FallbackEndingNarrator.Build(result);
+        }
+
+        onResolved(script);
+    }
+
+    /// <summary>이미지를 생성해 배경에 페이드인한다. 실패하면 아무것도 하지 않는다(암전 유지).</summary>
+    private IEnumerator ResolveImageRoutine(RunResult result, string imagePrompt)
+    {
+        if (forceFallback || backgroundImage == null)
+            yield break;
+
+        var generator = new EndingImageGenerator(imageModel, imageTimeout);
+        Texture2D texture = null;
+
+        yield return generator.GetOrCreate(result.CombinationKey, imagePrompt, t => texture = t);
+
+        if (texture == null)
+            yield break;
+
+        backgroundImage.texture = texture;
+        backgroundImage.enabled = true;
+
+        yield return FadeBackgroundRoutine(0f, 1f, imageFadeDuration);
+    }
+
+    private IEnumerator FadeBackgroundRoutine(float from, float to, float duration)
+    {
+        if (backgroundGroup == null)
+        {
+            yield break;
+        }
+
+        if (duration <= 0f)
+        {
+            backgroundGroup.alpha = to;
+            yield break;
+        }
+
+        float t = 0f;
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+            backgroundGroup.alpha = Mathf.Lerp(from, to, Mathf.Clamp01(t / duration));
+            yield return null;
+        }
+
+        backgroundGroup.alpha = to;
+    }
+
+    /// <summary>크레딧 본문을 화면 아래에서 위로 흘려보낸다.</summary>
+    private IEnumerator ScrollCreditsRoutine(EndingScript script)
+    {
+        if (creditText == null)
+            yield break;
+
+        creditText.text = string.Join("\n", script.credit_lines);
+
+        RectTransform rect = creditRect != null ? creditRect : creditText.rectTransform;
+
+        // 레이아웃이 갱신돼야 preferredHeight 가 실제 값이 된다.
+        creditText.ForceMeshUpdate();
+        Canvas.ForceUpdateCanvases();
+
+        float viewportHeight = GetViewportHeight(rect);
+        float contentHeight = creditText.preferredHeight;
+
+        // 화면 아래(보이지 않는 곳)에서 시작해, 마지막 줄이 화면 위로 완전히 빠져나갈 때까지 올린다.
+        float startY = -viewportHeight * 0.5f - contentHeight * 0.5f;
+        float endY = viewportHeight * 0.5f + contentHeight * 0.5f;
+
+        Vector2 pos = rect.anchoredPosition;
+        pos.y = startY;
+        rect.anchoredPosition = pos;
+
+        float distance = endY - startY;
+        float speed = Mathf.Max(scrollSpeed, 1f);
+        float travelled = 0f;
+
+        while (travelled < distance)
+        {
+            travelled += speed * Time.deltaTime;
+            pos.y = Mathf.Min(startY + travelled, endY);
+            rect.anchoredPosition = pos;
+            yield return null;
+        }
+    }
+
+    /// <summary>스크롤 범위 계산에 쓸 화면 높이. 부모 RectTransform 기준, 없으면 화면 해상도.</summary>
+    private static float GetViewportHeight(RectTransform rect)
+    {
+        var parent = rect.parent as RectTransform;
+        float height = parent != null ? parent.rect.height : 0f;
+        return height > 1f ? height : Screen.height;
+    }
+
+    private void ShowEpilogue(string epilogue)
+    {
+        if (epilogueText == null || string.IsNullOrWhiteSpace(epilogue))
+            return;
+
+        epilogueText.text = epilogue;
+        epilogueText.gameObject.SetActive(true);
+    }
+}
