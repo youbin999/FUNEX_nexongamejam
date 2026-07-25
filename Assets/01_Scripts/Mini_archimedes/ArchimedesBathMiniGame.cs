@@ -103,7 +103,7 @@ public class ArchimedesBathMiniGame : TimedMiniGame
             return;
 
         archimedesRenderer.transform.position += Vector3.right * stepDistance;
-
+        
         useFrame0 = !useFrame0;
         archimedesRenderer.sprite = useFrame0 ? archimedesFrame0 : archimedesFrame1;
 
