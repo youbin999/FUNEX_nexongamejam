@@ -753,7 +753,14 @@ public class TimingDropMiniGame : TimedMiniGame
 
         // 풍선이 사라진다. 다음 재생 때 ResetInternal 이 되살린다.
         if (fallingObject != null)
+        {
+            // [버그 추적용 임시 로깅] 이 순간 철의여인(닫힌 문)도 같이 사라진다면
+            // 문이 풍선의 자식이거나 정렬 동률로 배경 뒤에 그려진 것이다.
+            Debug.Log($"[TimingDrop][진단] 풍선 비활성화. 닫힌 문 activeInHierarchy=" +
+                $"{(doorClosedObject != null ? doorClosedObject.activeInHierarchy.ToString() : "참조 없음")}", this);
+
             fallingObject.gameObject.SetActive(false);
+        }
 
         if (hitEffect != null)
             hitEffect.SetActive(true);
@@ -832,6 +839,12 @@ public class TimingDropMiniGame : TimedMiniGame
         cameraRestorePos = t.localPosition;
         cameraShaking = true;
 
+        // [버그 추적용 임시 로깅] CameraEffectManager(실패 패널티 셰이크 등)가 카메라를 움직이는 중에
+        // 이 값을 캐시하면 "오프셋 걸린 위치"를 원위치로 복원해 카메라가 영구히 어긋난다.
+        // 이후 미니게임(삽 등)의 스프라이트가 화면 밖으로 밀려 안 보일 수 있는 의심 지점.
+        Debug.Log($"[TimingDrop][진단] 카메라 셰이크 시작: 복원 기준 localPos={cameraRestorePos} " +
+            $"(CameraEffectManager 활성 여부 확인 필요)", this);
+
         float time = 0f;
         while (time < successShakeDuration)
         {
@@ -847,6 +860,10 @@ public class TimingDropMiniGame : TimedMiniGame
         t.localPosition = cameraRestorePos;
         cameraShaking = false;
         shakeRoutine = null;
+
+        // [버그 추적용 임시 로깅] 셰이크 종료 시 복원된 위치. 시작 로그와 값이 다르거나
+        // 이후 다른 게임 시작 로그의 카메라 위치와 어긋나면 카메라 복원 경합이 원인이다.
+        Debug.Log($"[TimingDrop][진단] 카메라 셰이크 종료: localPos={t.localPosition} 로 복원", this);
     }
 
     /// <summary>끝에서 살짝 넘쳤다가 제자리로 돌아오는 이징(통통 튀는 느낌).</summary>
@@ -901,6 +918,14 @@ public class TimingDropMiniGame : TimedMiniGame
         if (balloonRenderers == null || pressRenderer == null)
             return;
 
+        // [버그 추적용 임시 로깅] "풍선을 터뜨릴 때 철의여인(닫힌 문)이 함께 사라지는" 문제 진단.
+        // 의심: 풍선을 pressRenderer.order - 1 로 내리는데, 배경이 그보다 높거나 같은 order 면
+        //       풍선이 배경 뒤로 사라지고, 닫힌 문(order 0)과 배경(order 0)이 동률이면
+        //       문 자체도 그리기 순서 미정의로 배경 뒤로 갈 수 있다.
+        Debug.Log($"[TimingDrop][진단] SendBalloonBehindDoor: pressRenderer='{pressRenderer.name}' " +
+            $"layer={pressRenderer.sortingLayerName}, order={pressRenderer.sortingOrder} → " +
+            $"풍선 목표 order={pressRenderer.sortingOrder - 1}", this);
+
         foreach (SpriteRenderer renderer in balloonRenderers)
         {
             if (renderer == null)
@@ -909,6 +934,42 @@ public class TimingDropMiniGame : TimedMiniGame
             // 문과 같은 정렬 레이어로 맞춘 뒤 한 칸 뒤로 보낸다. 레이어가 다르면 순서만으론 안 가려진다.
             renderer.sortingLayerID = pressRenderer.sortingLayerID;
             renderer.sortingOrder = pressRenderer.sortingOrder - 1;
+        }
+
+        LogDoorSortingTies();
+    }
+
+    /// <summary>
+    /// [버그 추적용 임시 로깅] 닫힌 문(철의여인)과 정렬 순서가 동률인 렌더러를 찾아 경고한다.
+    /// 동률이면 그리기 순서가 미정의라 문이 배경 뒤로 그려져 "사라진 것처럼" 보일 수 있다.
+    /// </summary>
+    private void LogDoorSortingTies()
+    {
+        if (doorClosedObject == null)
+            return;
+
+        SpriteRenderer[] doorRenderers = doorClosedObject.GetComponentsInChildren<SpriteRenderer>(true);
+
+        foreach (SpriteRenderer other in GetComponentsInChildren<SpriteRenderer>(true))
+        {
+            if (other == null || other.transform.IsChildOf(doorClosedObject.transform))
+                continue;
+
+            foreach (SpriteRenderer door in doorRenderers)
+            {
+                Debug.Log($"[TimingDrop][진단] 렌더러 '{other.name}' layer={other.sortingLayerName}, " +
+                    $"order={other.sortingOrder}, z={other.transform.position.z:F3}, " +
+                    $"active={other.gameObject.activeInHierarchy}", other);
+
+                if (other.sortingLayerID == door.sortingLayerID && other.sortingOrder == door.sortingOrder)
+                {
+                    Debug.LogWarning($"[TimingDrop][진단] 정렬 순서 동률! 닫힌 문 '{door.name}'(order {door.sortingOrder}, " +
+                        $"z {door.transform.position.z:F3}) vs '{other.name}'(order {other.sortingOrder}, " +
+                        $"z {other.transform.position.z:F3}) — 문이 배경 뒤로 그려져 사라져 보일 수 있다.", door);
+                }
+
+                break; // 렌더러 나열 로그는 문 렌더러마다 반복하지 않는다.
+            }
         }
     }
 
