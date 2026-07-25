@@ -492,7 +492,7 @@ MonoBehaviour:
     kind: 1
     era: 1
     borderSprite: {fileID: 21300000, guid: 593a65498821e214ab53f9e91968141c, type: 3}
-    eraYearText: "\uAE30\uC6D0\uC804 3000\uB144\uC804 \uCBE4..."
+    eraYearText: "\uC11D\uAE30\uC2DC\uB300"
     eventLabel: "\uACE0\uC778\uB3CC \uB9CC\uB4E4\uAE30"
     successMeaning: "\uB108\uC758 \uC138\uACC4\uB294 \uACE0\uC778\uB3CC \uC720\uC801\uC9C0\uAC00
       \uAD00\uAD11\uC790\uC6D0\uC73C\uB85C \uD65C\uBC1C\uD788 \uC0AC\uC6A9\uB418\uACE0
@@ -531,7 +531,7 @@ MonoBehaviour:
     kind: 1
     era: 2
     borderSprite: {fileID: 21300000, guid: 74eaa5d12046003439fb8d2225b9e40c, type: 3}
-    eraYearText: "\uAE30\uC6D0\uC804 1500\uB144"
+    eraYearText: "\uCCAD\uB3D9\uAE30 \uC2DC\uB300"
     eventLabel: 
     successMeaning: "\uBD80\uB825\uC744 \uBC1C\uACAC\uD558\uC5EC \uD574\uC0C1 \uC601\uC5ED\uC73C\uB85C
       \uC778\uAC04\uC774 \uC9C4\uCD9C\uD588\uB2E4."
@@ -551,7 +551,7 @@ MonoBehaviour:
       \uBABB\uD574 \uB354 \uC774\uC0C1\uC758 \uBC1C\uC804\uC744 \uC774\uB8E8\uC9C0
       \uBABB\uD588\uB2E4."
     successVisual: 
-    failureVisual: 
+    failureVisual: egypt Pharaoh,
     visualWeight: 5
   - prefab: {fileID: 72291910205155039, guid: e6f0bf9670e1982478561fdd3e743a6b, type: 3}
     kind: 2
@@ -563,13 +563,13 @@ MonoBehaviour:
     failureMeaning: "\uC778\uB958\uB294 \uCCAD\uB3D9\uC744 \uD65C\uC6A9\uD558\uC9C0
       \uBABB\uD574 \uBC1C\uC804\uC744 \uBA48\uCD94\uC5C8\uB2E4."
     successVisual: 
-    failureVisual: 
+    failureVisual: bronze age,
     visualWeight: 5
   - prefab: {fileID: 4657186777680439362, guid: 6e7c95e72c6956141abad54d4c53d242, type: 3}
     kind: 1
     era: 3
     borderSprite: {fileID: 21300000, guid: 7827973d7db50d04ab783518ed8b9b3b, type: 3}
-    eraYearText: "\uAE30\uC6D0\uD6C4 1500\uB144"
+    eraYearText: "\uC911\uC138 \uC2DC\uB300"
     eventLabel: "\uB9C8\uB140\uC0AC\uB0E5"
     successMeaning: "\uB9C8\uB140\uC0AC\uB0E5\uC774 \uC131\uD589\uD588\uB2E4."
     failureMeaning: "\uB9C8\uB140\uC0AC\uB0E5\uC73C\uB85C \uC5B5\uC6B8\uD55C \uD76C\uC0DD\uC591\uC774
@@ -598,18 +598,20 @@ MonoBehaviour:
     failureMeaning: "\uC99D\uAE30 \uAE30\uAD00\uC744 \uBC1C\uBA85\uD558\uC9C0 \uBABB\uD574
       \uC0B0\uC5C5\uC744 \uBC1C\uC804\uC2DC\uD0A4\uC9C0 \uBABB\uD588\uB2E4."
     successVisual: 
-    failureVisual: 
+    failureVisual: rural
     visualWeight: 4
-  - prefab: {fileID: 4700864808614509273, guid: d109eaaff3d885844a73d86db8d12dc2, type: 3}
+  - prefab: {fileID: 7810906958207532481, guid: 7185235f0fea32140aebf20382bf89bb, type: 3}
     kind: 1
     era: 4
     borderSprite: {fileID: 21300000, guid: 25322d51181498745be0f4cb9ccb3611, type: 3}
-    eraYearText: "\uAE30\uC6D0\uD6C4 1900\uB144"
+    eraYearText: "\uADFC\uB300 \uC2DC\uB300"
     eventLabel: 
-    successMeaning: "\uC758\uAC70\uAC00 \uC131\uACF5\uD588\uB2E4."
-    failureMeaning: "\uC758\uAC70\uAC00 \uC218\uD3EC\uB85C \uB3CC\uC544\uAC14\uB2E4."
+    successMeaning: "\uCE90\uB9AC\uC5B4\uAC00 \uC5D0\uC5B4\uCEE8\uC744 \uBC1C\uBA85\uD588\uB2E4."
+    failureMeaning: "\uCE90\uB9AC\uC5B4\uAC00 \uC5D0\uC5B4\uCEE8\uC758 \uD544\uC694\uC131\uC744
+      \uB290\uB07C\uC9C0 \uBABB\uD574 \uC5D0\uC5B4\uCEE8\uC774 \uBC1C\uBA85\uB418\uC9C0
+      \uC54A\uC558\uB2E4."
     successVisual: 
-    failureVisual: 
+    failureVisual: very hot summer
     visualWeight: 5
   - prefab: {fileID: 8796445717193832805, guid: 133e85cc3a50fcc48a57f374f8b9f011, type: 3}
     kind: 0
@@ -632,13 +634,13 @@ MonoBehaviour:
     failureMeaning: "\uC804\uAD6C\uB97C \uBC1C\uBA85\uD558\uC9C0 \uBABB\uD574 \uC778\uB958\uB294
       \uCE60\uD759\uAC19\uC740 \uBC24\uC744 \uC815\uBCF5\uD558\uC9C0 \uBABB\uD588\uB2E4."
     successVisual: 
-    failureVisual: 
+    failureVisual: very dark night, no any lights,
     visualWeight: 5
   - prefab: {fileID: 1870836362585978639, guid: 8e988c43d299d9a4d9f90a75d3398e97, type: 3}
     kind: 1
     era: 5
     borderSprite: {fileID: 21300000, guid: 7d1664222bd094e44b0a119186329ddb, type: 3}
-    eraYearText: "\uAE30\uC6D0\uD6C4 2026\uB144, \uD604\uC7AC"
+    eraYearText: "\uD604\uB300 \uC2DC\uB300"
     eventLabel: 
     successMeaning: "\uB125\uC2A8 \uC804\uC790\uC758 \uC8FC\uAC00\uAC00 \uBC31\uB9CC\uC6D0\uC744
       \uCC0D\uC5C8\uB2E4."
@@ -647,18 +649,6 @@ MonoBehaviour:
     failureVisual: "some homeless people are in front of \uB125\uC2A8\uC804\uC790
       building"
     visualWeight: 4
-  - prefab: {fileID: 7810906958207532481, guid: 7185235f0fea32140aebf20382bf89bb, type: 3}
-    kind: 1
-    era: 5
-    borderSprite: {fileID: 0}
-    eraYearText: 
-    eventLabel: "\uC5D0\uC5B4\uCEE8\uC758 \uBC1C\uBA85"
-    successMeaning: "\uCE90\uB9AC\uC5B4\uAC00 \uC5D0\uC5B4\uCEE8\uC744 \uBC1C\uBA85\uD558\uC600\uB2E4."
-    failureMeaning: "\uCE90\uB9AC\uC5B4\uAC00 \uB354\uC704\uB97C \uB290\uB07C\uC9C0
-      \uBABB\uD574 \uC5D0\uC5B4\uCEE8\uC774 \uBC1C\uBA85\uB418\uC9C0 \uC54A\uC558\uB2E4."
-    successVisual: humans are stay cool in indoor thanks to airconditional
-    failureVisual: humans are very hot due to no aircon (no invented)
-    visualWeight: 2
   - prefab: {fileID: 5500000012, guid: f3a8c1b6d9e24705a1c8b3f6e9d02417, type: 3}
     kind: 2
     era: 5
@@ -675,7 +665,7 @@ MonoBehaviour:
     kind: 1
     era: 6
     borderSprite: {fileID: -8945467959818111224, guid: 188115b7c96669846b360eec57dac7f7, type: 3}
-    eraYearText: "\uAE30\uC6D0\uD6C4 2222\uB144"
+    eraYearText: "\uBBF8\uB798 \uC2DC\uB300"
     eventLabel: "\uC678\uACC4\uC778\uACFC\uC758 \uBCF5\uC2F1"
     successMeaning: "\uC678\uACC4\uC778\uACFC 1:1 \uC57C\uCC28\uC5D0\uC11C \uC2B9\uB9AC\uD558\uC5EC
       \uD3C9\uD654\uB86D\uAC8C \uACF5\uC874\uD558\uC600\uB2E4."
