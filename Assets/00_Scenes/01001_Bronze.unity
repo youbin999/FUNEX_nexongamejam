@@ -149,7 +149,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MiniGamePlayer
   gamePrefabs:
-  - {fileID: 4657186777680439362, guid: 0e5158902dad44f1896b9e200df9e1dd, type: 3}
+  - {fileID: 72291910205155039, guid: e6f0bf9670e1982478561fdd3e743a6b, type: 3}
   preloadOnAwake: 1
   playFirstOnStart: 1
   onGameFinished:
