@@ -74,6 +74,9 @@ public class GameFlowController : MonoBehaviour
     [Header("참조")]
     [SerializeField] private MiniGamePlayer player;
 
+    [Tooltip("시대별 BGM 디렉터. 비워두면 씬에 놓인 것을 자동으로 찾는다. 없어도 흐름은 그대로 돌아간다")]
+    [SerializeField] private EraBgmDirector bgmDirector;
+
     [Header("게임 순서")]
     [Tooltip("순서대로 재생할 게임 목록")]
     [SerializeField] private List<GameEntry> games = new List<GameEntry>();
@@ -200,12 +203,24 @@ public class GameFlowController : MonoBehaviour
         }
 
         GameEntry entry = games[currentIndex];
+
+        // 시대가 바뀌면 BGM 도 같이 넘긴다. 같은 시대가 이어지면 디렉터가 알아서 곡을 유지한다.
+        PlayEraBgm(entry.era);
+
         if (entry.prefab == null || player == null ||
             !player.PlayGame(entry.prefab, entry.borderSprite, entry.eraYearText))
         {
             Debug.LogWarning($"GameFlowController: index {currentIndex} 게임을 재생할 수 없습니다.", this);
             PlayNext();
         }
+    }
+
+    /// <summary>해당 시대의 BGM 을 요청한다. 디렉터가 없으면 조용히 넘어간다.</summary>
+    private void PlayEraBgm(Era era)
+    {
+        EraBgmDirector director = bgmDirector != null ? bgmDirector : EraBgmDirector.Instance;
+        if (director != null)
+            director.Play(era);
     }
 
     private void OnGameFinished(MiniGame instance, bool success)
