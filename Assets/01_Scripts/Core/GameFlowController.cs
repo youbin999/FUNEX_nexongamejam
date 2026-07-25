@@ -16,11 +16,52 @@ public class GameFlowController : MonoBehaviour
         [Tooltip("재생할 미니게임 프리팹. player 쪽에는 따로 등록할 필요 없다 — Start 시점에 이 목록이 자동으로 주입된다")]
         public MiniGame prefab;
 
-        [Tooltip("체크하면 이 게임 실패 시 즉시 게임 엔딩으로 진행한다")]
-        public bool isCritical;
+        [Tooltip("미니게임의 서사적 성격.\n" +
+            "Normal: 실패해도 아무 영향 없음\n" +
+            "Change: 실패해도 흐름은 이어지지만 엔딩 서사·엔딩 이미지에 반영됨\n" +
+            "Critical: 실패 시 즉시 엔딩으로 이동")]
+        public MiniGameKind kind = MiniGameKind.Normal;
+
+        [Tooltip("이 게임이 속한 시대")]
+        public Era era = Era.Prehistoric;
 
         [Tooltip("이 게임 시작 시 GameBorder 에 적용할 시대 테마 스프라이트. 비워두면 기존 테마를 유지한다")]
         public Sprite borderSprite;
+
+        [Header("엔딩 맥락 (Change 일 때만 사용)")]
+        [Tooltip("사건 이름. 예: '마녀사냥에서 마녀를 색출'")]
+        public string eventLabel;
+
+        [Tooltip("성공했을 때의 역사적 의미(한국어). 크레딧 문장의 재료")]
+        [TextArea(2, 4)] public string successMeaning;
+
+        [Tooltip("실패했을 때의 역사적 의미(한국어). 크레딧 문장의 재료")]
+        [TextArea(2, 4)] public string failureMeaning;
+
+        [Tooltip("성공했을 때 엔딩 이미지에 들어갈 시각 요소(영문 구절).\n" +
+            "예: a witch burned at the stake, shown only as a faded illustration in a children's storybook")]
+        [TextArea(2, 4)] public string successVisual;
+
+        [Tooltip("실패했을 때 엔딩 이미지에 들어갈 시각 요소(영문 구절).\n" +
+            "예: a young witch in a modern school uniform sitting among ordinary students")]
+        [TextArea(2, 4)] public string failureVisual;
+
+        [Tooltip("서사 비중. 높을수록 엔딩 이미지 전경에 배치되도록 유도한다")]
+        [Range(0, 10)] public int visualWeight = 5;
+
+        /// <summary>실패 시 즉시 엔딩으로 가야 하는 게임인지.</summary>
+        public bool IsCritical => kind == MiniGameKind.Critical;
+
+        /// <summary>결과에 따라 이 항목을 엔딩 재료(<see cref="MiniGameOutcome"/>)로 변환한다.</summary>
+        public MiniGameOutcome ToOutcome(bool success) => new MiniGameOutcome
+        {
+            eventLabel = string.IsNullOrWhiteSpace(eventLabel) && prefab != null ? prefab.name : eventLabel,
+            era = era.ToKorean(),
+            success = success,
+            meaning = success ? successMeaning : failureMeaning,
+            visual = success ? successVisual : failureVisual,
+            visualWeight = visualWeight,
+        };
     }
 
     [Header("참조")]
@@ -99,6 +140,10 @@ public class GameFlowController : MonoBehaviour
     {
         ended = false;
         currentIndex = -1;
+
+        // 재시작 시 이전 판의 엔딩 재료가 섞이지 않도록 비운다.
+        RunResult.Instance.Clear();
+
         PlayNext();
     }
 
@@ -130,9 +175,15 @@ public class GameFlowController : MonoBehaviour
             return;
 
         GameEntry entry = games[currentIndex];
-        if (!success && entry.isCritical)
+
+        // 변화 미니게임은 성공/실패 모두 엔딩 재료가 된다 — 실패만 기록하는 게 아니다.
+        if (entry.kind == MiniGameKind.Change)
+            RunResult.Instance.Record(entry.ToOutcome(success));
+
+        if (!success && entry.IsCritical)
         {
             ended = true;
+            RunResult.Instance.MarkEarlyEnding(entry.era.ToKorean(), entry.eventLabel);
             onGameEnding.Invoke();
             return;
         }
