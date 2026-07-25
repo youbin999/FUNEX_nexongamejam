@@ -60,9 +60,25 @@ public class HackMiniGame : TimedMiniGame
     [Tooltip("흔들림의 최대 세기(월드 유닛). 시간이 지날수록 점점 잦아든다")]
     [SerializeField] private float shakeMagnitude = 0.25f;
 
+    [Header("배경음")]
+    [Tooltip("게임이 시작되는 순간부터 판정이 날 때까지 루프로 깔리는 소리. 비워두면 재생하지 않는다")]
+    [SerializeField] private AudioClip bgmClip;
+
+    [Tooltip("배경음 원본 크기. 설정 창의 BGM 게이지 값에 이 값을 곱한다")]
+    [Range(0f, 1f)]
+    [SerializeField] private float bgmVolume = 0.6f;
+
+    [Tooltip("이 배경음이 도는 동안 전역 BGM 을 낮출 비율. 0.15 면 원래 크기의 15%. 1이면 낮추지 않는다.\n" +
+        "전역 BGM 을 멈췄다 다시 트는 게 아니라 볼륨만 낮추므로 곡이 처음부터 다시 시작하지 않는다")]
+    [Range(0f, 1f)]
+    [SerializeField] private float globalBgmDuck = 0.15f;
+
     [Header("이벤트")]
     public UnityEvent onClear;
     public UnityEvent onFail;
+
+    // 배경음 전용 AudioSource. 프리팹에 심지 않고 필요할 때 만들어 쓴다(SfxPlayer 의 폴백과 같은 방식).
+    private AudioSource bgmSource;
 
     // 판정이 끝나 결과 연출 중인지 여부. true 인 동안은 추가 입력/재판정을 받지 않는다.
     private bool resolving;
@@ -102,10 +118,58 @@ public class HackMiniGame : TimedMiniGame
     protected override void OnTimedPlay()
     {
         ResetInternal();
+        StartBgm();
+    }
+
+    /// <summary>배경음을 처음부터 재생한다. 클립이 없으면 아무것도 하지 않는다.</summary>
+    private void StartBgm()
+    {
+        if (bgmClip == null)
+            return;
+
+        if (bgmSource == null)
+        {
+            bgmSource = gameObject.AddComponent<AudioSource>();
+            bgmSource.playOnAwake = false;
+            bgmSource.loop = true;
+
+            // 2D 로 재생한다. 3D 로 두면 카메라와의 거리에 따라 소리가 죽는다.
+            bgmSource.spatialBlend = 0f;
+            bgmSource.clip = bgmClip;
+        }
+
+        bgmSource.volume = GameSettings.BgmVolume * bgmVolume;
+        bgmSource.time = 0f;
+        bgmSource.Play();
+
+        // 전역 BGM 이 그대로 깔려 있으면 서로 잡아먹는다. 끊지 않고 볼륨만 낮춘다.
+        if (globalBgmDuck < 1f && AudioManager.Instance != null)
+            AudioManager.Instance.DuckBgm(globalBgmDuck);
+    }
+
+    /// <summary>배경음을 멈추고 전역 BGM 을 되돌린다. 재생 중이 아닐 때 불러도 안전하다(멱등).</summary>
+    private void StopBgm()
+    {
+        if (bgmSource != null)
+            bgmSource.Stop();
+
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.RestoreBgm();
+    }
+
+    /// <summary>
+    /// 어떤 경로로 꺼지든 전역 BGM 은 반드시 되돌린다.
+    /// 감쇠를 걸어 둔 채 이 게임이 사라지면 남은 판 내내 BGM 이 작은 채로 남는다.
+    /// </summary>
+    private void OnDisable()
+    {
+        StopBgm();
     }
 
     protected override void OnTimedStopAndReset()
     {
+        StopBgm();
+
         if (resolveRoutine != null)
         {
             StopCoroutine(resolveRoutine);
@@ -190,6 +254,9 @@ public class HackMiniGame : TimedMiniGame
             if (targetCamera != null && shakeDuration > 0f)
                 shakeRoutine = StartCoroutine(ShakeCameraRoutine());
         }
+
+        // 결과음(Aha / Hack_Fail)이 묻히지 않도록 배경음을 먼저 끊는다.
+        StopBgm();
 
         if (success)
             onClear.Invoke();
