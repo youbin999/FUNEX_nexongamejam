@@ -1911,8 +1911,8 @@ MonoBehaviour:
   resultAppearDuration: 0.3
   resultStartScale: 0.3
   failPresentDuration: 0.35
-  clearSfx: {fileID: 0}
-  failSfx: {fileID: 0}
+  clearSfx: {fileID: 8300000, guid: 5d66cbd0b11665d4e83769df1a8cfdbc, type: 3}
+  failSfx: {fileID: 8300000, guid: 8b7fd2566e4ccbe468380b2b4f3ef0ce, type: 3}
   onClear:
     m_PersistentCalls:
       m_Calls: []
