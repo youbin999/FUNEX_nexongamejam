@@ -39,8 +39,21 @@ public class SfxPlayer : MonoBehaviour
     [Tooltip("PlayStep 의 음 높이가 이만큼 오르면 더는 올라가지 않는다")]
     [SerializeField] private float stepPitchCap = 0.5f;
 
+    [Header("뒷정리")]
+    [Tooltip("이 오브젝트가 꺼질 때(미니게임이 끝나 풀로 돌아갈 때) 재생 중이던 소리를 멈춘다.\n" +
+        "소리는 씬을 넘어 사는 AudioManager 채널에서 나기 때문에, 켜두지 않으면 긴 클립이 다음 미니게임까지 이어진다")]
+    [SerializeField] private bool stopOnDisable;
+
+    [Tooltip("stopOnDisable 로 끌 때 이만큼 볼륨을 줄이며 끈다(초). 0이면 즉시 끊는다")]
+    [SerializeField] private float stopFadeDuration = 0.15f;
+
     // AudioManager 가 없을 때만 만들어 쓰는 대비책.
     private AudioSource fallbackSource;
+
+    // 마지막으로 재생시킨 채널과 그때 걸어둔 클립.
+    // 채널은 돌려 쓰이므로, 끌 때 클립까지 같은지 봐야 남의 소리를 죽이지 않는다.
+    private AudioSource activeSource;
+    private AudioClip activeClip;
 
     private float lastPlayTime = float.NegativeInfinity;
     private int lastIndex = -1;
@@ -50,6 +63,34 @@ public class SfxPlayer : MonoBehaviour
         // 프리팹이 풀에서 다시 꺼내질 때 지난 판의 간격 제한과 직전 클립 기록이 남지 않게 한다.
         lastPlayTime = float.NegativeInfinity;
         lastIndex = -1;
+    }
+
+    private void OnDisable()
+    {
+        if (stopOnDisable)
+            Stop();
+
+        activeSource = null;
+        activeClip = null;
+    }
+
+    /// <summary>
+    /// 이 컴포넌트가 마지막으로 재생시킨 소리를 멈춘다.
+    /// 인수가 없으므로 onClear / onFail 같은 UnityEvent 에 직접 연결해도 된다.
+    /// </summary>
+    public void Stop()
+    {
+        if (fallbackSource != null && fallbackSource.isPlaying)
+            fallbackSource.Stop();
+
+        if (activeSource == null || activeClip == null || activeSource.clip != activeClip)
+            return;
+
+        AudioManager manager = AudioManager.Instance;
+        if (manager != null)
+            manager.StopSfx(activeSource, stopFadeDuration);
+        else
+            activeSource.Stop();
     }
 
     /// <summary>
@@ -97,7 +138,8 @@ public class SfxPlayer : MonoBehaviour
         AudioManager manager = AudioManager.Instance;
         if (manager != null)
         {
-            manager.PlaySfx(clip, volume, finalPitch);
+            activeSource = manager.PlaySfx(clip, volume, finalPitch);
+            activeClip = activeSource != null ? clip : null;
             return;
         }
 
