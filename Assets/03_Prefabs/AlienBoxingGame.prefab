@@ -92,13 +92,37 @@ MonoBehaviour:
   cameraShakeMagnitude: 0.6
   onPunch:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8300000, guid: 50e257787c085694480d98503c6c3553, type: 3}
+        m_TargetAssemblyTypeName: UnityEngine.AudioClip, UnityEngine
+        m_MethodName: set_name
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: On Punch
+          m_BoolArgument: 0
+        m_CallState: 2
   onReset:
     m_PersistentCalls:
       m_Calls: []
   onClear:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8300000, guid: ba354fef30eaa0e439e7d6b6f55a2d9d, type: 3}
+        m_TargetAssemblyTypeName: UnityEngine.AudioClip, UnityEngine
+        m_MethodName: set_name
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: Clear
+          m_BoolArgument: 0
+        m_CallState: 2
   onFail:
     m_PersistentCalls:
       m_Calls: []
