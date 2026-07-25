@@ -26,27 +26,27 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _BarrelDistortion: 0.06
-    - _Brightness: 0.95
-    - _ChromaticAberration: 1
-    - _ColorBits: 5
-    - _Contrast: 1.15
+    - _BarrelDistortion: 0.082
+    - _Brightness: 1.22
+    - _ChromaticAberration: 0.44
+    - _ColorBits: 1.94
+    - _Contrast: 1.14
     - _Dither: 1
-    - _DitherScale: 1
-    - _DitherStrength: 1
+    - _DitherScale: 1.5
+    - _DitherStrength: 1.07
     - _FrameRate: 15
-    - _Intensity: 1
-    - _JitterAmount: 0.002
-    - _JitterDensity: 0.03
-    - _NoiseAmount: 0.05
-    - _PixelateAmount: 1
-    - _Saturation: 0.6
-    - _ScanlineIntensity: 0.12
-    - _TargetHeight: 240
-    - _TintStrength: 0.6
-    - _Vignette: 0.7
-    - _VignetteInner: 0.45
-    - _VignetteOuter: 1.05
+    - _Intensity: 0.278
+    - _JitterAmount: 0.0082
+    - _JitterDensity: 0.488
+    - _NoiseAmount: 0.196
+    - _PixelateAmount: 0.373
+    - _Saturation: 0
+    - _ScanlineIntensity: 0.163
+    - _TargetHeight: 706
+    - _TintStrength: 0
+    - _Vignette: 0
+    - _VignetteInner: 0
+    - _VignetteOuter: 1.5
     m_Colors:
     - _HighlightTint: {r: 1, g: 0.94, b: 0.8399999, a: 1}
     - _ShadowTint: {r: 0.23999995, g: 0.32999998, b: 0.45, a: 1}
