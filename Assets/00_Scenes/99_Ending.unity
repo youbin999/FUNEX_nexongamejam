@@ -1026,7 +1026,7 @@ MonoBehaviour:
   fastForwardMultiplier: 5
   epilogueDelay: 1
   imageFadeDuration: 2
-  narratorModel: gemini-3.6-flash
+  narratorModel: gemini-3.1-flash-lite
   narratorTimeout: 20
   imageProvider: 0
   imageModel: gemini-3.1-flash-image
