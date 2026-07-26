@@ -796,7 +796,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -278}
   m_SizeDelta: {x: 1024, y: 256}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &1830008057
@@ -959,11 +959,20 @@ MonoBehaviour:
   borderSpriteFadeDuration: 0.15
   borderTransitionDuration: 0.35
   transitionHoldDuration: 0.6
-  eraYearText: {fileID: 0}
+  eraTitleImage: {fileID: 0}
+  eraTitleSprites:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   eraTransitionExtraHoldDuration: 1.5
-  eraTextScrambleDurationPerCharacter: 0.12
-  eraTextScrambleInterval: 0.035
-  eraTextRandomCharacterPool: ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*?
+  eraTitleEnterDuration: 0.35
+  eraTitleExitDuration: 0.2
+  eraTitleStartScale: 0.72
+  eraTitleOvershootScale: 1.08
+  eraTitleExitScale: 0.9
 --- !u!4 &1962046308
 Transform:
   m_ObjectHideFlags: 0
@@ -999,6 +1008,8 @@ MonoBehaviour:
   transitionDuration: 0.25
   holdDuration: 0.75
   startScale: 0.8
+  descriptionOutlineWidth: 0.15
+  descriptionOutlineColor: {r: 0, g: 0, b: 0, a: 1}
 --- !u!1 &1989906138
 GameObject:
   m_ObjectHideFlags: 0
@@ -1076,7 +1087,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 100

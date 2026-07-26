@@ -1022,11 +1022,11 @@ MonoBehaviour:
   backgroundGroup: {fileID: 459776364}
   namePrompt: {fileID: 2072262255}
   leadInDuration: 3
-  scrollSpeed: 60
+  scrollSpeed: 120
   fastForwardMultiplier: 5
   epilogueDelay: 1
   imageFadeDuration: 2
-  narratorModel: gemini-3.6-flash
+  narratorModel: gemini-3.1-flash-lite
   narratorTimeout: 20
   imageProvider: 0
   imageModel: gemini-3.1-flash-image

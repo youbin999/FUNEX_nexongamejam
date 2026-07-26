@@ -523,8 +523,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DigMiniGame
   gameDescription: "\uD30C\uB77C!"
   keyboardGuides:
-  - actionLabel: 
-    keys: 25000000210000003f000000
+  - actionLabel: "\uCC9C\uCC9C\uD788!"
+    keys: 2500000021000000
   failurePenaltyPrefab: {fileID: 7412580364119003003, guid: 34877292998d1dc6479c14e5e2b35f71, type: 3}
   failureShakeDuration: 0.4
   failureShakeAmplitude: 0.35

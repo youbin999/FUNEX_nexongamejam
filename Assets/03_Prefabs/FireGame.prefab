@@ -217,7 +217,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FireMiniGame
   gameDescription: "\uD53C\uC6CC\uB77C!"
   keyboardGuides:
-  - actionLabel: 
+  - actionLabel: "\uB9E4\uC6B0 \uBE60\uB974\uAC8C!"
     keys: 01000000
   failurePenaltyPrefab: {fileID: 0}
   failureShakeDuration: 0.4
