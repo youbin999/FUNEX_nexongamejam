@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -71,22 +70,35 @@ public class MiniGamePlayer : MonoBehaviour
     [Tooltip("보더가 축소된 채로 대기하는 시간(초) — 게임 사이 쉬어가는 타임")]
     [SerializeField] private float transitionHoldDuration = 0.6f;
 
-    [Header("시대 전환 텍스트")]
-    [Tooltip("시대가 바뀔 때 연도 문구를 표시할 TextMeshPro 텍스트")]
-    [SerializeField] private TMP_Text eraYearText;
+    [Header("시대 전환 이미지")]
+    [Tooltip("시대가 바뀔 때 제목 스프라이트를 표시할 Image")]
+    [SerializeField] private Image eraTitleImage;
+
+    [Tooltip("석기시대부터 미래시대까지 순서대로 사용할 제목 스프라이트")]
+    [SerializeField] private Sprite[] eraTitleSprites = new Sprite[6];
 
     [Tooltip("시대 전환 시 보더가 축소된 상태로 추가 유지되는 시간(초)")]
     [SerializeField] private float eraTransitionExtraHoldDuration = 1.5f;
 
-    [Tooltip("각 글자가 무작위 문자로 변하다 원래 글자로 확정되기까지 걸리는 시간(초)")]
-    [SerializeField] private float eraTextScrambleDurationPerCharacter = 0.12f;
+    [Tooltip("시대 제목이 투명한 축소 상태에서 튀어 오르며 나타나는 시간(초)")]
+    [Min(0f)]
+    [SerializeField] private float eraTitleEnterDuration = 0.35f;
 
-    [Tooltip("현재 글자의 무작위 문자를 교체하는 간격(초). 0 이하면 매 프레임 교체한다")]
-    [SerializeField] private float eraTextScrambleInterval = 0.035f;
+    [Tooltip("시대 제목이 작아지며 사라지는 시간(초)")]
+    [Min(0f)]
+    [SerializeField] private float eraTitleExitDuration = 0.2f;
 
-    [Tooltip("글리치 애니메이션에 사용할 무작위 문자 목록")]
-    [SerializeField] private string eraTextRandomCharacterPool =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*?";
+    [Tooltip("등장 시작 시 제목 크기")]
+    [Range(0.1f, 1f)]
+    [SerializeField] private float eraTitleStartScale = 0.72f;
+
+    [Tooltip("등장 중 목표 크기를 살짝 넘어 튀어 오르는 정도")]
+    [Range(1f, 1.3f)]
+    [SerializeField] private float eraTitleOvershootScale = 1.08f;
+
+    [Tooltip("퇴장 끝에서 제목이 줄어드는 크기")]
+    [Range(0.1f, 1f)]
+    [SerializeField] private float eraTitleExitScale = 0.9f;
 
     // 프리팹 인덱스 -> 프리로드된 인스턴스.
     private readonly Dictionary<int, MiniGame> instances = new Dictionary<int, MiniGame>();
@@ -115,6 +127,7 @@ public class MiniGamePlayer : MonoBehaviour
     // GameBorder 의 "확대(평상시)" 기준값. Awake 시점에 씬에 세팅된 값을 그대로 캐시한다.
     private Vector2 borderExpandedAnchoredPosition;
     private Vector2 borderExpandedSizeDelta;
+    private Vector3 eraTitleBaseScale = Vector3.one;
 
     // GameBorder 의 "축소(테두리 노출)" 목표값. 사용자 스펙에 따라 0,0 으로 고정한다.
     private static readonly Vector2 BorderFramedAnchoredPosition = Vector2.zero;
@@ -143,7 +156,10 @@ public class MiniGamePlayer : MonoBehaviour
         if (gameBorderCanvasGroup == null && gameBorderImage != null)
             gameBorderCanvasGroup = gameBorderImage.GetComponent<CanvasGroup>();
 
-        HideEraYearTextImmediate();
+        if (eraTitleImage != null)
+            eraTitleBaseScale = eraTitleImage.rectTransform.localScale;
+
+        HideEraTitleImmediate();
 
         if (preloadOnAwake)
             Preload();
@@ -151,7 +167,7 @@ public class MiniGamePlayer : MonoBehaviour
 
     private void OnDisable()
     {
-        HideEraYearTextImmediate();
+        HideEraTitleImmediate();
         RestoreBorderOpacityImmediate();
     }
 
@@ -224,7 +240,7 @@ public class MiniGamePlayer : MonoBehaviour
     /// 이미 재생 중이거나 인덱스 범위 밖이면 false.
     /// 프리로드가 안 돼 있으면 먼저 프리로드한다(지연 로드 허용).
     /// </summary>
-    public bool PlayGame(int index, Sprite borderSprite = null, string eraYearLabel = null)
+    public bool PlayGame(int index, Sprite borderSprite = null, Era? era = null)
     {
         if (IsPlaying)
             return false;
@@ -243,7 +259,7 @@ public class MiniGamePlayer : MonoBehaviour
         // 재진입(중복 PlayGame 호출)을 막기 위함이다.
         Current = instance;
         transitionRoutine = StartCoroutine(
-            TransitionThenPlayRoutine(instance, borderSprite, eraYearLabel));
+            TransitionThenPlayRoutine(instance, borderSprite, era));
         return true;
     }
 
@@ -253,9 +269,9 @@ public class MiniGamePlayer : MonoBehaviour
     /// 각 단계는 관련 필드가 비어 있으면 건너뛴다.
     /// </summary>
     private IEnumerator TransitionThenPlayRoutine(
-        MiniGame instance, Sprite borderSprite, string eraYearLabel)
+        MiniGame instance, Sprite borderSprite, Era? era)
     {
-        HideEraYearTextImmediate();
+        HideEraTitleImmediate();
 
         if (pendingCleanup != null)
         {
@@ -278,11 +294,11 @@ public class MiniGamePlayer : MonoBehaviour
             BorderFramedAnchoredPosition, BorderFramedSizeDelta, borderTransitionDuration);
 
         if (borderSprite != null)
-            yield return PresentEraYearText(eraYearLabel);
+            yield return PresentEraTitle(era);
 
         yield return new WaitForSeconds(transitionHoldDuration);
 
-        HideEraYearTextImmediate();
+        HideEraTitleImmediate();
 
         yield return AnimateBorder(BorderFramedAnchoredPosition, BorderFramedSizeDelta,
             borderExpandedAnchoredPosition, borderExpandedSizeDelta, borderTransitionDuration);
@@ -389,101 +405,111 @@ public class MiniGamePlayer : MonoBehaviour
         gameBorderRect.sizeDelta = toSize;
     }
 
-    /// <summary>
-    /// 시대 연도 문구를 왼쪽부터 한 글자씩 해독되는 것처럼 표시한다.
-    /// 현재 글자는 무작위 문자로 빠르게 교체하다 원래 글자로 확정한다.
-    /// </summary>
-    private IEnumerator PresentEraYearText(string label)
+    /// <summary>시대에 대응하는 제목을 페이드와 스케일 팝 연출로 표시한다.</summary>
+    private IEnumerator PresentEraTitle(Era? era)
     {
-        float elapsed = 0f;
-        bool canAnimate = eraYearText != null && !string.IsNullOrWhiteSpace(label);
+        int spriteIndex = era.HasValue ? (int)era.Value - (int)Era.Prehistoric : -1;
+        bool canPresent = eraTitleImage != null &&
+            spriteIndex >= 0 && spriteIndex < eraTitleSprites.Length &&
+            eraTitleSprites[spriteIndex] != null;
 
-        if (canAnimate)
+        if (canPresent)
         {
-            eraYearText.gameObject.SetActive(true);
-            SetEraYearTextProgress(label, 0);
+            eraTitleImage.sprite = eraTitleSprites[spriteIndex];
+            eraTitleImage.preserveAspect = true;
+            SetEraTitleVisual(0f, eraTitleStartScale);
+            eraTitleImage.gameObject.SetActive(true);
 
-            for (int index = 0; index < label.Length; index++)
-            {
-                if (char.IsWhiteSpace(label[index]))
-                {
-                    SetEraYearTextProgress(label, index + 1);
-                    continue;
-                }
+            yield return AnimateEraTitleEnter();
 
-                float characterElapsed = 0f;
-                float nextScrambleTime = 0f;
+            float visibleHoldDuration = Mathf.Max(
+                0f, eraTransitionExtraHoldDuration - eraTitleEnterDuration - eraTitleExitDuration);
+            if (visibleHoldDuration > 0f)
+                yield return new WaitForSeconds(visibleHoldDuration);
 
-                while (characterElapsed < eraTextScrambleDurationPerCharacter)
-                {
-                    if (eraTextScrambleInterval <= 0f || characterElapsed >= nextScrambleTime)
-                    {
-                        eraYearText.text = BuildScrambledEraText(
-                            label, index, PickRandomEraCharacter());
-                        nextScrambleTime += Mathf.Max(eraTextScrambleInterval, 0f);
-                    }
+            yield return AnimateEraTitle(
+                1f, 0f, 1f, eraTitleExitScale, eraTitleExitDuration);
+        }
+        else if (era.HasValue)
+        {
+            Debug.LogWarning($"MiniGamePlayer: {era.Value} 시대 제목 스프라이트가 지정되지 않았습니다.", this);
+        }
+        else if (eraTransitionExtraHoldDuration > 0f)
+        {
+            yield return new WaitForSeconds(eraTransitionExtraHoldDuration);
+        }
+    }
 
-                    float deltaTime = Time.deltaTime;
-                    characterElapsed += deltaTime;
-                    elapsed += deltaTime;
-                    yield return null;
-                }
+    /// <summary>빠르게 커졌다가 살짝 되돌아오는 팝인 연출.</summary>
+    private IEnumerator AnimateEraTitleEnter()
+    {
+        float overshootDuration = eraTitleEnterDuration * 0.72f;
+        float settleDuration = eraTitleEnterDuration - overshootDuration;
 
-                SetEraYearTextProgress(label, index + 1);
-            }
+        yield return AnimateEraTitle(
+            0f, 1f, eraTitleStartScale, eraTitleOvershootScale, overshootDuration);
+        yield return AnimateEraTitle(
+            1f, 1f, eraTitleOvershootScale, 1f, settleDuration);
+    }
 
-            eraYearText.text = label;
+    /// <summary>시대 제목의 투명도와 크기를 동시에 보간한다.</summary>
+    private IEnumerator AnimateEraTitle(
+        float fromAlpha, float toAlpha, float fromScale, float toScale, float duration)
+    {
+        if (eraTitleImage == null)
+            yield break;
+
+        if (duration <= 0f)
+        {
+            SetEraTitleVisual(toAlpha, toScale);
+            yield break;
         }
 
-        float remainingHold = eraTransitionExtraHoldDuration - elapsed;
-        if (remainingHold > 0f)
-            yield return new WaitForSeconds(remainingHold);
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float ratio = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(elapsed / duration));
+            SetEraTitleVisual(
+                Mathf.Lerp(fromAlpha, toAlpha, ratio),
+                Mathf.Lerp(fromScale, toScale, ratio));
+            yield return null;
+        }
+
+        SetEraTitleVisual(toAlpha, toScale);
     }
 
-    /// <summary>현재까지 확정된 접두사만 표시한다.</summary>
-    private void SetEraYearTextProgress(string label, int confirmedCharacterCount)
+    /// <summary>이미지 RGB는 유지하면서 알파와 기준 크기 배율을 적용한다.</summary>
+    private void SetEraTitleVisual(float alpha, float scale)
     {
-        int confirmedCount = Mathf.Clamp(confirmedCharacterCount, 0, label.Length);
-        eraYearText.text = label.Substring(0, confirmedCount);
+        Color color = eraTitleImage.color;
+        color.a = alpha;
+        eraTitleImage.color = color;
+        eraTitleImage.rectTransform.localScale = eraTitleBaseScale * scale;
     }
 
-    /// <summary>확정된 글자와 현재 무작위 글자만 표시한다.</summary>
-    private static string BuildScrambledEraText(string label, int currentIndex, char randomCharacter)
+    /// <summary>시대 제목 이미지를 즉시 숨기고 초기화한다.</summary>
+    private void HideEraTitleImmediate()
     {
-        return label.Substring(0, currentIndex) + randomCharacter;
-    }
-
-    /// <summary>인스펙터에 지정된 풀에서 글리치용 문자를 하나 고른다.</summary>
-    private char PickRandomEraCharacter()
-    {
-        if (string.IsNullOrEmpty(eraTextRandomCharacterPool))
-            return '?';
-
-        int index = UnityEngine.Random.Range(0, eraTextRandomCharacterPool.Length);
-        return eraTextRandomCharacterPool[index];
-    }
-
-    /// <summary>시대 연도 텍스트를 즉시 숨기고 초기화한다.</summary>
-    private void HideEraYearTextImmediate()
-    {
-        if (eraYearText == null)
+        if (eraTitleImage == null)
             return;
 
-        eraYearText.text = string.Empty;
-        eraYearText.gameObject.SetActive(false);
+        eraTitleImage.sprite = null;
+        SetEraTitleVisual(0f, eraTitleStartScale);
+        eraTitleImage.gameObject.SetActive(false);
     }
 
     /// <summary>
     /// gamePrefabs 에 등록된 프리팹 에셋으로 게임을 재생한다. 내부적으로 인덱스를 찾아 PlayGame(int) 를 호출한다.
     /// 등록되지 않은 프리팹이면 false.
     /// </summary>
-    public bool PlayGame(MiniGame prefab, Sprite borderSprite = null, string eraYearLabel = null)
+    public bool PlayGame(MiniGame prefab, Sprite borderSprite = null, Era? era = null)
     {
         int index = gamePrefabs.IndexOf(prefab);
         if (index < 0)
             return false;
 
-        return PlayGame(index, borderSprite, eraYearLabel);
+        return PlayGame(index, borderSprite, era);
     }
 
     /// <summary>현재 게임을 강제로 중단·초기화하고 비활성화한다. (onGameFinished 는 발화하지 않는다)</summary>
@@ -497,7 +523,7 @@ public class MiniGamePlayer : MonoBehaviour
             transitionRoutine = null;
         }
 
-        HideEraYearTextImmediate();
+        HideEraTitleImmediate();
         RestoreBorderOpacityImmediate();
 
         if (introPresenter != null)

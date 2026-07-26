@@ -256,73 +256,6 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
---- !u!21 &175322310
-Material:
-  serializedVersion: 8
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: LiberationSans SDF Material (Instance)
-  m_Shader: {fileID: 4800000, guid: fe393ace9b354375a9cb14cdbbc28be4, type: 3}
-  m_Parent: {fileID: 0}
-  m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
-  m_LightmapFlags: 1
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_LockedProperties: 
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 28684132378477856, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Ints: []
-    m_Floats:
-    - _ColorMask: 15
-    - _CullMode: 0
-    - _FaceDilate: 0
-    - _GradientScale: 10
-    - _MaskSoftnessX: 0
-    - _MaskSoftnessY: 0
-    - _OutlineSoftness: 0
-    - _OutlineWidth: 0.18
-    - _PerspectiveFilter: 0.875
-    - _ScaleRatioA: 0.9
-    - _ScaleRatioB: 1
-    - _ScaleRatioC: 0.73125
-    - _ScaleX: 1
-    - _ScaleY: 1
-    - _ShaderFlags: 0
-    - _Sharpness: 0
-    - _Stencil: 0
-    - _StencilComp: 8
-    - _StencilOp: 0
-    - _StencilReadMask: 255
-    - _StencilWriteMask: 255
-    - _TextureHeight: 1024
-    - _TextureWidth: 1024
-    - _UnderlayDilate: 0
-    - _UnderlayOffsetX: 0
-    - _UnderlayOffsetY: 0
-    - _UnderlaySoftness: 0
-    - _VertexOffsetX: 0
-    - _VertexOffsetY: 0
-    - _WeightBold: 0.75
-    - _WeightNormal: 0
-    m_Colors:
-    - _ClipRect: {r: -32767, g: -32767, b: 32767, a: 32767}
-    - _FaceColor: {r: 1, g: 1, b: 1, a: 1}
-    - _OutlineColor: {r: 0, g: 0, b: 0, a: 0.9019608}
-    - _UnderlayColor: {r: 0, g: 0, b: 0, a: 0.5}
-  m_BuildTextureStacks: []
-  m_AllowLocking: 1
 --- !u!1 &700000001
 GameObject:
   m_ObjectHideFlags: 0
@@ -387,11 +320,20 @@ MonoBehaviour:
   borderSpriteFadeDuration: 0.15
   borderTransitionDuration: 0.35
   transitionHoldDuration: 0.6
-  eraYearText: {fileID: 1578787885}
+  eraTitleImage: {fileID: 1578787887}
+  eraTitleSprites:
+  - {fileID: 21300000, guid: f342e6aa5d359534b9c28908358ab97a, type: 3}
+  - {fileID: 21300000, guid: 4b79e40ac642ac14e8b684193b4d945f, type: 3}
+  - {fileID: 21300000, guid: abe7b9931d5cacb4cb5be7fa600443b9, type: 3}
+  - {fileID: 21300000, guid: 8b9ab2e46ff8b404babb9bf64e7ec0b7, type: 3}
+  - {fileID: 21300000, guid: 5b9c26ea7a523684b96f5ecb067d18a9, type: 3}
+  - {fileID: 21300000, guid: ace6f32218c31dc4ea468edbf51a7663, type: 3}
   eraTransitionExtraHoldDuration: 1.5
-  eraTextScrambleDurationPerCharacter: 0.12
-  eraTextScrambleInterval: 0.035
-  eraTextRandomCharacterPool: ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*?
+  eraTitleEnterDuration: 0.35
+  eraTitleExitDuration: 0.2
+  eraTitleStartScale: 0.72
+  eraTitleOvershootScale: 1.08
+  eraTitleExitScale: 1
 --- !u!114 &700000004
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -494,7 +436,6 @@ MonoBehaviour:
     kind: 1
     era: 1
     borderSprite: {fileID: 21300000, guid: 593a65498821e214ab53f9e91968141c, type: 3}
-    eraYearText: "\uC11D\uAE30\uC2DC\uB300"
     eventLabel: "\uACE0\uC778\uB3CC \uB9CC\uB4E4\uAE30"
     successMeaning: "\uB108\uC758 \uC138\uACC4\uB294 \uACE0\uC778\uB3CC \uC720\uC801\uC9C0\uAC00
       \uAD00\uAD11\uC790\uC6D0\uC73C\uB85C \uD65C\uBC1C\uD788 \uC0AC\uC6A9\uB418\uACE0
@@ -508,7 +449,6 @@ MonoBehaviour:
     kind: 1
     era: 1
     borderSprite: {fileID: 0}
-    eraYearText: 
     eventLabel: 
     successMeaning: "\uD55C\uB54C \uAE30\uC6B0\uC81C\uB97C \uC704\uC2DC\uD55C \uC0E4\uBA38\uB2C8\uC998\uC774
       \uC720\uD589\uD558\uC600\uB2E4."
@@ -521,7 +461,6 @@ MonoBehaviour:
     kind: 2
     era: 1
     borderSprite: {fileID: 0}
-    eraYearText: 
     eventLabel: "\uBD88\uC744 \uBC1C\uACAC\uD558\uB2E4"
     successMeaning: 
     failureMeaning: "\uC778\uB958\uB294 \uC601\uC601 \uBD88\uC744 \uBC1C\uACAC\uD558\uC9C0
@@ -533,7 +472,6 @@ MonoBehaviour:
     kind: 1
     era: 2
     borderSprite: {fileID: 21300000, guid: 74eaa5d12046003439fb8d2225b9e40c, type: 3}
-    eraYearText: "\uCCAD\uB3D9\uAE30 \uC2DC\uB300"
     eventLabel: 
     successMeaning: "\uBD80\uB825\uC744 \uBC1C\uACAC\uD558\uC5EC \uD574\uC0C1 \uC601\uC5ED\uC73C\uB85C
       \uC778\uAC04\uC774 \uC9C4\uCD9C\uD588\uB2E4."
@@ -546,7 +484,6 @@ MonoBehaviour:
     kind: 2
     era: 2
     borderSprite: {fileID: 0}
-    eraYearText: 
     eventLabel: "\uC0C1\uD615 \uBB38\uC790\uC758 \uBC1C\uBA85"
     successMeaning: 
     failureMeaning: "\uC778\uB958\uB294 \uC601\uC601 \uBB38\uC790\uB97C \uBC1C\uBA85\uD558\uC9C0
@@ -559,7 +496,6 @@ MonoBehaviour:
     kind: 2
     era: 2
     borderSprite: {fileID: 0}
-    eraYearText: 
     eventLabel: "\uCCAD\uB3D9\uC758 \uD65C\uC6A9"
     successMeaning: 
     failureMeaning: "\uC778\uB958\uB294 \uCCAD\uB3D9\uC744 \uD65C\uC6A9\uD558\uC9C0
@@ -571,7 +507,6 @@ MonoBehaviour:
     kind: 1
     era: 3
     borderSprite: {fileID: 21300000, guid: 7827973d7db50d04ab783518ed8b9b3b, type: 3}
-    eraYearText: "\uC911\uC138 \uC2DC\uB300"
     eventLabel: "\uB9C8\uB140\uC0AC\uB0E5"
     successMeaning: "\uB9C8\uB140\uC0AC\uB0E5\uC774 \uC131\uD589\uD588\uB2E4."
     failureMeaning: "\uB9C8\uB140\uC0AC\uB0E5\uC73C\uB85C \uC5B5\uC6B8\uD55C \uD76C\uC0DD\uC591\uC774
@@ -583,7 +518,6 @@ MonoBehaviour:
     kind: 0
     era: 3
     borderSprite: {fileID: 0}
-    eraYearText: 
     eventLabel: 
     successMeaning: 
     failureMeaning: 
@@ -594,7 +528,6 @@ MonoBehaviour:
     kind: 0
     era: 3
     borderSprite: {fileID: 0}
-    eraYearText: 
     eventLabel: 
     successMeaning: 
     failureMeaning: 
@@ -605,7 +538,6 @@ MonoBehaviour:
     kind: 2
     era: 3
     borderSprite: {fileID: 0}
-    eraYearText: 
     eventLabel: "\uC99D\uAE30 \uAE30\uAD00\uC758 \uBC1C\uBA85"
     successMeaning: 
     failureMeaning: "\uC99D\uAE30 \uAE30\uAD00\uC744 \uBC1C\uBA85\uD558\uC9C0 \uBABB\uD574
@@ -617,7 +549,6 @@ MonoBehaviour:
     kind: 1
     era: 4
     borderSprite: {fileID: 21300000, guid: 25322d51181498745be0f4cb9ccb3611, type: 3}
-    eraYearText: "\uADFC\uB300 \uC2DC\uB300"
     eventLabel: 
     successMeaning: "\uCE90\uB9AC\uC5B4\uAC00 \uC5D0\uC5B4\uCEE8\uC744 \uBC1C\uBA85\uD588\uB2E4."
     failureMeaning: "\uCE90\uB9AC\uC5B4\uAC00 \uC5D0\uC5B4\uCEE8\uC758 \uD544\uC694\uC131\uC744
@@ -630,7 +561,6 @@ MonoBehaviour:
     kind: 0
     era: 4
     borderSprite: {fileID: 0}
-    eraYearText: 
     eventLabel: 
     successMeaning: 
     failureMeaning: 
@@ -641,7 +571,6 @@ MonoBehaviour:
     kind: 1
     era: 4
     borderSprite: {fileID: 0}
-    eraYearText: 
     eventLabel: 
     successMeaning: "\uD398\uB2C8\uC2E4\uB9B0\uC758 \uBC1C\uBA85\uC73C\uB85C \uD604\uB300
       \uC758\uD559\uC774 \uBC1C\uC804\uD560 \uC218 \uC788\uC5C8\uB2E4."
@@ -654,7 +583,6 @@ MonoBehaviour:
     kind: 2
     era: 4
     borderSprite: {fileID: 0}
-    eraYearText: 
     eventLabel: "\uC804\uAD6C\uC758 \uBC1C\uBA85"
     successMeaning: 
     failureMeaning: "\uC804\uAD6C\uB97C \uBC1C\uBA85\uD558\uC9C0 \uBABB\uD574 \uC778\uB958\uB294
@@ -666,7 +594,6 @@ MonoBehaviour:
     kind: 1
     era: 5
     borderSprite: {fileID: 21300000, guid: 7d1664222bd094e44b0a119186329ddb, type: 3}
-    eraYearText: "\uD604\uB300 \uC2DC\uB300"
     eventLabel: 
     successMeaning: "\uB125\uC2A8 \uC804\uC790\uC758 \uC8FC\uAC00\uAC00 \uBC31\uB9CC\uC6D0\uC744
       \uCC0D\uC5C8\uB2E4."
@@ -679,7 +606,6 @@ MonoBehaviour:
     kind: 2
     era: 5
     borderSprite: {fileID: 0}
-    eraYearText: 
     eventLabel: "\uD575\uC804\uC7C1 \uBC1C\uBC1C"
     successMeaning: 
     failureMeaning: "\uC778\uB958\uB294 \uC138\uACC4 \uD575\uC804\uC7C1\uC73C\uB85C
@@ -691,7 +617,6 @@ MonoBehaviour:
     kind: 1
     era: 6
     borderSprite: {fileID: -8945467959818111224, guid: 188115b7c96669846b360eec57dac7f7, type: 3}
-    eraYearText: "\uBBF8\uB798 \uC2DC\uB300"
     eventLabel: "\uC678\uACC4\uC778\uACFC\uC758 \uBCF5\uC2F1"
     successMeaning: "\uC678\uACC4\uC778\uACFC 1:1 \uC57C\uCC28\uC5D0\uC11C \uC2B9\uB9AC\uD558\uC5EC
       \uD3C9\uD654\uB86D\uAC8C \uACF5\uC874\uD558\uC600\uB2E4."
@@ -705,7 +630,6 @@ MonoBehaviour:
     kind: 0
     era: 6
     borderSprite: {fileID: 0}
-    eraYearText: 
     eventLabel: 
     successMeaning: 
     failureMeaning: 
@@ -716,7 +640,6 @@ MonoBehaviour:
     kind: 1
     era: 6
     borderSprite: {fileID: 0}
-    eraYearText: 
     eventLabel: 
     successMeaning: "\uC9C0\uAD6C \uC4F0\uB808\uAE30\uB97C \uC131\uACF5\uC801\uC73C\uB85C
       \uC6B0\uC8FC\uC5D0 \uBC84\uB838\uB2E4."
@@ -1188,14 +1111,14 @@ GameObject:
   m_Component:
   - component: {fileID: 1578787884}
   - component: {fileID: 1578787886}
-  - component: {fileID: 1578787885}
+  - component: {fileID: 1578787887}
   m_Layer: 5
-  m_Name: EraYearText
+  m_Name: EraTitleImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1578787884
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1205,8 +1128,8 @@ RectTransform:
   m_GameObject: {fileID: 1578787883}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1.36, y: 1.36, z: 1.36}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 2047684450}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1215,98 +1138,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 1024, y: 256}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1578787885
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1578787883}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_text: 
-  m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 2ffcc6a664dbc7946bcc2c6e3f509000, type: 2}
-  m_sharedMaterial: {fileID: 3280642254698710165, guid: 2ffcc6a664dbc7946bcc2c6e3f509000, type: 2}
-  m_fontSharedMaterials: []
-  m_fontMaterial: {fileID: 175322310}
-  m_fontMaterials: []
-  m_fontColor32:
-    serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
-  m_enableVertexGradient: 0
-  m_colorMode: 3
-  m_fontColorGradient:
-    topLeft: {r: 1, g: 1, b: 1, a: 1}
-    topRight: {r: 1, g: 1, b: 1, a: 1}
-    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
-    bottomRight: {r: 1, g: 1, b: 1, a: 1}
-  m_fontColorGradientPreset: {fileID: 0}
-  m_spriteAsset: {fileID: 0}
-  m_tintAllSprites: 0
-  m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: -1183493901
-  m_overrideHtmlColors: 0
-  m_faceColor:
-    serializedVersion: 2
-    rgba: 4294967295
-  m_fontSize: 96
-  m_fontSizeBase: 96
-  m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
-  m_fontStyle: 1
-  m_HorizontalAlignment: 2
-  m_VerticalAlignment: 512
-  m_textAlignment: 65535
-  m_characterSpacing: 0
-  m_characterHorizontalScale: 1
-  m_wordSpacing: 0
-  m_lineSpacing: 0
-  m_lineSpacingMax: 0
-  m_paragraphSpacing: 0
-  m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 0
-  m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
-  m_linkedTextComponent: {fileID: 0}
-  parentLinkedComponent: {fileID: 0}
-  m_enableKerning: 0
-  m_ActiveFontFeatures: 6e72656b
-  m_enableExtraPadding: 0
-  checkPaddingRequired: 0
-  m_isRichText: 1
-  m_EmojiFallbackSupport: 1
-  m_parseCtrlCharacters: 1
-  m_isOrthographic: 1
-  m_isCullingEnabled: 0
-  m_horizontalMapping: 0
-  m_verticalMapping: 0
-  m_uvLineOffset: 0
-  m_geometrySortingOrder: 0
-  m_IsTextObjectScaleStatic: 0
-  m_VertexBufferAutoSizeReduction: 0
-  m_useMaxVisibleDescender: 1
-  m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
-  m_isUsingLegacyAnimationComponent: 0
-  m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
-  m_baseMaterial: {fileID: 0}
-  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &1578787886
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1315,6 +1146,36 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1578787883}
   m_CullTransparentMesh: 1
+--- !u!114 &1578787887
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1578787883}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 1
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &1630025800
 GameObject:
   m_ObjectHideFlags: 0
@@ -1350,7 +1211,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -43.2, y: -0.5}
+  m_AnchoredPosition: {x: -43.19995, y: -0.5}
   m_SizeDelta: {x: 772.9373, y: 545.9241}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1630025802
