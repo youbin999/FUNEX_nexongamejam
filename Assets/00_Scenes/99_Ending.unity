@@ -1022,7 +1022,7 @@ MonoBehaviour:
   backgroundGroup: {fileID: 459776364}
   namePrompt: {fileID: 2072262255}
   leadInDuration: 3
-  scrollSpeed: 60
+  scrollSpeed: 120
   fastForwardMultiplier: 5
   epilogueDelay: 1
   imageFadeDuration: 2

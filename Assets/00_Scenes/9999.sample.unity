@@ -365,7 +365,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MiniGamePlayer
   gamePrefabs:
-  - {fileID: 4657186777680439362, guid: 6e7c95e72c6956141abad54d4c53d242, type: 3}
+  - {fileID: 1870836362585978639, guid: 8e988c43d299d9a4d9f90a75d3398e97, type: 3}
   preloadOnAwake: 1
   playFirstOnStart: 1
   onGameFinished:
@@ -382,11 +382,20 @@ MonoBehaviour:
   borderSpriteFadeDuration: 0.15
   borderTransitionDuration: 0.35
   transitionHoldDuration: 0.6
-  eraYearText: {fileID: 0}
+  eraTitleImage: {fileID: 0}
+  eraTitleSprites:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   eraTransitionExtraHoldDuration: 1.5
-  eraTextScrambleDurationPerCharacter: 0.12
-  eraTextScrambleInterval: 0.035
-  eraTextRandomCharacterPool: ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*?
+  eraTitleEnterDuration: 0.35
+  eraTitleExitDuration: 0.2
+  eraTitleStartScale: 0.72
+  eraTitleOvershootScale: 1.08
+  eraTitleExitScale: 0.9
 --- !u!4 &1947669444
 Transform:
   m_ObjectHideFlags: 0

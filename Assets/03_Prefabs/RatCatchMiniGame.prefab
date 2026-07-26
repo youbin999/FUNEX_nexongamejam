@@ -162,7 +162,7 @@ MonoBehaviour:
   - {fileID: 6435551993725121504}
   - {fileID: 2812754050552576752}
   - {fileID: 2791685957589257011}
-  moveSpeed: 5
+  moveSpeed: 6
   handAreaHalfSize: {x: 7, y: 3.4}
   catchRadius: 1.1
   spawnInterval: 0.7
