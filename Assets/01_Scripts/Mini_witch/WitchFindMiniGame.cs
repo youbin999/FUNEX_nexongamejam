@@ -46,6 +46,8 @@ public class WitchFindMiniGame : TimedMiniGame
 
     public UnityEvent onClear;
     public UnityEvent onFail;
+    [Tooltip("일반 여성을 잘못 선택했을 때 발생한다.")]
+    public UnityEvent onWrongSelection;
 
     private readonly List<int> witchIndices = new List<int>();
     private bool[] marked = Array.Empty<bool>();
@@ -208,7 +210,7 @@ public class WitchFindMiniGame : TimedMiniGame
             state = State.Failed;
             // 잘못 고른 얼굴이 푸른 귀신이 되어 다음 미니게임까지 따라다닌다.
             WitchGhostPenaltyRequest.Set(cells[index] != null ? cells[index].CurrentFace : null, true);
-            onFail.Invoke();
+            onWrongSelection.Invoke();
             FailImmediately();
         }
     }

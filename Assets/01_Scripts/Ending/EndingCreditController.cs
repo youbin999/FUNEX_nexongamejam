@@ -15,7 +15,7 @@ using UnityEngine.UI;
 ///                      │
 ///   대본 도착 → 크레딧 롤 시작 ─┬─ (병렬) 이미지 생성 → 도착 시 배경에 페이드인
 ///                              │
-///   롤 종료 → 에필로그 표시 → (이미지 합류) → 이름 입력 탭 → 갤러리 저장 → onCreditsFinished → 갤러리 씬
+///   롤 종료 → 에필로그 표시 및 계속 버튼 대기 → (이미지 합류) → 이름 입력 탭 → 갤러리 저장 → onCreditsFinished → 갤러리 씬
 ///
 /// 이미지가 0초에 있을 필요가 없다는 점을 이용해, 생성 지연을 롤 시간에 흡수시킨다.
 /// 다만 갤러리에는 텍스트와 이미지가 한 쌍으로 들어가야 하므로, 저장 직전에 이미지 쪽을 합류시킨다.
@@ -33,6 +33,9 @@ public class EndingCreditController : MonoBehaviour
 
     [Tooltip("롤이 끝난 뒤 화면 중앙에 표시할 마무리 문장")]
     [SerializeField] private TMP_Text epilogueText;
+
+    [Tooltip("에필로그를 닫는 계속 버튼 오브젝트. OnClick 에 ContinueFromEpilogue 를 연결한다")]
+    [SerializeField] private GameObject epilogueContinueButton;
 
     [Tooltip("엔딩 이미지를 표시할 RawImage")]
     [SerializeField] private RawImage backgroundImage;
@@ -98,6 +101,8 @@ public class EndingCreditController : MonoBehaviour
     /// <summary>생성에 성공한 엔딩 이미지. 갤러리 저장에 그대로 쓴다. 실패했으면 null.</summary>
     private Texture2D endingImage;
 
+    private bool isWaitingForEpilogueContinue;
+
     private void Start()
     {
         StartCoroutine(RunEndingRoutine());
@@ -128,6 +133,7 @@ public class EndingCreditController : MonoBehaviour
 
         yield return WaitSkippable(epilogueDelay);
         ShowEpilogue(script.epilogue);
+        yield return WaitForEpilogueContinueRoutine();
 
         // 롤이 짧았거나 생성이 느렸으면 이미지가 아직 안 떠 있을 수 있다.
         // 갤러리에는 텍스트와 이미지가 한 쌍으로 들어가야 하므로 여기서 합류시킨다.
@@ -177,10 +183,18 @@ public class EndingCreditController : MonoBehaviour
     private void PrepareInitialState()
     {
         if (creditText != null)
+        {
+            creditText.gameObject.SetActive(true);
             creditText.text = string.Empty;
+        }
 
         if (epilogueText != null)
             epilogueText.gameObject.SetActive(false);
+
+        if (epilogueContinueButton != null)
+            epilogueContinueButton.SetActive(false);
+
+        isWaitingForEpilogueContinue = false;
 
         if (backgroundGroup != null)
             backgroundGroup.alpha = 0f;
@@ -354,7 +368,41 @@ public class EndingCreditController : MonoBehaviour
         if (epilogueText == null || string.IsNullOrWhiteSpace(epilogue))
             return;
 
+        if (creditText != null)
+            creditText.gameObject.SetActive(false);
+
         epilogueText.text = epilogue;
         epilogueText.gameObject.SetActive(true);
+    }
+
+    /// <summary>
+    /// 에필로그의 계속 버튼 OnClick 에서 호출한다.
+    /// 엔딩 롤 빨리감기 입력으로는 호출되지 않는다.
+    /// </summary>
+    public void ContinueFromEpilogue()
+    {
+        if (!isWaitingForEpilogueContinue)
+            return;
+
+        isWaitingForEpilogueContinue = false;
+    }
+
+    /// <summary>에필로그를 표시한 뒤 계속 버튼이 눌릴 때까지 기다린다.</summary>
+    private IEnumerator WaitForEpilogueContinueRoutine()
+    {
+        isWaitingForEpilogueContinue = true;
+
+        if (epilogueContinueButton != null)
+            epilogueContinueButton.SetActive(true);
+        else
+            Debug.LogWarning("EndingCreditController: epilogueContinueButton 이 연결되지 않아 에필로그를 진행할 수 없습니다.");
+
+        yield return new WaitUntil(() => !isWaitingForEpilogueContinue);
+
+        if (epilogueContinueButton != null)
+            epilogueContinueButton.SetActive(false);
+
+        if (epilogueText != null)
+            epilogueText.gameObject.SetActive(false);
     }
 }
