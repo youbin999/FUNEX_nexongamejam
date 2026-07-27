@@ -590,9 +590,7 @@ MonoBehaviour:
   gameDescription: "\uB0A9\uCE58\uD574\uB77C!"
   keyboardGuides:
   - actionLabel: 
-    keys: 0f00000012000000
-  - actionLabel: 
-    keys: 01000000
+    keys: 0f0000001200000001000000
   failurePenaltyPrefab: {fileID: 0}
   failureShakeDuration: 0.4
   failureShakeAmplitude: 0.35
