@@ -120,6 +120,7 @@ public class SpannerMiniGame : MiniGame
     /// <summary>0에서 1로 차오르는 타이머 값.</summary>
     public override float TimerRatio => timeLimit > 0f ? Mathf.Clamp01(elapsed / timeLimit) : 0f;
 
+    /// <summary>카메라와 드래그 판정 필터를 준비하고 게이지를 0으로 비운다.</summary>
     private void Awake()
     {
         if (targetCamera == null)
@@ -135,6 +136,7 @@ public class SpannerMiniGame : MiniGame
         onTimerChanged.Invoke(0f);
     }
 
+    /// <summary>제한 시간을 흘린 뒤 드래그를 처리한다. 시간이 다 되면 조작을 받지 않는다.</summary>
     private void Update()
     {
         if (state != State.Playing)
@@ -184,6 +186,7 @@ public class SpannerMiniGame : MiniGame
         lockedDirection = 0;
     }
 
+    /// <summary>제한 시간을 흘리고 게이지를 갱신한다. 다 쓰면 실패로 끝낸다.</summary>
     private void TickTimer()
     {
         elapsed += Time.deltaTime;
@@ -198,6 +201,7 @@ public class SpannerMiniGame : MiniGame
         ReportFinished(false);
     }
 
+    /// <summary>잡은 지점을 기준으로 돌린 각도를 계산한다. 손을 떼면 다음 접점을 새 기준으로 삼는다.</summary>
     private void HandleDrag()
     {
         if (targetCamera == null)
@@ -333,6 +337,7 @@ public class SpannerMiniGame : MiniGame
         return false;
     }
 
+    /// <summary>그 월드 좌표에 잡을 수 있는 콜라이더가 있는지.</summary>
     private bool IsOnGrabbable(Vector2 worldPosition)
     {
         return Physics2D.OverlapPoint(worldPosition, filter, hitBuffer) > 0;

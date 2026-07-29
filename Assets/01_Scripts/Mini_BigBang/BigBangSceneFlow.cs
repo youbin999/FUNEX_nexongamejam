@@ -26,24 +26,34 @@ public class BigBangSceneFlow : MonoBehaviour
 
     private bool handled;
 
+
+    // ── 수명주기 ──
+
+    /// <summary>미니게임 종료 통지를 구독한다.</summary>
     private void OnEnable()
     {
         if (player != null)
             player.onGameFinished.AddListener(OnGameFinished);
     }
 
+    /// <summary>미니게임 종료 통지 구독을 해제한다.</summary>
     private void OnDisable()
     {
         if (player != null)
             player.onGameFinished.RemoveListener(OnGameFinished);
     }
 
+    /// <summary>실패 UI 를 감춘 상태로 시작한다.</summary>
     private void Start()
     {
         if (failUI != null)
             failUI.SetActive(false);
     }
 
+
+    // ── 결과 분기 ──
+
+    /// <summary>성공이면 타이틀로 넘어가고, 실패면 실패 UI 를 띄운 뒤 게임을 종료한다.</summary>
     private void OnGameFinished(MiniGame instance, bool success)
     {
         // 종료 통지는 한 번뿐이지만, 씬 전환/종료는 되돌릴 수 없으니 한 번만 타도록 막아 둔다.
@@ -67,12 +77,14 @@ public class BigBangSceneFlow : MonoBehaviour
             Quit();
     }
 
+    /// <summary>실패 UI 를 잠깐 보여준 뒤 종료한다.</summary>
     private IEnumerator QuitAfterDelay()
     {
         yield return new WaitForSecondsRealtime(quitDelay);
         Quit();
     }
 
+    /// <summary>게임을 종료한다. 에디터에서는 플레이 모드를 끈다.</summary>
     private void Quit()
     {
 #if UNITY_EDITOR

@@ -47,18 +47,24 @@ public abstract class TimedMiniGame : MiniGame
     /// </summary>
     protected virtual bool IsSuccessPresentationDone => true;
 
+
+    // ── 수명주기 ──
+
+    /// <summary>타이머를 0으로 초기화한 뒤 파생 클래스의 시작 훅을 부른다.</summary>
     protected sealed override void OnPlay()
     {
         ResetTimer();
         OnTimedPlay();
     }
 
+    /// <summary>타이머를 0으로 되돌린 뒤 파생 클래스의 초기화 훅을 부른다.</summary>
     protected sealed override void OnStopAndReset()
     {
         ResetTimer();
         OnTimedStopAndReset();
     }
 
+    /// <summary>경과 시간과 결과 확정 플래그를 초기 상태로 되돌리고 게이지를 0으로 통지한다.</summary>
     private void ResetTimer()
     {
         elapsed = 0f;
@@ -67,6 +73,12 @@ public abstract class TimedMiniGame : MiniGame
         onTimerChanged.Invoke(0f);
     }
 
+    /// <summary>
+    /// 제한 시간을 흘리고 결과를 판정한다.
+    /// - 시간은 결과 확정 여부와 무관하게 항상 흐른다
+    /// - 성공 대기 중: 시간이 다 차고 연출도 끝났을 때만 통지
+    /// - 시간 초과: 실패로 확정하고 <see cref="OnTimeUp"/> 호출
+    /// </summary>
     private void Update()
     {
         if (!IsPlaying)
@@ -96,6 +108,9 @@ public abstract class TimedMiniGame : MiniGame
         OnTimedUpdate();
     }
 
+
+    // ── 파생 클래스 훅 ──
+
     /// <summary>파생 클래스의 재생 시작 처리. 호출 시점에 타이머는 이미 0으로 초기화돼 있다.</summary>
     protected abstract void OnTimedPlay();
 
@@ -113,6 +128,9 @@ public abstract class TimedMiniGame : MiniGame
     {
         ReportFinished(false);
     }
+
+
+    // ── 결과 확정 (파생 클래스가 호출) ──
 
     /// <summary>
     /// 잘못된 조작으로 즉시 실패시킨다. 남은 시간과 무관하게 바로 끝난다(와리오웨어 스타일).

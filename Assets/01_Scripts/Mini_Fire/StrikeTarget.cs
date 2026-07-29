@@ -33,6 +33,7 @@ public class StrikeTarget : MonoBehaviour
     private Vector3 restScale;
     private Coroutine running;
 
+    /// <summary>기준 자세를 기억하고 튕겨나갈 방향을 정규화해 둔다.</summary>
     private void Awake()
     {
         restPosition = transform.localPosition;
@@ -68,6 +69,7 @@ public class StrikeTarget : MonoBehaviour
         transform.localScale = restScale;
     }
 
+    /// <summary>맞은 자세(밀림·눌림·기울기)를 즉시 잡았다가 원래 자세로 돌아온다.</summary>
     private IEnumerator HitRoutine()
     {
         Vector3 knockedPosition = restPosition + (Vector3)(knockDirection * knockDistance);
@@ -94,6 +96,7 @@ public class StrikeTarget : MonoBehaviour
         running = null;
     }
 
+    /// <summary>현재 자세에서 목표 자세까지 위치·회전·크기를 함께 보간한다.</summary>
     private IEnumerator MoveRoutine(Vector3 toPos, Quaternion toRot, Vector3 toScale, float duration, AnimationCurve ease)
     {
         Vector3 fromPos = transform.localPosition;

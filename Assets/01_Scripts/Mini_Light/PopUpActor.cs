@@ -44,6 +44,7 @@ public class PopUpActor : MonoBehaviour
     private bool cached;
     private Coroutine running;
 
+    /// <summary>배치된 자리와 크기를 기억해 둔다. 팝업은 여기서부터 계산한다.</summary>
     private void Awake()
     {
         CacheRest();
@@ -90,6 +91,7 @@ public class PopUpActor : MonoBehaviour
         transform.localPosition = restPosition;
     }
 
+    /// <summary>지연 뒤 위로 솟아올라 잠시 머물렀다가 다시 내려간다.</summary>
     private IEnumerator PopRoutine()
     {
         if (delay > 0f)
@@ -109,6 +111,7 @@ public class PopUpActor : MonoBehaviour
         running = null;
     }
 
+    /// <summary>두 지점 사이를 이징 곡선으로 옮긴다. 곡선이 1을 넘는 구간도 살린다.</summary>
     private IEnumerator MoveRoutine(Vector3 from, Vector3 to, float duration, AnimationCurve ease)
     {
         if (duration > 0f)

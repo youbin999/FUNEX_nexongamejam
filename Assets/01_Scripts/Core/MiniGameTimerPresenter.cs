@@ -33,6 +33,10 @@ public class MiniGameTimerPresenter : MonoBehaviour
     [Tooltip("나타나고 사라지는 데 걸리는 시간(초). 0이면 즉시 전환")]
     [SerializeField] private float fadeDuration = 0.15f;
 
+
+    // ── 수명주기 ──
+
+    /// <summary>플레이어 참조를 확보하고 게이지를 감춘 상태로 시작한다.</summary>
     private void Awake()
     {
         if (player == null)
@@ -46,6 +50,7 @@ public class MiniGameTimerPresenter : MonoBehaviour
             canvasGroup.alpha = 0f;
     }
 
+    /// <summary>재생 중인 게임의 진행도를 읽어 게이지에 반영하고 표시 여부를 갱신한다.</summary>
     private void Update()
     {
         MiniGame game = player != null ? player.Current : null;
@@ -60,6 +65,10 @@ public class MiniGameTimerPresenter : MonoBehaviour
         ApplyVisibility(show);
     }
 
+
+    // ── 표시 전환 ──
+
+    /// <summary>타이머 UI를 목표 투명도로 서서히 전환한다. 연출 시간이 0이면 즉시 적용한다.</summary>
     private void ApplyVisibility(bool show)
     {
         if (canvasGroup == null)

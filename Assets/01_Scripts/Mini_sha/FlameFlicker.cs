@@ -36,6 +36,7 @@ public class FlameFlicker : MonoBehaviour
     // 개체마다 다른 흐름을 타게 하는 값. 없으면 불 세 개가 한 몸처럼 똑같이 흔들린다.
     private float seed;
 
+    /// <summary>원래 자세를 기억해 둔다.</summary>
     private void Awake()
     {
         CacheRest();
@@ -66,6 +67,7 @@ public class FlameFlicker : MonoBehaviour
         transform.localRotation = restRotation;
     }
 
+    /// <summary>축마다 어긋난 노이즈로 회전·크기·위치를 흔들어 불꽃처럼 보이게 한다.</summary>
     private void Update()
     {
         CacheRest();

@@ -44,6 +44,9 @@ public class MoneyBurst : MonoBehaviour
     private readonly Dictionary<MoneyPiece, List<MoneyPiece>> pools = new Dictionary<MoneyPiece, List<MoneyPiece>>();
     private Coroutine running;
 
+
+    // ── 뿜기 ──
+
     /// <summary>돈을 뿜기 시작한다. 이미 뿜고 있었다면 처음부터 다시 시작한다.</summary>
     public void Burst()
     {
@@ -73,6 +76,7 @@ public class MoneyBurst : MonoBehaviour
         }
     }
 
+    /// <summary>동전과 지폐를 번갈아 한 조각씩 내보낸다. 간격이 0이면 한꺼번에 터진다.</summary>
     private IEnumerator BurstRoutine()
     {
         // 동전과 지폐를 번갈아 내보낸다. 한쪽이 다 나오고 나서 다른 쪽이 나오면 두 번 터진 것처럼 보인다.
@@ -100,6 +104,10 @@ public class MoneyBurst : MonoBehaviour
         running = null;
     }
 
+
+    // ── 조각 만들기 ──
+
+    /// <summary>템플릿 하나를 골라 무작위 각도·속도로 발사한다.</summary>
     private void Spawn(MoneyPiece[] templates)
     {
         MoneyPiece template = PickTemplate(templates);
@@ -115,6 +123,7 @@ public class MoneyBurst : MonoBehaviour
         Take(template).Launch(position, velocity);
     }
 
+    /// <summary>뿜을 자리를 하나 고르고 지정한 폭만큼 흩뜨린다.</summary>
     private Vector3 PickSpawnPosition()
     {
         Vector3 position = transform.position;
@@ -131,6 +140,7 @@ public class MoneyBurst : MonoBehaviour
         return position;
     }
 
+    /// <summary>뿜을 수 있는 템플릿이 하나라도 있는지.</summary>
     private static bool HasTemplate(MoneyPiece[] templates)
     {
         if (templates == null)
@@ -145,6 +155,7 @@ public class MoneyBurst : MonoBehaviour
         return false;
     }
 
+    /// <summary>템플릿 하나를 무작위로 고른다. 빈 칸이 섞여 있어도 되도록 몇 번 더 뽑아본다.</summary>
     private static MoneyPiece PickTemplate(MoneyPiece[] templates)
     {
         if (templates == null || templates.Length == 0)

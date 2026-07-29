@@ -211,6 +211,7 @@ public class TimingDropMiniGame : TimedMiniGame
     private SpriteRenderer autoBlackout;
     private Texture2D autoBlackoutTexture;
 
+    /// <summary>풍선과 문이 배치된 처음 자세, 풍선의 정렬 순서를 기억해 둔다.</summary>
     private void Awake()
     {
         if (fallingObject != null)
@@ -248,6 +249,7 @@ public class TimingDropMiniGame : TimedMiniGame
         }
     }
 
+    /// <summary>자동 생성한 검은 판의 텍스처를 정리한다.</summary>
     private void OnDestroy()
     {
         // 자동 생성한 검은 판의 텍스처는 직접 만든 것이라 직접 정리한다.
@@ -255,6 +257,7 @@ public class TimingDropMiniGame : TimedMiniGame
             Destroy(autoBlackoutTexture);
     }
 
+    /// <summary>초기 표시만 한다. 풍선은 배치해 둔 자리에 그대로 둔다.</summary>
     private void Start()
     {
         // 게임 진행이 아니라 초기 표시만 한다.
@@ -266,6 +269,7 @@ public class TimingDropMiniGame : TimedMiniGame
             hitEffect.SetActive(false);
     }
 
+    /// <summary>게임을 시작한다. 호출 시점에 타이머는 이미 0으로 초기화돼 있다.</summary>
     protected override void OnTimedPlay()
     {
         ResetInternal();
@@ -308,6 +312,7 @@ public class TimingDropMiniGame : TimedMiniGame
         }
     }
 
+    /// <summary>게임을 중단하고 초기 상태로 되돌린다. 멱등하다.</summary>
     protected override void OnTimedStopAndReset()
     {
         if (hitRoutine != null)
@@ -337,6 +342,7 @@ public class TimingDropMiniGame : TimedMiniGame
         ResetInternal();
     }
 
+    /// <summary>매 프레임 입력과 진행을 처리한다. 결과가 확정된 뒤에는 불리지 않는다.</summary>
     protected override void OnTimedUpdate()
     {
         // 실패 연출 중에는 풍선도 입력도 그 자리에 멈춘다.
@@ -612,9 +618,6 @@ public class TimingDropMiniGame : TimedMiniGame
     /// <param name="marginY">세로로 남은 여유(월드 유닛).</param>
     private void Hit(float marginX, float marginY)
     {
-        Debug.Log($"[{name}] 클리어! 풍선이 판정 영역 안에 완전히 들어왔다 " +
-            $"(남은 여유 가로 {marginX:F2} / 세로 {marginY:F2})", this);
-
         // 판정은 들어왔나/아닌가 뿐이므로 통지 값은 항상 1로 고정한다.
         onJudged.Invoke(1f);
 
@@ -637,11 +640,9 @@ public class TimingDropMiniGame : TimedMiniGame
     {
         if (failOnMistimedPress)
         {
-            BeginFail("헛닫힘 — 판정 영역 밖에서 눌렀다");
+            BeginFail();
             return;
         }
-
-        Debug.Log($"[{name}] 헛닫힘 — 문이 다시 열린다(재시도 가능)", this);
 
         // 실패시키지 않는 설정이면 문만 잠깐 닫혔다가 다시 열린다.
         reopenTimer = Mathf.Max(doorReopenDelay, Mathf.Epsilon);
@@ -650,7 +651,7 @@ public class TimingDropMiniGame : TimedMiniGame
     /// <summary>문 가운데를 지나칠 때까지 누르지 못했다.</summary>
     private void Miss()
     {
-        BeginFail("놓침 — 풍선이 문을 지나쳐 내려갔다");
+        BeginFail();
     }
 
     /// <summary>제한 시간을 다 썼다. 즉시 통지하지 않고 실패 연출을 거친다.</summary>
@@ -660,22 +661,19 @@ public class TimingDropMiniGame : TimedMiniGame
         if (failing)
             return;
 
-        BeginFail("시간 초과");
+        BeginFail();
     }
 
     /// <summary>
     /// 실패 연출을 시작한다. 문이 닫힌 채로 잠시 멈췄다가 화면이 까매지고, 그 뒤에 실패로 통지된다.
     /// 연출 중에는 <see cref="failing"/> 로 입력과 낙하를 막는다.
     /// </summary>
-    /// <param name="reason">로그에 남길 실패 원인.</param>
-    private void BeginFail(string reason)
+    private void BeginFail()
     {
         if (failing)
             return;
 
         failing = true;
-
-        Debug.Log($"[{name}] 실패! {reason}", this);
 
         // 실패한 순간에도 문은 닫힌 그림으로 보여준다.
         ApplyDoorClosed(true);
@@ -830,14 +828,7 @@ public class TimingDropMiniGame : TimedMiniGame
 
         // 풍선이 사라진다. 다음 재생 때 ResetInternal 이 되살린다.
         if (fallingObject != null)
-        {
-            // [버그 추적용 임시 로깅] 이 순간 철의여인(닫힌 문)도 같이 사라진다면
-            // 문이 풍선의 자식이거나 정렬 동률로 배경 뒤에 그려진 것이다.
-            Debug.Log($"[TimingDrop][진단] 풍선 비활성화. 닫힌 문 activeInHierarchy=" +
-                $"{(doorClosedObject != null ? doorClosedObject.activeInHierarchy.ToString() : "참조 없음")}", this);
-
             fallingObject.gameObject.SetActive(false);
-        }
 
         if (hitEffect != null)
             hitEffect.SetActive(true);
@@ -895,7 +886,7 @@ public class TimingDropMiniGame : TimedMiniGame
             float k = Mathf.Clamp01(powGrowDuration > 0f ? time / powGrowDuration : 1f);
 
             // 커지는 건 끝에서 살짝 넘쳤다 수렴하고, 흔들림은 갈수록 잦아든다.
-            t.localScale = Vector3.LerpUnclamped(restScale * powStartScale, restScale, EaseOutBack(k));
+            t.localScale = Vector3.LerpUnclamped(restScale * powStartScale, restScale, Ease.OutBack(k));
 
             float damper = 1f - k;
             float angle = UnityEngine.Random.value * Mathf.PI * 2f;
@@ -916,12 +907,6 @@ public class TimingDropMiniGame : TimedMiniGame
         cameraRestorePos = t.localPosition;
         cameraShaking = true;
 
-        // [버그 추적용 임시 로깅] CameraEffectManager(실패 패널티 셰이크 등)가 카메라를 움직이는 중에
-        // 이 값을 캐시하면 "오프셋 걸린 위치"를 원위치로 복원해 카메라가 영구히 어긋난다.
-        // 이후 미니게임(삽 등)의 스프라이트가 화면 밖으로 밀려 안 보일 수 있는 의심 지점.
-        Debug.Log($"[TimingDrop][진단] 카메라 셰이크 시작: 복원 기준 localPos={cameraRestorePos} " +
-            $"(CameraEffectManager 활성 여부 확인 필요)", this);
-
         float time = 0f;
         while (time < successShakeDuration)
         {
@@ -937,19 +922,6 @@ public class TimingDropMiniGame : TimedMiniGame
         t.localPosition = cameraRestorePos;
         cameraShaking = false;
         shakeRoutine = null;
-
-        // [버그 추적용 임시 로깅] 셰이크 종료 시 복원된 위치. 시작 로그와 값이 다르거나
-        // 이후 다른 게임 시작 로그의 카메라 위치와 어긋나면 카메라 복원 경합이 원인이다.
-        Debug.Log($"[TimingDrop][진단] 카메라 셰이크 종료: localPos={t.localPosition} 로 복원", this);
-    }
-
-    /// <summary>끝에서 살짝 넘쳤다가 제자리로 돌아오는 이징(통통 튀는 느낌).</summary>
-    private static float EaseOutBack(float x)
-    {
-        const float c1 = 1.70158f;
-        const float c3 = c1 + 1f;
-        float p = x - 1f;
-        return 1f + c3 * p * p * p + c1 * p * p;
     }
 
     /// <summary>
@@ -995,14 +967,6 @@ public class TimingDropMiniGame : TimedMiniGame
         if (balloonRenderers == null || pressRenderer == null)
             return;
 
-        // [버그 추적용 임시 로깅] "풍선을 터뜨릴 때 철의여인(닫힌 문)이 함께 사라지는" 문제 진단.
-        // 의심: 풍선을 pressRenderer.order - 1 로 내리는데, 배경이 그보다 높거나 같은 order 면
-        //       풍선이 배경 뒤로 사라지고, 닫힌 문(order 0)과 배경(order 0)이 동률이면
-        //       문 자체도 그리기 순서 미정의로 배경 뒤로 갈 수 있다.
-        Debug.Log($"[TimingDrop][진단] SendBalloonBehindDoor: pressRenderer='{pressRenderer.name}' " +
-            $"layer={pressRenderer.sortingLayerName}, order={pressRenderer.sortingOrder} → " +
-            $"풍선 목표 order={pressRenderer.sortingOrder - 1}", this);
-
         foreach (SpriteRenderer renderer in balloonRenderers)
         {
             if (renderer == null)
@@ -1011,42 +975,6 @@ public class TimingDropMiniGame : TimedMiniGame
             // 문과 같은 정렬 레이어로 맞춘 뒤 한 칸 뒤로 보낸다. 레이어가 다르면 순서만으론 안 가려진다.
             renderer.sortingLayerID = pressRenderer.sortingLayerID;
             renderer.sortingOrder = pressRenderer.sortingOrder - 1;
-        }
-
-        LogDoorSortingTies();
-    }
-
-    /// <summary>
-    /// [버그 추적용 임시 로깅] 닫힌 문(철의여인)과 정렬 순서가 동률인 렌더러를 찾아 경고한다.
-    /// 동률이면 그리기 순서가 미정의라 문이 배경 뒤로 그려져 "사라진 것처럼" 보일 수 있다.
-    /// </summary>
-    private void LogDoorSortingTies()
-    {
-        if (doorClosedObject == null)
-            return;
-
-        SpriteRenderer[] doorRenderers = doorClosedObject.GetComponentsInChildren<SpriteRenderer>(true);
-
-        foreach (SpriteRenderer other in GetComponentsInChildren<SpriteRenderer>(true))
-        {
-            if (other == null || other.transform.IsChildOf(doorClosedObject.transform))
-                continue;
-
-            foreach (SpriteRenderer door in doorRenderers)
-            {
-                Debug.Log($"[TimingDrop][진단] 렌더러 '{other.name}' layer={other.sortingLayerName}, " +
-                    $"order={other.sortingOrder}, z={other.transform.position.z:F3}, " +
-                    $"active={other.gameObject.activeInHierarchy}", other);
-
-                if (other.sortingLayerID == door.sortingLayerID && other.sortingOrder == door.sortingOrder)
-                {
-                    Debug.LogWarning($"[TimingDrop][진단] 정렬 순서 동률! 닫힌 문 '{door.name}'(order {door.sortingOrder}, " +
-                        $"z {door.transform.position.z:F3}) vs '{other.name}'(order {other.sortingOrder}, " +
-                        $"z {other.transform.position.z:F3}) — 문이 배경 뒤로 그려져 사라져 보일 수 있다.", door);
-                }
-
-                break; // 렌더러 나열 로그는 문 렌더러마다 반복하지 않는다.
-            }
         }
     }
 

@@ -102,6 +102,10 @@ public class HangingSprite : MonoBehaviour
     /// <summary>떨어지는 중이거나 흔들리는 중이면 true.</summary>
     public bool IsDropping => dropping;
 
+
+    // ── 수명주기 ──
+
+    /// <summary>카메라·콜라이더를 확보하고 앵커를 잡은 뒤 떨어지기 전 자세로 세운다.</summary>
     private void Awake()
     {
         if (targetCamera == null)
@@ -117,12 +121,17 @@ public class HangingSprite : MonoBehaviour
         ResetPose();
     }
 
+    /// <summary>옵션이 켜져 있으면 바로 떨어뜨린다.</summary>
     private void Start()
     {
         if (dropOnStart)
             Drop();
     }
 
+    /// <summary>
+    /// 지연을 소진한 뒤 마우스 반응과 진자 적분을 돌린다.
+    /// 적분은 프레임 레이트와 무관하게 보이도록 고정 간격(<see cref="Step"/>)으로 나눠 돈다.
+    /// </summary>
     private void Update()
     {
         float dt = Time.deltaTime;
@@ -152,6 +161,9 @@ public class HangingSprite : MonoBehaviour
 
         Apply();
     }
+
+
+    // ── 외부 조작 ──
 
     /// <summary>줄을 풀어 떨어뜨린다. <see cref="dropDelay"/> 만큼 기다린 뒤 시작한다.</summary>
     public void Drop()
@@ -222,6 +234,9 @@ public class HangingSprite : MonoBehaviour
     {
         targetCamera = camera;
     }
+
+
+    // ── 시뮬레이션 ──
 
     /// <summary>스프링 진자 한 스텝. 극좌표(줄 길이 + 각도)로 푼다.</summary>
     private void Simulate(float dt)
@@ -320,6 +335,7 @@ public class HangingSprite : MonoBehaviour
             angleVelocity += Vector2.Dot(away.normalized, tangent) * mouseHoverPush * dt / safeLength;
     }
 
+    /// <summary>마우스가 그림 위에 있는지. 콜라이더가 있으면 그것을, 없으면 반지름으로 잰다.</summary>
     private bool IsTouching(Vector2 world)
     {
         if (hitCollider != null)
@@ -328,6 +344,10 @@ public class HangingSprite : MonoBehaviour
         return ((Vector2)transform.position - world).sqrMagnitude <= mouseRadius * mouseRadius;
     }
 
+
+    // ── 에디터 기즈모 ──
+
+    /// <summary>앵커와 줄, 마우스 판정 범위를 씬 뷰에 그려 배치를 확인하게 한다.</summary>
     private void OnDrawGizmosSelected()
     {
         Vector3 anchorPosition = Application.isPlaying

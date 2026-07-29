@@ -136,6 +136,7 @@ public class SangMiniGame : TimedMiniGame
     // 성공/실패 결과 연출 코루틴.
     private Coroutine resultRoutine;
 
+    /// <summary>카메라를 확보하고 점과 선을 만들어 둔다.</summary>
     private void Awake()
     {
         if (targetCamera == null)
@@ -145,12 +146,14 @@ public class SangMiniGame : TimedMiniGame
         BuildLine();
     }
 
+    /// <summary>게임을 시작한다. 호출 시점에 타이머는 이미 0으로 초기화돼 있다.</summary>
     protected override void OnTimedPlay()
     {
         ResetInternal();
         state = State.Playing;
     }
 
+    /// <summary>게임을 중단하고 초기 상태로 되돌린다. 멱등하다.</summary>
     protected override void OnTimedStopAndReset()
     {
         if (resultRoutine != null)
@@ -237,6 +240,7 @@ public class SangMiniGame : TimedMiniGame
         thumb.gameObject.SetActive(false);
     }
 
+    /// <summary>매 프레임 입력과 진행을 처리한다. 결과가 확정된 뒤에는 불리지 않는다.</summary>
     protected override void OnTimedUpdate()
     {
         if (state != State.Playing || dots.Count == 0)
@@ -544,6 +548,7 @@ public class SangMiniGame : TimedMiniGame
             result.Add(last);
     }
 
+    /// <summary>네 점을 지나는 Catmull-Rom 곡선 위의 한 점. 점들을 부드럽게 이을 때 쓴다.</summary>
     private static Vector2 CatmullRom(Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3, float t)
     {
         float t2 = t * t;
@@ -554,6 +559,7 @@ public class SangMiniGame : TimedMiniGame
             + (-p0 + 3f * p1 - 3f * p2 + p3) * t3);
     }
 
+    /// <summary>화면 좌표를 월드 좌표로 바꾼다. 카메라가 없으면 그대로 돌려준다.</summary>
     private Vector2 ScreenToWorld(Vector2 screenPosition)
     {
         if (targetCamera == null)

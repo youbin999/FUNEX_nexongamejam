@@ -37,6 +37,7 @@ public sealed class PerforatedScreenFailurePenalty : FailurePenalty
     private Sprite circleSprite;
     private Texture2D circleTexture;
 
+    /// <summary>구멍 뚫린 화면 오버레이를 서서히 덮어씌운다. 이후 판이 끝날 때까지 남는다.</summary>
     public override IEnumerator Apply()
     {
         EnsureOverlay();
@@ -64,6 +65,7 @@ public sealed class PerforatedScreenFailurePenalty : FailurePenalty
         overlayGroup.alpha = 1f;
     }
 
+    /// <summary>런타임에 만든 오버레이와 스프라이트를 정리한다.</summary>
     private void OnDestroy()
     {
         if (circleSprite != null)
@@ -73,6 +75,7 @@ public sealed class PerforatedScreenFailurePenalty : FailurePenalty
             Destroy(circleTexture);
     }
 
+    /// <summary>화면을 덮는 오버레이를 (없으면) 만들고 구멍을 뚫어 둔다.</summary>
     private void EnsureOverlay()
     {
         if (overlayGroup != null)
@@ -115,6 +118,7 @@ public sealed class PerforatedScreenFailurePenalty : FailurePenalty
         }
     }
 
+    /// <summary>오버레이에 구멍 하나를 배치한다.</summary>
     private void CreateHole(
         Transform parent,
         int row,
@@ -145,6 +149,7 @@ public sealed class PerforatedScreenFailurePenalty : FailurePenalty
         image.preserveAspect = true;
     }
 
+    /// <summary>구멍 모양으로 쓸 원형 스프라이트를 런타임에 생성한다.</summary>
     private Sprite CreateCircleSprite()
     {
         const int textureSize = 64;

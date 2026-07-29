@@ -33,6 +33,7 @@ public class BigBangVisual : MonoBehaviour
     private float pendingProgress;
     private bool prepared;
 
+    /// <summary>영상이 스스로 재생되지 않도록 막는다. 프레임은 SetProgress 가 전적으로 지정한다.</summary>
     private void Awake()
     {
         if (videoPlayer == null)
@@ -48,6 +49,7 @@ public class BigBangVisual : MonoBehaviour
         videoPlayer.waitForFirstFrame = true;
     }
 
+    /// <summary>준비 완료 구독을 해제하고 프레임 캐시를 비운다.</summary>
     private void OnDisable()
     {
         if (videoPlayer != null)
@@ -125,6 +127,7 @@ public class BigBangVisual : MonoBehaviour
         ApplyProgress(0f, true);
     }
 
+    /// <summary>영상 준비가 끝났다. 첫 프레임을 강제로 렌더한 뒤 밀린 진행도를 반영한다.</summary>
     private void OnPrepared(VideoPlayer source)
     {
         prepared = true;
@@ -151,6 +154,7 @@ public class BigBangVisual : MonoBehaviour
         return Mathf.Lerp(startRatio, endRatio, shaped);
     }
 
+    /// <summary>진행도를 프레임 번호로 바꿔 영상을 스크럽한다. 같은 프레임이면 탐색 요청을 건너뛴다.</summary>
     private void ApplyProgress(float progress, bool force)
     {
         if (videoPlayer == null || frameCount <= 0)

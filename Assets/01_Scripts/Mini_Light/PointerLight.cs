@@ -28,6 +28,7 @@ public class PointerLight : MonoBehaviour
     // 노이즈 시작 지점. 빛이 여러 개여도 같은 박자로 흔들리지 않게 한다.
     private float seed;
 
+    /// <summary>손전등의 기준 위치와 크기를 기억해 둔다.</summary>
     private void Awake()
     {
         CacheRest();
@@ -72,6 +73,7 @@ public class PointerLight : MonoBehaviour
         transform.localScale = restScale;
     }
 
+    /// <summary>목표 지점을 프레임 독립적으로 따라가고, 촛불처럼 크기를 흔든다.</summary>
     private void Update()
     {
         // 프레임 독립적으로 따라간다.

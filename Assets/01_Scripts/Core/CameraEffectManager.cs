@@ -57,6 +57,10 @@ public class CameraEffectManager : MonoBehaviour
     /// <summary>이미 있을 때만 준다. 정리 코드(OnDestroy 등)에서 새로 만들지 않으려고 쓴다.</summary>
     public static CameraEffectManager TryGetInstance => instance;
 
+
+    // ── 수명주기 ──
+
+    /// <summary>싱글턴 자리를 잡는다. 이미 다른 인스턴스가 있으면 스스로를 지운다.</summary>
     private void Awake()
     {
         if (instance != null && instance != this)
@@ -68,11 +72,15 @@ public class CameraEffectManager : MonoBehaviour
         instance = this;
     }
 
+    /// <summary>싱글턴 자리를 비운다.</summary>
     private void OnDestroy()
     {
         if (instance == this)
             instance = null;
     }
+
+
+    // ── 효과 등록 ──
 
     /// <summary>일회성 감쇠 셰이크. 시간이 지날수록 진폭이 선형으로 줄어든다.</summary>
     public void Shake(float duration, float amplitude)
@@ -155,6 +163,15 @@ public class CameraEffectManager : MonoBehaviour
         hasBasePose = false;
     }
 
+
+    // ── 매 프레임 합성 ──
+
+    /// <summary>
+    /// 활성 효과의 오프셋을 전부 합산해 카메라에 한 번에 적용한다.
+    /// - 효과가 하나도 없으면 기준 포즈로 되돌린 뒤 카메라를 건드리지 않는다
+    /// - 셰이크는 시드별 사인 합성으로 빠르게 튀고, 시간에 따라 선형 감쇠한다
+    /// - 일렁임은 서로 다른 위상·주파수의 사인을 겹쳐 취한 듯한 흔들림을 만든다
+    /// </summary>
     private void LateUpdate()
     {
         Camera cam = ResolveCamera();
@@ -230,6 +247,7 @@ public class CameraEffectManager : MonoBehaviour
         return t * t * (3f - 2f * t);
     }
 
+    /// <summary>지속 시간이 끝난 셰이크를 목록에서 걷어낸다.</summary>
     private void PruneFinishedShakes()
     {
         float now = Time.unscaledTime;
@@ -239,6 +257,9 @@ public class CameraEffectManager : MonoBehaviour
                 shakes.RemoveAt(i);
         }
     }
+
+
+    // ── 기준 포즈 관리 ──
 
     /// <summary>효과가 없다가 새로 생기는 순간의 카메라 포즈를 기준으로 삼는다.</summary>
     private void EnsureBasePose()
@@ -258,6 +279,7 @@ public class CameraEffectManager : MonoBehaviour
         poseDirty = false;
     }
 
+    /// <summary>카메라를 기준 포즈로 되돌린다. 기준을 아직 안 잡았으면 아무것도 하지 않는다.</summary>
     private void RestoreBasePose()
     {
         poseDirty = false;
@@ -277,6 +299,7 @@ public class CameraEffectManager : MonoBehaviour
             cam.orthographicSize = baseOrthographicSize;
     }
 
+    /// <summary>대상 카메라를 얻는다. 지정이 없으면 Camera.main 을 찾아 캐시한다.</summary>
     private Camera ResolveCamera()
     {
         if (targetCamera != null)
@@ -288,6 +311,10 @@ public class CameraEffectManager : MonoBehaviour
         return cachedCamera;
     }
 
+
+    // ── 효과 데이터 ──
+
+    /// <summary>일회성 감쇠 셰이크 하나.</summary>
     private struct ShakeEffect
     {
         public float startTime;
@@ -296,6 +323,7 @@ public class CameraEffectManager : MonoBehaviour
         public float seed;
     }
 
+    /// <summary>핸들 id로 조절·중단하는 지속 일렁임 하나.</summary>
     private struct WobbleEffect
     {
         public int id;

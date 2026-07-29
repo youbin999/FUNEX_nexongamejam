@@ -64,16 +64,22 @@ public class EraBgmDirector : MonoBehaviour
     /// <summary>마지막으로 요청받은 시대.</summary>
     public Era CurrentEra => currentEra;
 
+
+    // ── 수명주기 ──
+
+    /// <summary>컴포넌트를 처음 붙였을 때 시대별 칸을 채운다.</summary>
     private void Reset()
     {
         SyncEraSlots();
     }
 
+    /// <summary>인스펙터 값이 바뀔 때마다 빠진 시대 칸을 다시 채운다.</summary>
     private void OnValidate()
     {
         SyncEraSlots();
     }
 
+    /// <summary>싱글턴 자리를 잡고, 옵션이 켜져 있으면 씬 전환에도 살아남게 한다.</summary>
     private void Awake()
     {
         if (instance != null && instance != this)
@@ -94,17 +100,22 @@ public class EraBgmDirector : MonoBehaviour
         }
     }
 
+    /// <summary>싱글턴 자리를 비운다.</summary>
     private void OnDestroy()
     {
         if (instance == this)
             instance = null;
     }
 
+    /// <summary>옵션이 켜져 있으면 씬이 열리자마자 지정 시대의 곡을 튼다.</summary>
     private void Start()
     {
         if (playOnStart)
             Play(startEra);
     }
+
+
+    // ── 재생 ──
 
     /// <summary>
     /// 해당 시대의 BGM 으로 넘어간다. 같은 시대를 다시 요청하면 곡을 끊지 않는다.
@@ -138,6 +149,10 @@ public class EraBgmDirector : MonoBehaviour
             manager.StopBgm(fadeDuration);
     }
 
+
+    // ── 시대 칸 ──
+
+    /// <summary>해당 시대의 칸을 찾는다. 없으면 null.</summary>
     private EraTrack Find(Era era)
     {
         foreach (EraTrack track in tracks)

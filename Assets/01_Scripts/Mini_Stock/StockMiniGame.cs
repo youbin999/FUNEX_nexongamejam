@@ -111,23 +111,27 @@ public class StockMiniGame : TimedMiniGame
     private bool failPending;
     private Coroutine failRoutine;
 
+    /// <summary>게임을 시작한다. 호출 시점에 타이머는 이미 0으로 초기화돼 있다.</summary>
     protected override void OnTimedPlay()
     {
         BuildSchedule();
         ResetSequence();
     }
 
+    /// <summary>게임을 중단하고 초기 상태로 되돌린다. 멱등하다.</summary>
     protected override void OnTimedStopAndReset()
     {
         ResetSequence();
     }
 
+    /// <summary>완성된 봉이 미리 보이지 않도록 숨겨만 둔다. 게임 진행은 시작하지 않는다.</summary>
     private void Awake()
     {
         // 프리팹이 켜져 있는 동안 완성된 봉이 미리 보이지 않도록 숨겨만 둔다. 게임 진행은 시작하지 않는다.
         HideAllCandles();
     }
 
+    /// <summary>매 프레임 입력과 진행을 처리한다. 결과가 확정된 뒤에는 불리지 않는다.</summary>
     protected override void OnTimedUpdate()
     {
         // 실패 연출 중에는 봉도 입력도 그 자리에 멈춰 있어야 한다.
@@ -190,11 +194,13 @@ public class StockMiniGame : TimedMiniGame
     /// <summary>마지막 봉이 다 자라는 시각(초).</summary>
     private float SequenceEnd => steps.Length > 0 ? EndTime(steps.Length - 1) : 0f;
 
+    /// <summary>index 번째 봉이 다 자라는 시각(초).</summary>
     private float EndTime(int index)
     {
         return startTimes[index] + Mathf.Max(0f, steps[index].growDuration);
     }
 
+    /// <summary>진행 위치와 정답 기록, 예약된 실패 처리를 처음으로 되돌린다.</summary>
     private void ResetSequence()
     {
         cursor = 0;
@@ -216,6 +222,7 @@ public class StockMiniGame : TimedMiniGame
         onResetEffects.Invoke();
     }
 
+    /// <summary>모든 봉을 감춘다.</summary>
     private void HideAllCandles()
     {
         if (steps == null)
@@ -271,6 +278,7 @@ public class StockMiniGame : TimedMiniGame
         }
     }
 
+    /// <summary>매수·매도 입력을 읽어 지금 자라는 봉의 방향과 맞는지 판정한다.</summary>
     private void HandleInput(float now)
     {
         Keyboard keyboard = Keyboard.current;
@@ -338,6 +346,7 @@ public class StockMiniGame : TimedMiniGame
         failRoutine = StartCoroutine(FailAfterDelayRoutine());
     }
 
+    /// <summary>실패 연출을 잠깐 보여준 뒤 실패로 통지한다.</summary>
     private IEnumerator FailAfterDelayRoutine()
     {
         yield return new WaitForSeconds(failEffectDelay);
@@ -347,6 +356,7 @@ public class StockMiniGame : TimedMiniGame
         FailImmediately();
     }
 
+    /// <summary>해당 키가 이번 프레임에 새로 눌렸는지. None 은 항상 false.</summary>
     private static bool WasPressed(Keyboard keyboard, Key key)
     {
         return key != Key.None && keyboard[key].wasPressedThisFrame;

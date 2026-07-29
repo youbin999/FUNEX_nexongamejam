@@ -54,6 +54,7 @@ public static class EraNames
         { Era.Future, "미래 시대" },
     };
 
+    /// <summary>시대를 한국어 이름으로 바꾼다. 표에 없으면 enum 이름을 그대로 쓴다.</summary>
     public static string ToKorean(this Era era)
         => Korean.TryGetValue(era, out string name) ? name : era.ToString();
 }

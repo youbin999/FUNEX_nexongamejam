@@ -51,6 +51,7 @@ public class Striker : MonoBehaviour
     private Quaternion pendingContactRotation;
     private bool reachedContact = true;
 
+    /// <summary>기준 자세를 기억하고 내려칠 방향을 정규화해 둔다.</summary>
     private void Awake()
     {
         restPosition = transform.localPosition;
@@ -97,6 +98,7 @@ public class Striker : MonoBehaviour
         transform.localRotation = restRotation;
     }
 
+    /// <summary>살짝 흔들린 거리·각도로 내려쳐 접촉 순간 onImpact 를 알리고 제자리로 돌아온다.</summary>
     private IEnumerator StrikeRoutine()
     {
         float hitDistance = distance * (1f + Random.Range(-distanceJitter, distanceJitter));
@@ -120,6 +122,7 @@ public class Striker : MonoBehaviour
         running = null;
     }
 
+    /// <summary>목표 자세까지 옮긴다. 연타로 끊겨도 속도가 일정하도록 남은 거리에 비례해 시간을 줄인다.</summary>
     private IEnumerator MoveRoutine(Vector3 toPos, Quaternion toRot, float fullDuration, AnimationCurve ease)
     {
         Vector3 fromPos = transform.localPosition;

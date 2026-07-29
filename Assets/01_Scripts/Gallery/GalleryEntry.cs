@@ -38,6 +38,9 @@ public class GalleryEntry
     /// <summary>중단된 시대(한국어). <see cref="endedEarly"/> 가 false 면 빈 문자열.</summary>
     public string endedAtEra;
 
+
+    // ── 표시용 파생 값 ──
+
     /// <summary>저장 시각을 <see cref="DateTime"/> 으로. 파싱할 수 없으면 <see cref="DateTime.MinValue"/>.</summary>
     public DateTime SavedAtTime =>
         DateTime.TryParse(savedAt, out DateTime parsed) ? parsed : DateTime.MinValue;
@@ -54,7 +57,7 @@ public class GalleryEntry
 
     /// <summary>목록·상세에 표시할 이름. 이름 없이 저장된 옛 엔트리는 폴백 문구로 보인다.</summary>
     public string DisplayName =>
-        string.IsNullOrWhiteSpace(worldName) ? "이름 없는 worla" : worldName;
+        string.IsNullOrWhiteSpace(worldName) ? "이름 없는 세계" : worldName;
 
     /// <summary>상세 화면에 그대로 뿌릴 크레딧 본문.</summary>
     public string CreditBody => creditLines == null ? string.Empty : string.Join("\n", creditLines);

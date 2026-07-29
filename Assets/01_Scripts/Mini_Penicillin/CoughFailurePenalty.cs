@@ -42,12 +42,14 @@ public sealed class CoughFailurePenalty : FailurePenalty
     [Tooltip("기침할 때마다 발화. 소리 말고 다른 연출(화면 흔들림 등)을 같이 붙이고 싶을 때 쓴다")]
     public UnityEvent onCough;
 
+    /// <summary>패널티 프리팹에 붙은 SfxPlayer 를 찾아 둔다.</summary>
     private void Awake()
     {
         if (coughSfx == null)
             coughSfx = GetComponentInChildren<SfxPlayer>(true);
     }
 
+    /// <summary>실패 직후 첫 기침을 들려준다. 이후 반복 기침은 판이 끝날 때까지 알아서 돈다.</summary>
     public override IEnumerator Apply()
     {
         // 소리 없는 패널티는 아무 일도 안 일어난 것과 같다 — 배선이 빠졌으면 바로 알려준다.
@@ -67,6 +69,7 @@ public sealed class CoughFailurePenalty : FailurePenalty
         StartCoroutine(LoopRoutine());
     }
 
+    /// <summary>판이 끝날 때까지 무작위 간격으로 기침을 되풀이한다.</summary>
     private IEnumerator LoopRoutine()
     {
         while (true)
@@ -76,6 +79,7 @@ public sealed class CoughFailurePenalty : FailurePenalty
         }
     }
 
+    /// <summary>기침 소리를 한 번 낸다.</summary>
     private void Cough()
     {
         if (coughSfx != null)

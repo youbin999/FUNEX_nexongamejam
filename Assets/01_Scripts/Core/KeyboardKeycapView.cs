@@ -6,14 +6,23 @@ using UnityEngine.UI;
 /// <summary>키 하나를 키캡 모양으로 표시하는 UI.</summary>
 public sealed class KeyboardKeycapView : MonoBehaviour
 {
+    [Header("참조")]
     [SerializeField] private TMP_Text label;
+
     [SerializeField] private LayoutElement layoutElement;
+
+    [Header("키캡 폭")]
     [Tooltip("W, ↑ 처럼 1~2글자 키의 폭")]
     [SerializeField] private float regularWidth = 52f;
+
     [Tooltip("SHIFT, ENTER 처럼 3글자 이상 키의 폭")]
     [SerializeField] private float wideWidth = 108f;
+
     [Tooltip("스페이스바 전용 폭")]
     [SerializeField] private float spaceWidth = 168f;
+
+
+    // ── 표시 ──
 
     /// <summary>표시할 키를 적용한다.</summary>
     public void Bind(Key key)
@@ -51,6 +60,9 @@ public sealed class KeyboardKeycapView : MonoBehaviour
         if (rect != null)
             rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
     }
+
+
+    // ── 키 이름 변환 ──
 
     /// <summary>Input System 키 값을 플레이어가 읽기 쉬운 짧은 이름으로 변환한다.</summary>
     public static string GetDisplayName(Key key)

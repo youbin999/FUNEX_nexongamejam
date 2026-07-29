@@ -9,12 +9,17 @@ using UnityEngine.UI;
 /// </summary>
 public sealed class GalleryItemView : MonoBehaviour
 {
+    [Header("참조")]
+    [Tooltip("엔딩 이미지를 띄울 썸네일")]
     [SerializeField] private RawImage thumbnail;
 
     [Tooltip("플레이어가 붙인 world 이름. 비워두면 이름은 표시되지 않는다")]
     [SerializeField] private TMP_Text nameLabel;
 
+    [Tooltip("저장 시각 라벨")]
     [SerializeField] private TMP_Text dateLabel;
+
+    [Tooltip("칸 전체를 덮는 선택 버튼")]
     [SerializeField] private Button button;
 
     private GalleryEntry entry;
@@ -51,6 +56,7 @@ public sealed class GalleryItemView : MonoBehaviour
         button.onClick.AddListener(Select);
     }
 
+    /// <summary>버튼 OnClick. 붙여둔 엔트리와 텍스처를 그대로 상세로 넘긴다.</summary>
     private void Select()
     {
         if (entry != null)

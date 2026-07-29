@@ -94,6 +94,7 @@ public sealed class RatCatchMiniGame : TimedMiniGame
     private float spawnTimer;
     private State state = State.Idle;
 
+    /// <summary>참조와 처음 위치를 캐시만 한다. 게임은 Play() 로만 시작한다.</summary>
     private void Awake()
     {
         // 계약 1.3 — 여기서는 참조와 초기 위치를 캐시만 한다. 게임은 Play() 로만 시작한다.
@@ -106,6 +107,7 @@ public sealed class RatCatchMiniGame : TimedMiniGame
         CacheStarts();
     }
 
+    /// <summary>게임을 시작한다. 호출 시점에 타이머는 이미 0으로 초기화돼 있다.</summary>
     protected override void OnTimedPlay()
     {
         WarnIfNotWired();
@@ -113,6 +115,7 @@ public sealed class RatCatchMiniGame : TimedMiniGame
         state = State.Playing;
     }
 
+    /// <summary>게임을 중단하고 초기 상태로 되돌린다. 멱등하다.</summary>
     protected override void OnTimedStopAndReset()
     {
         StopAllCoroutines();
@@ -120,6 +123,7 @@ public sealed class RatCatchMiniGame : TimedMiniGame
         state = State.Idle;
     }
 
+    /// <summary>매 프레임 입력과 진행을 처리한다. 결과가 확정된 뒤에는 불리지 않는다.</summary>
     protected override void OnTimedUpdate()
     {
         if (state != State.Playing)
@@ -176,10 +180,17 @@ public sealed class RatCatchMiniGame : TimedMiniGame
             return;
 
         Vector2 input = Vector2.zero;
-        if (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed) input.x -= 1f;
-        if (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed) input.x += 1f;
-        if (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed) input.y += 1f;
-        if (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed) input.y -= 1f;
+        if (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed)
+            input.x -= 1f;
+
+        if (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed)
+            input.x += 1f;
+
+        if (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed)
+            input.y += 1f;
+
+        if (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed)
+            input.y -= 1f;
 
         // 대각선이 더 빠르지 않도록 정규화한다.
         if (input.sqrMagnitude > 1f)
@@ -206,6 +217,7 @@ public sealed class RatCatchMiniGame : TimedMiniGame
         spawnTimer = spawnInterval;
     }
 
+    /// <summary>쥐 한 마리를 무작위 위치·속도로 내려보낸다. 빈 칸은 이미 지나간 것으로 친다.</summary>
     private void Spawn(int index)
     {
         Transform rat = rats[index];
@@ -262,6 +274,7 @@ public sealed class RatCatchMiniGame : TimedMiniGame
         }
     }
 
+    /// <summary>쥐를 잡았다. 잡힘 연출을 재생하고 클리어 여부를 확인한다.</summary>
     private void Catch(int index)
     {
         ratStates[index] = RatState.Caught;
@@ -298,6 +311,7 @@ public sealed class RatCatchMiniGame : TimedMiniGame
         rat.localRotation = Quaternion.identity;
     }
 
+    /// <summary>세 마리를 다 잡았으면 클리어. 통지는 제한 시간이 다 찰 때 나간다.</summary>
     private void CheckCleared()
     {
         if (state != State.Playing || caughtCount < rats.Length)
@@ -310,6 +324,7 @@ public sealed class RatCatchMiniGame : TimedMiniGame
         SucceedWhenTimeUp();
     }
 
+    /// <summary>쥐를 놓쳤다. 즉시 실패로 끝낸다.</summary>
     private void Fail()
     {
         if (state != State.Playing)
@@ -332,6 +347,7 @@ public sealed class RatCatchMiniGame : TimedMiniGame
             rats[i] = group.GetChild(i);
     }
 
+    /// <summary>손과 쥐들의 시작 자세를 기억하고 상태 배열을 잡는다.</summary>
     private void CacheStarts()
     {
         if (hand != null)
@@ -387,6 +403,7 @@ public sealed class RatCatchMiniGame : TimedMiniGame
     private void SetLocalPosition(Transform target, Vector3 localPosition)
         => target.position = transform.TransformPoint(localPosition);
 
+    /// <summary>손 이동 범위와 등장선·실패선을 씬 뷰에 그려 배치를 확인하게 한다.</summary>
     private void OnDrawGizmosSelected()
     {
         // 손 이동 범위

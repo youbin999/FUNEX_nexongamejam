@@ -45,6 +45,10 @@ public class SteamPuff : MonoBehaviour
     private float phase;
     private float swayDirection = 1f;
 
+
+    // ── 수명주기 ──
+
+    /// <summary>원래 크기와 색을 기억해 둔다.</summary>
     private void Awake()
     {
         CacheRest();
@@ -67,6 +71,9 @@ public class SteamPuff : MonoBehaviour
             restColor = spriteRenderer.color;
     }
 
+
+    // ── 재생과 움직임 ──
+
     /// <summary>지정한 자리에서 한 덩이를 피워 올린다. 재사용되는 오브젝트라 매번 상태를 초기화한다.</summary>
     public void Play(Vector3 worldPosition)
     {
@@ -81,6 +88,7 @@ public class SteamPuff : MonoBehaviour
         Apply();
     }
 
+    /// <summary>수명을 흘리고 자세를 갱신한다. 수명이 다하면 스스로 꺼져 풀로 돌아간다.</summary>
     private void Update()
     {
         elapsed += Time.deltaTime;
@@ -95,6 +103,7 @@ public class SteamPuff : MonoBehaviour
         Apply();
     }
 
+    /// <summary>경과 시간으로 위치·크기·투명도를 계산해 적용한다. 올라갈수록 흔들림이 커진다.</summary>
     private void Apply()
     {
         float t = lifeTime > 0f ? Mathf.Clamp01(elapsed / lifeTime) : 1f;

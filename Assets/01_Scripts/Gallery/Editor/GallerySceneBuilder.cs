@@ -152,6 +152,7 @@ public static class GallerySceneBuilder
         return content;
     }
 
+    /// <summary>목록용 세로 스크롤바를 만든다.</summary>
     private static RectTransform BuildScrollbar(RectTransform parent)
     {
         RectTransform bar = NewUI("Scrollbar Vertical", parent);
@@ -177,6 +178,7 @@ public static class GallerySceneBuilder
         return bar;
     }
 
+    /// <summary>저장된 엔딩이 없을 때 보여줄 안내 문구를 만든다.</summary>
     private static GameObject BuildEmptyMessage(RectTransform canvas)
     {
         TextMeshProUGUI text = AddText(
@@ -289,6 +291,7 @@ public static class GallerySceneBuilder
         return detail;
     }
 
+    /// <summary>타이틀로 돌아가는 Back 버튼을 만들고 OnClick 을 연결한다.</summary>
     private static void BuildBackButton(RectTransform canvas, GalleryScreen screen)
     {
         RectTransform back = BuildButton("Back Button", canvas, "Back", screen, nameof(GalleryScreen.BackToTitle));
@@ -419,6 +422,7 @@ public static class GallerySceneBuilder
         return (RectTransform)go.transform;
     }
 
+    /// <summary>부모 영역에 맞춰 늘리고 사방 여백을 준다.</summary>
     private static RectTransform Stretch(RectTransform rect, float left, float top, float right, float bottom)
     {
         rect.anchorMin = Vector2.zero;
@@ -428,6 +432,7 @@ public static class GallerySceneBuilder
         return rect;
     }
 
+    /// <summary>단색 Image 를 붙인다.</summary>
     private static Image AddImage(RectTransform rect, Color color, bool raycastTarget)
     {
         var image = rect.gameObject.AddComponent<Image>();
@@ -436,6 +441,7 @@ public static class GallerySceneBuilder
         return image;
     }
 
+    /// <summary>기본 서식을 적용한 TMP 텍스트를 붙인다.</summary>
     private static TextMeshProUGUI AddText(
         string name, Transform parent, string content, float size, TextAlignmentOptions alignment)
     {
@@ -476,6 +482,7 @@ public static class GallerySceneBuilder
         serialized.ApplyModifiedPropertiesWithoutUndo();
     }
 
+    /// <summary>경로의 폴더가 없으면 만든다.</summary>
     private static void EnsureFolder(string folder)
     {
         string[] parts = folder.Split('/');

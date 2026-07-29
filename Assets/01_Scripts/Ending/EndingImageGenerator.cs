@@ -28,6 +28,7 @@ public class EndingImageGenerator
     private readonly int timeoutSeconds;
     private readonly bool useCache;
 
+    /// <summary>생성처와 타임아웃, 캐시 사용 여부를 고정해 둔다.</summary>
     public EndingImageGenerator(
         EndingImageProvider provider = EndingImageProvider.Pollinations,
         string geminiModel = "gemini-3.1-flash-image",
@@ -40,6 +41,9 @@ public class EndingImageGenerator
         this.useCache = useCache;
     }
 
+
+    // ── 캐시 경로 ──
+
     /// <summary>
     /// 생성된 엔딩 이미지의 캐시 폴더. 어디까지나 재생성을 아끼기 위한 임시 저장소라
     /// 지워져도 무방하다 — 갤러리에 영구 보관할 이미지는 갤러리가 따로 복사해 간다.
@@ -49,6 +53,9 @@ public class EndingImageGenerator
     /// <summary>조합 키에 대응하는 캐시 파일 경로.</summary>
     public static string CachePathFor(string combinationKey)
         => Path.Combine(CacheDirectory, $"ending_{combinationKey}.png");
+
+
+    // ── 생성 ──
 
     /// <summary>
     /// 엔딩 이미지를 얻는다. 캐시가 있으면 즉시, 없으면 생성 후 캐시에 저장한다.
@@ -152,7 +159,7 @@ public class EndingImageGenerator
             {
                 Debug.LogWarning(
                     $"EndingImageGenerator: 생성 실패 HTTP {req.responseCode} {req.error}\n" +
-                    Truncate(req.downloadHandler.text, 500));
+                    JsonText.Truncate(req.downloadHandler.text, 500));
                 onDone(null);
                 yield break;
             }
@@ -172,12 +179,15 @@ public class EndingImageGenerator
                 // 안전 필터에 걸리면 200 이면서 이미지 파트가 없는 응답이 온다.
                 Debug.LogWarning(
                     "EndingImageGenerator: 응답에 이미지가 없습니다(안전 필터 가능성).\n" +
-                    Truncate(req.downloadHandler.text, 500));
+                    JsonText.Truncate(req.downloadHandler.text, 500));
             }
 
             onDone(tex);
         }
     }
+
+
+    // ── 응답 디코드와 캐시 ──
 
     /// <summary>응답에서 inlineData(base64)를 찾아 Texture2D 로 디코드한다.</summary>
     private static Texture2D DecodeImage(string json)
@@ -206,6 +216,7 @@ public class EndingImageGenerator
         return null;
     }
 
+    /// <summary>캐시된 PNG 를 읽어 텍스처로 만든다. 없거나 읽기에 실패하면 null.</summary>
     private static Texture2D TryLoadCache(string combinationKey)
     {
         try
@@ -228,6 +239,7 @@ public class EndingImageGenerator
         return null;
     }
 
+    /// <summary>생성한 이미지를 조합 키 이름의 PNG 로 남긴다. 실패해도 이번 판에는 지장이 없다.</summary>
     private static void TrySaveCache(string combinationKey, Texture2D tex)
     {
         try
@@ -241,9 +253,6 @@ public class EndingImageGenerator
             Debug.LogWarning($"EndingImageGenerator: 캐시 저장 실패 — {e.Message}");
         }
     }
-
-    private static string Truncate(string s, int max)
-        => string.IsNullOrEmpty(s) ? string.Empty : (s.Length <= max ? s : s.Substring(0, max) + "…");
 }
 
 /// <summary>엔딩 이미지를 어디서 생성할지.</summary>

@@ -29,6 +29,7 @@ public class RoomLighting : MonoBehaviour
     private bool turningOn;
     private float elapsed;
 
+    /// <summary>방 조명의 기준 밝기를 기억해 둔다.</summary>
     private void Awake()
     {
         CacheRest();
@@ -92,6 +93,7 @@ public class RoomLighting : MonoBehaviour
         Apply();
     }
 
+    /// <summary>불이 켜지는 동안 어둠을 서서히 걷어낸다.</summary>
     private void Update()
     {
         if (!turningOn)
@@ -115,6 +117,7 @@ public class RoomLighting : MonoBehaviour
         Apply();
     }
 
+    /// <summary>현재 어둠 정도를 어둠 레이어들의 투명도에 반영한다.</summary>
     private void Apply()
     {
         if (darkness == null)

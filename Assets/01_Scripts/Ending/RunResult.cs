@@ -11,6 +11,8 @@ public class RunResult : MonoBehaviour
 {
     private static RunResult instance;
 
+    private readonly List<MiniGameOutcome> outcomes = new List<MiniGameOutcome>();
+
     /// <summary>싱글턴 인스턴스. 없으면 만들어서 반환한다.</summary>
     public static RunResult Instance
     {
@@ -27,8 +29,6 @@ public class RunResult : MonoBehaviour
         }
     }
 
-    private readonly List<MiniGameOutcome> outcomes = new List<MiniGameOutcome>();
-
     /// <summary>이번 판의 엔딩에 반영할 Change 결과와 Critical 실패 결과. 등록 순서 = 시대 순서.</summary>
     public IReadOnlyList<MiniGameOutcome> Outcomes => outcomes;
 
@@ -44,6 +44,10 @@ public class RunResult : MonoBehaviour
     /// <summary>중단을 유발한 사건의 실패 의미(한국어). <see cref="EndedEarly"/> 가 false 면 빈 문자열.</summary>
     public string EndedFailureMeaning { get; private set; } = string.Empty;
 
+
+    // ── 수명주기 ──
+
+    /// <summary>싱글턴 자리를 잡고 씬 전환에도 살아남게 한다.</summary>
     private void Awake()
     {
         // 씬에 직접 배치한 경우의 중복 방지.
@@ -56,6 +60,9 @@ public class RunResult : MonoBehaviour
         instance = this;
         DontDestroyOnLoad(gameObject);
     }
+
+
+    // ── 결과 기록 ──
 
     /// <summary>변화 미니게임 결과를 하나 기록한다.</summary>
     public void Record(MiniGameOutcome outcome)
@@ -84,6 +91,9 @@ public class RunResult : MonoBehaviour
         EndedByEvent = string.Empty;
         EndedFailureMeaning = string.Empty;
     }
+
+
+    // ── 조합 키 ──
 
     /// <summary>
     /// 변화 미니게임 성공/실패 조합을 비트마스크로 만든다(i번째 비트 = i번째 결과의 성공 여부).
@@ -136,6 +146,9 @@ public class RunResult : MonoBehaviour
             return sb.ToString();
         }
     }
+
+
+    // ── 프롬프트 직렬화 ──
 
     /// <summary>LLM 에 넘길 결과 요약을 사람이 읽는 형태로 직렬화한다.</summary>
     public string ToPromptPayload()

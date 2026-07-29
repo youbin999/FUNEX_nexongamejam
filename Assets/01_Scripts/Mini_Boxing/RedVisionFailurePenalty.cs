@@ -41,6 +41,7 @@ public sealed class RedVisionFailurePenalty : FailurePenalty
         tintCanvasGroup.alpha = Mathf.Clamp01(persistentAlpha);
     }
 
+    /// <summary>붉은 시야 오버레이를 투명한 상태로 켜 둔다. 연결된 것이 없으면 false.</summary>
     private bool TryPrepareTint()
     {
         if (tintImage == null || tintCanvasGroup == null || tintImage.sprite == null)
@@ -53,6 +54,7 @@ public sealed class RedVisionFailurePenalty : FailurePenalty
         return true;
     }
 
+    /// <summary>오버레이 투명도를 목표값까지 보간한다.</summary>
     private IEnumerator AnimateAlpha(float from, float to, float duration)
     {
         duration = Mathf.Max(0f, duration);

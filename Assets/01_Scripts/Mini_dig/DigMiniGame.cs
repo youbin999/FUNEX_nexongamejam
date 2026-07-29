@@ -122,6 +122,7 @@ public class DigMiniGame : MiniGame
     /// </summary>
     protected override bool HasOwnFailureCameraImpact => true;
 
+    /// <summary>게이지 초기 표시만 한다. 게임 진행은 하지 않는다.</summary>
     private void Start()
     {
         // 게임 진행이 아니라 게이지 초기 표시만 한다.
@@ -129,6 +130,7 @@ public class DigMiniGame : MiniGame
         onTimerChanged.Invoke(0f);
     }
 
+    /// <summary>제한 시간을 흘린 뒤 삽 자세와 입력을 처리한다. 시간이 다 되면 입력을 받지 않는다.</summary>
     private void Update()
     {
         if (state != State.Playing)
@@ -154,63 +156,8 @@ public class DigMiniGame : MiniGame
     {
         ResetInternal();
         state = State.Playing;
-        LogVisibilityDiagnostics();
     }
 
-    /// <summary>
-    /// [버그 추적용 임시 로깅] "삽 스프라이트가 때때로 표출되지 않는" 문제 진단.
-    /// 의심 1: 삽(order 0)과 배경(order 0)이 같은 정렬 레이어·순서라 그리기 순서가 미정의 —
-    ///         활성화 순서/z 값에 따라 삽이 배경 뒤로 그려질 수 있다.
-    /// 의심 2: 다른 미니게임의 카메라 셰이크가 복원되지 않아 카메라가 어긋난 채 시작.
-    /// </summary>
-    private void LogVisibilityDiagnostics()
-    {
-        Camera cam = Camera.main;
-        if (cam != null)
-        {
-            Debug.Log($"[DigMiniGame][진단] 시작 시 카메라 localPos={cam.transform.localPosition}, " +
-                $"orthoSize={cam.orthographicSize}", this);
-        }
-
-        if (shovel != null)
-        {
-            foreach (SpriteRenderer r in shovel.GetComponentsInChildren<SpriteRenderer>(true))
-            {
-                Debug.Log($"[DigMiniGame][진단] 삽 렌더러 '{r.name}' activeInHierarchy={r.gameObject.activeInHierarchy}, " +
-                    $"enabled={r.enabled}, sprite={(r.sprite != null ? r.sprite.name : "null")}, " +
-                    $"sortingLayer={r.sortingLayerName}, order={r.sortingOrder}, pos={r.transform.position}", r);
-            }
-        }
-        else
-        {
-            Debug.LogWarning("[DigMiniGame][진단] shovel 참조가 비어 있다!", this);
-        }
-
-        if (groundRenderer != null)
-        {
-            Debug.Log($"[DigMiniGame][진단] 흙 렌더러 sortingLayer={groundRenderer.sortingLayerName}, " +
-                $"order={groundRenderer.sortingOrder}, pos={groundRenderer.transform.position}", groundRenderer);
-        }
-
-        // 삽·배경이 같은 레이어·같은 order 면 그리기 순서가 미정의 — 이번 판에서 재현될 수 있는 조건.
-        foreach (SpriteRenderer r in GetComponentsInChildren<SpriteRenderer>(true))
-        {
-            if (shovel != null && r.transform.IsChildOf(shovel.transform))
-                continue;
-
-            foreach (SpriteRenderer s in shovel != null
-                ? shovel.GetComponentsInChildren<SpriteRenderer>(true)
-                : Array.Empty<SpriteRenderer>())
-            {
-                if (r.sortingLayerID == s.sortingLayerID && r.sortingOrder == s.sortingOrder)
-                {
-                    Debug.LogWarning($"[DigMiniGame][진단] 정렬 순서 동률 발견! '{r.name}'(order {r.sortingOrder}, z {r.transform.position.z:F3}) " +
-                        $"vs 삽 '{s.name}'(order {s.sortingOrder}, z {s.transform.position.z:F3}) — " +
-                        "동률이면 그리기 순서가 미정의라 삽이 뒤로 그려질 수 있다.", r);
-                }
-            }
-        }
-    }
 
     /// <summary>게임을 강제 중단하고 초기 상태(Idle)로 되돌린다.</summary>
     protected override void OnStopAndReset()
@@ -258,6 +205,7 @@ public class DigMiniGame : MiniGame
             groundRenderer.sprite = picked.sprite;
     }
 
+    /// <summary>제한 시간을 흘리고 게이지를 갱신한다. 다 쓰면 실패로 끝낸다.</summary>
     private void TickTimer(float dt)
     {
         elapsed += dt;
@@ -288,6 +236,7 @@ public class DigMiniGame : MiniGame
             shovel.MoveToIdle();
     }
 
+    /// <summary>S로 삽을 박고 W로 퍼올린다. 방향키 옵션이 켜져 있으면 아래/위도 같이 인정한다.</summary>
     private void ReadInput(float dt)
     {
         Keyboard keyboard = Keyboard.current;
@@ -361,6 +310,7 @@ public class DigMiniGame : MiniGame
         SucceedDig();
     }
 
+    /// <summary>제대로 팠다. 횟수를 올리고 흙 그림을 갈아 끼운다. 목표를 채우면 클리어.</summary>
     private void SucceedDig()
     {
         digCount++;
@@ -391,6 +341,7 @@ public class DigMiniGame : MiniGame
         onDigFailed.Invoke();
     }
 
+    /// <summary>삽을 도로 뽑아 기본 자세로 되돌린다.</summary>
     private void PullOut()
     {
         shovelState = ShovelState.Up;

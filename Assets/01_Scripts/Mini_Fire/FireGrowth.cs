@@ -54,6 +54,7 @@ public class FireGrowth : MonoBehaviour
     private float visibility = 1f;
     private bool extinguishing;
 
+    /// <summary>기준 크기를 기억하고 불이 꺼진 상태로 시작한다.</summary>
     private void Awake()
     {
         CacheRest();
@@ -132,6 +133,7 @@ public class FireGrowth : MonoBehaviour
         ApplyRatio(0f, 0f);
     }
 
+    /// <summary>목표 크기를 프레임 독립적으로 따라가고, 꺼지는 중이면 서서히 사그라든다.</summary>
     private void Update()
     {
         // 프레임 독립적으로 목표를 따라간다.
@@ -152,6 +154,7 @@ public class FireGrowth : MonoBehaviour
         ApplyRatio(currentRatio, popAmount);
     }
 
+    /// <summary>비율을 크기·투명도에 반영한다. 밑변 고정 옵션이 켜져 있으면 위치도 보정한다.</summary>
     private void ApplyRatio(float ratio, float extra)
     {
         // 꺼지는 중이면 크기와 투명도가 함께 줄어서 사그라드는 것처럼 보인다.

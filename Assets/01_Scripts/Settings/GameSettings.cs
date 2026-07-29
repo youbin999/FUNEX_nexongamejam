@@ -31,6 +31,9 @@ public static class GameSettings
     private static Vector2Int resolution;
     private static bool loaded;
 
+
+    // ── 설정 값 ──
+
     /// <summary>BGM 볼륨. 0이 무음, 1이 최대.</summary>
     public static float BgmVolume
     {
@@ -119,6 +122,9 @@ public static class GameSettings
             DisplayChanged?.Invoke();
         }
     }
+
+
+    // ── 저장과 적용 ──
 
     /// <summary>저장된 값을 아직 안 읽었으면 읽는다.</summary>
     public static void EnsureLoaded()

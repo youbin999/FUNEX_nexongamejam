@@ -26,12 +26,14 @@ public class StepLights : MonoBehaviour
     // 지금 켜져 있는지. SetCount 가 매 횟수마다 불리므로, 바뀔 때만 처리하려고 들고 있는다.
     private bool[] litState;
 
+    /// <summary>불빛 상태 배열을 잡고 전부 꺼진 상태로 시작한다.</summary>
     private void Awake()
     {
         EnsureState();
         ResetPose();
     }
 
+    /// <summary>불빛 개수에 맞춰 상태 배열 크기를 맞춘다.</summary>
     private void EnsureState()
     {
         int count = lights != null ? lights.Length : 0;
@@ -79,6 +81,7 @@ public class StepLights : MonoBehaviour
         return index < thresholds.Length ? thresholds[index] : thresholds[thresholds.Length - 1];
     }
 
+    /// <summary>불빛 하나를 켜거나 끈다. 상태가 그대로면 아무것도 하지 않는다.</summary>
     private void Apply(int index, bool lit)
     {
         // 상태가 그대로면 아무것도 하지 않는다. 안 그러면 켜져 있는 동안 매 횟수마다 onLit 이 터진다.

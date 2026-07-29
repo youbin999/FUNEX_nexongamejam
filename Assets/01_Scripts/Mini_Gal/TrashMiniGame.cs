@@ -146,6 +146,7 @@ public class TrashMiniGame : TimedMiniGame
     /// <summary>지금까지 버린 개수.</summary>
     public int DisposedCount => disposedCount;
 
+    /// <summary>카메라를 확보하고 쓰레기들에게 같은 카메라를 물려준다.</summary>
     private void Awake()
     {
         if (targetCamera == null)
@@ -191,12 +192,14 @@ public class TrashMiniGame : TimedMiniGame
         }
     }
 
+    /// <summary>게임을 시작한다. 호출 시점에 타이머는 이미 0으로 초기화돼 있다.</summary>
     protected override void OnTimedPlay()
     {
         ResetInternal();
         state = State.Playing;
     }
 
+    /// <summary>게임을 중단하고 초기 상태로 되돌린다. 멱등하다.</summary>
     protected override void OnTimedStopAndReset()
     {
         ResetInternal();
@@ -272,6 +275,7 @@ public class TrashMiniGame : TimedMiniGame
         }
     }
 
+    /// <summary>매 프레임 입력과 진행을 처리한다. 결과가 확정된 뒤에는 불리지 않는다.</summary>
     protected override void OnTimedUpdate()
     {
         if (state != State.Playing)
@@ -562,7 +566,7 @@ public class TrashMiniGame : TimedMiniGame
         {
             time += Time.deltaTime;
             float k = popupDuration > 0f ? Mathf.Clamp01(time / popupDuration) : 1f;
-            t.localScale = Vector3.LerpUnclamped(popupRestScale * popupStartScale, popupRestScale, EaseOutBack(k));
+            t.localScale = Vector3.LerpUnclamped(popupRestScale * popupStartScale, popupRestScale, Ease.OutBack(k));
 
             yield return null;
         }
@@ -608,21 +612,12 @@ public class TrashMiniGame : TimedMiniGame
             float k = riseDuration > 0f ? Mathf.Clamp01(time / riseDuration) : 1f;
 
             // 끝에서 살짝 넘쳤다 자리잡아 쑥 올라오는 느낌을 준다.
-            t.localPosition = Vector3.LerpUnclamped(fromPos, restPos, EaseOutBack(k));
+            t.localPosition = Vector3.LerpUnclamped(fromPos, restPos, Ease.OutBack(k));
 
             yield return null;
         }
 
         t.localPosition = restPos;
-    }
-
-    /// <summary>끝에서 살짝 넘쳤다가 제자리로 돌아오는 이징(통통 튀는 느낌).</summary>
-    private static float EaseOutBack(float x)
-    {
-        const float c1 = 1.70158f;
-        const float c3 = c1 + 1f;
-        float p = x - 1f;
-        return 1f + c3 * p * p * p + c1 * p * p;
     }
 
     /// <summary>제한 시간을 다 써서 실패로 확정될 때 호출된다.</summary>
@@ -638,6 +633,7 @@ public class TrashMiniGame : TimedMiniGame
         failRoutine = StartCoroutine(FailRoutine());
     }
 
+    /// <summary>화면 좌표를 월드 좌표로 바꾼다. 카메라가 없으면 그대로 돌려준다.</summary>
     private Vector2 ScreenToWorld(Vector2 screenPosition)
     {
         Camera cam = targetCamera != null ? targetCamera : Camera.main;

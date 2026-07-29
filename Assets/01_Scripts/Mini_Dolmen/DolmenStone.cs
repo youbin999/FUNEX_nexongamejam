@@ -34,6 +34,7 @@ public sealed class DolmenStone : MonoBehaviour
     private RigidbodyConstraints2D initialConstraints;
     private bool gameplayPhysicsActive;
 
+    /// <summary>물리 컴포넌트와 처음 자세를 잡아 두고, 프리로드 중에는 물리를 꺼 둔다.</summary>
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();

@@ -14,8 +14,13 @@ using UnityEngine.InputSystem;
 public class ArchimedesBathMiniGame : TimedMiniGame
 {
     [Header("아르키메데스")]
+    [Tooltip("걷는 애니메이션을 표시할 렌더러")]
     [SerializeField] private SpriteRenderer archimedesRenderer;
+
+    [Tooltip("걷기 프레임 A")]
     [SerializeField] private Sprite archimedesFrame0;
+
+    [Tooltip("걷기 프레임 B. A와 번갈아 표시해 걷는 것처럼 보이게 한다")]
     [SerializeField] private Sprite archimedesFrame1;
 
     [Header("목욕탕 (트리거)")]
@@ -29,16 +34,20 @@ public class ArchimedesBathMiniGame : TimedMiniGame
     [Header("유레카 연출 - 공중제비")]
     [Tooltip("목욕탕 도달 시 아르키메데스가 공중제비를 도는 데 걸리는 시간")]
     [SerializeField] private float somersaultDuration = 0.6f;
+
     [Tooltip("공중제비 도중 위로 뛰어오르는 높이(월드 유닛)")]
     [SerializeField] private float somersaultJumpHeight = 1.2f;
+
     [Tooltip("공중제비 회전 횟수 (1 = 360도 한 바퀴)")]
     [SerializeField] private int somersaultSpins = 1;
 
     [Header("유레카 연출 - 텍스트")]
     [Tooltip("'유레카!' 텍스트가 달린 오브젝트의 CanvasGroup. 알파(투명도) 애니메이션에 쓰며, 같은 오브젝트의 Transform 스케일도 함께 애니메이션한다")]
     [SerializeField] private CanvasGroup eurekaCanvasGroup;
+
     [Tooltip("텍스트가 스케일+알파로 팝인하는 데 걸리는 시간")]
     [SerializeField] private float eurekaAppearDuration = 0.35f;
+
     [Tooltip("팝인 시작 시점의 스케일 배율")]
     [SerializeField] private float eurekaStartScale = 0.3f;
 
@@ -53,28 +62,36 @@ public class ArchimedesBathMiniGame : TimedMiniGame
     private bool useFrame0 = true;
     private Coroutine eurekaRoutine;
 
+
+    // ── 수명주기 ──
+
+    /// <summary>출발 위치를 기억해 둔다. 매 판 여기서 다시 시작한다.</summary>
     private void Awake()
     {
         if (archimedesRenderer != null)
             startPosition = archimedesRenderer.transform.position;
     }
 
+    /// <summary>유레카 텍스트를 숨긴 상태로 시작한다.</summary>
     private void Start()
     {
         SetEurekaVisible(false);
     }
 
+    /// <summary>D 를 새로 누른 프레임에만 한 걸음 나아간다. 꾹 누르고 있는 것은 인정하지 않는다.</summary>
     protected override void OnTimedUpdate()
     {
         if (Keyboard.current != null && Keyboard.current.dKey.wasPressedThisFrame)
             StepForward();
     }
 
+    /// <summary>게임을 시작한다. 위치와 연출을 초기 상태로 되돌린다.</summary>
     protected override void OnTimedPlay()
     {
         ResetInternal();
     }
 
+    /// <summary>진행 중인 유레카 연출을 끊고 초기 상태로 되돌린다.</summary>
     protected override void OnTimedStopAndReset()
     {
         if (eurekaRoutine != null)
@@ -86,6 +103,7 @@ public class ArchimedesBathMiniGame : TimedMiniGame
         ResetInternal();
     }
 
+    /// <summary>아르키메데스의 위치·회전·프레임과 유레카 텍스트를 처음으로 되돌린다.</summary>
     private void ResetInternal()
     {
         useFrame0 = true;
@@ -100,13 +118,17 @@ public class ArchimedesBathMiniGame : TimedMiniGame
         SetEurekaVisible(false);
     }
 
+
+    // ── 진행 ──
+
+    /// <summary>한 걸음 오른쪽으로 옮기고 프레임을 뒤집는다. 목욕탕에 닿으면 클리어.</summary>
     private void StepForward()
     {
         if (archimedesRenderer == null)
             return;
 
         archimedesRenderer.transform.position += Vector3.right * stepDistance;
-        
+
         useFrame0 = !useFrame0;
         archimedesRenderer.sprite = useFrame0 ? archimedesFrame0 : archimedesFrame1;
 
@@ -114,17 +136,22 @@ public class ArchimedesBathMiniGame : TimedMiniGame
             Clear();
     }
 
+    /// <summary>목욕탕에 도달했다. 성공을 예약하고 유레카 연출을 재생한다.</summary>
     private void Clear()
     {
         SucceedWhenTimeUp();
         eurekaRoutine = StartCoroutine(EurekaRoutine());
     }
 
+    /// <summary>제한 시간 안에 도달하지 못했다.</summary>
     protected override void OnTimeUp()
     {
         onFail.Invoke();
         base.OnTimeUp();
     }
+
+
+    // ── 유레카 연출 ──
 
     /// <summary>목욕탕 도달 연출: 공중제비 → '유레카!' 텍스트 팝인. 이후엔 그대로 유지된 채 제한 시간이 다 찰 때까지 기다린다.</summary>
     private IEnumerator EurekaRoutine()
@@ -136,6 +163,7 @@ public class ArchimedesBathMiniGame : TimedMiniGame
         onClear.Invoke();
     }
 
+    /// <summary>포물선으로 뛰어오르며 Z축으로 회전해 공중제비처럼 보이게 한다.</summary>
     private IEnumerator SomersaultRoutine()
     {
         if (archimedesRenderer == null)
@@ -166,6 +194,7 @@ public class ArchimedesBathMiniGame : TimedMiniGame
         t.rotation = Quaternion.identity;
     }
 
+    /// <summary>'유레카!' 텍스트가 작게 시작해 통통 튀며 제 크기까지 커진다.</summary>
     private IEnumerator EurekaTextRoutine()
     {
         if (eurekaCanvasGroup == null)
@@ -179,7 +208,7 @@ public class ArchimedesBathMiniGame : TimedMiniGame
         {
             time += Time.deltaTime;
             float k = Mathf.Clamp01(time / eurekaAppearDuration);
-            float scale = Mathf.LerpUnclamped(eurekaStartScale, 1f, EaseOutBack(k));
+            float scale = Mathf.LerpUnclamped(eurekaStartScale, 1f, Ease.OutBack(k));
 
             t.localScale = new Vector3(scale, scale, 1f);
             eurekaCanvasGroup.alpha = k;
@@ -191,6 +220,7 @@ public class ArchimedesBathMiniGame : TimedMiniGame
         eurekaCanvasGroup.alpha = 1f;
     }
 
+    /// <summary>유레카 텍스트를 켜거나 끈다. 끌 때는 팝인 시작 상태로 되돌려 둔다.</summary>
     private void SetEurekaVisible(bool visible)
     {
         if (eurekaCanvasGroup == null)
@@ -203,13 +233,5 @@ public class ArchimedesBathMiniGame : TimedMiniGame
         }
 
         eurekaCanvasGroup.gameObject.SetActive(visible);
-    }
-
-    /// <summary>살짝 튀어나왔다가 정착하는 back-ease-out 곡선. 텍스트 팝인에 통통 튀는 느낌을 준다.</summary>
-    private static float EaseOutBack(float k)
-    {
-        const float overshoot = 1.70158f;
-        k -= 1f;
-        return k * k * ((overshoot + 1f) * k + overshoot) + 1f;
     }
 }

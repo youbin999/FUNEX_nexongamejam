@@ -47,6 +47,7 @@ public sealed class FailurePenaltyController : MonoBehaviour
         activePenalties.Clear();
     }
 
+    /// <summary>패널티의 최초 연출이 끝날 때까지 기다린 뒤 완료를 통지한다.</summary>
     private IEnumerator ApplyRoutine(FailurePenalty instance, Action onCompleted)
     {
         if (instance != null)

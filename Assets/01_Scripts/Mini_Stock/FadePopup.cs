@@ -29,6 +29,10 @@ public class FadePopup : MonoBehaviour
     private CanvasGroup group;
     private Coroutine running;
 
+
+    // ── 수명주기 ──
+
+    /// <summary>CanvasGroup 을 잡고 보이지 않는 상태로 시작한다.</summary>
     private void Awake()
     {
         Cache();
@@ -37,11 +41,15 @@ public class FadePopup : MonoBehaviour
         group.alpha = 0f;
     }
 
+    /// <summary>CanvasGroup 참조를 확보한다. 여러 번 불려도 안전하다.</summary>
     private void Cache()
     {
         if (group == null)
             group = GetComponent<CanvasGroup>();
     }
+
+
+    // ── 표시 ──
 
     /// <summary>나타났다가 다시 사라진다. 이미 떠 있었다면 처음부터 다시 재생한다.</summary>
     public void Show()
@@ -75,6 +83,7 @@ public class FadePopup : MonoBehaviour
         group.alpha = 0f;
     }
 
+    /// <summary>나타남 → 유지 → 사라짐 순서로 한 번 재생한다.</summary>
     private IEnumerator ShowRoutine()
     {
         yield return FadeTo(peakAlpha, fadeInDuration);
@@ -88,6 +97,7 @@ public class FadePopup : MonoBehaviour
         running = null;
     }
 
+    /// <summary>현재 알파에서 목표 알파까지 보간한다. 시간이 0이면 즉시 적용한다.</summary>
     private IEnumerator FadeTo(float target, float duration)
     {
         float from = group.alpha;

@@ -51,6 +51,10 @@ public class MoneyPiece : MonoBehaviour
     private float spinSpeed;
     private float phase;
 
+
+    // ── 수명주기 ──
+
+    /// <summary>원래 크기와 색을 기억해 둔다.</summary>
     private void Awake()
     {
         CacheRest();
@@ -73,6 +77,9 @@ public class MoneyPiece : MonoBehaviour
             restColor = spriteRenderer.color;
     }
 
+
+    // ── 발사와 움직임 ──
+
     /// <summary>지정한 자리에서 주어진 속도로 튀어나가게 한다. 재사용되는 오브젝트라 매번 상태를 초기화한다.</summary>
     public void Launch(Vector3 worldPosition, Vector2 initialVelocity)
     {
@@ -90,6 +97,7 @@ public class MoneyPiece : MonoBehaviour
         Apply();
     }
 
+    /// <summary>수명을 흘리고 자세를 갱신한다. 수명이 다하면 스스로 꺼져 풀로 돌아간다.</summary>
     private void Update()
     {
         elapsed += Time.deltaTime;
@@ -104,6 +112,10 @@ public class MoneyPiece : MonoBehaviour
         Apply();
     }
 
+    /// <summary>
+    /// 경과 시간으로 위치·회전·크기·투명도를 한 번에 계산해 적용한다.
+    /// 위치는 포물선(초기 속도 + 중력)에 좌우 흔들림을 더한 값이다.
+    /// </summary>
     private void Apply()
     {
         float t = lifeTime > 0f ? Mathf.Clamp01(elapsed / lifeTime) : 1f;

@@ -110,6 +110,7 @@ public class HackMiniGame : TimedMiniGame
     // 진행 중 지속 진동의 핸들. 0이면 걸려 있지 않다(StartWobble 은 1부터 발급한다).
     private int tensionShakeId;
 
+    /// <summary>카메라를 확보하고 엄지·경고 표시가 배치된 자리를 기억해 둔다.</summary>
     private void Awake()
     {
         if (targetCamera == null)
@@ -129,6 +130,7 @@ public class HackMiniGame : TimedMiniGame
         }
     }
 
+    /// <summary>게임을 시작한다. 호출 시점에 타이머는 이미 0으로 초기화돼 있다.</summary>
     protected override void OnTimedPlay()
     {
         ResetInternal();
@@ -228,6 +230,7 @@ public class HackMiniGame : TimedMiniGame
         StopTensionShake();
     }
 
+    /// <summary>게임을 중단하고 초기 상태로 되돌린다. 멱등하다.</summary>
     protected override void OnTimedStopAndReset()
     {
         StopBgm();
@@ -379,7 +382,7 @@ public class HackMiniGame : TimedMiniGame
                 float progress = warningPopDuration > 0f
                     ? (time - warningStagger * i) / warningPopDuration
                     : 1f;
-                float e = EaseOutBack(Mathf.Clamp01(progress));
+                float e = Ease.OutBack(Mathf.Clamp01(progress));
                 warnings[i].transform.localScale = Vector3.LerpUnclamped(Vector3.zero, shown, e);
             }
 
@@ -410,7 +413,7 @@ public class HackMiniGame : TimedMiniGame
         while (time < thumbPopDuration)
         {
             time += Time.deltaTime;
-            float e = EaseOutBack(Mathf.Clamp01(time / thumbPopDuration));
+            float e = Ease.OutBack(Mathf.Clamp01(time / thumbPopDuration));
 
             if (leftThumb != null)
                 leftThumb.transform.localPosition = Vector3.LerpUnclamped(leftHidden, leftThumbShownPos, e);
@@ -470,15 +473,6 @@ public class HackMiniGame : TimedMiniGame
     {
         if (thumb != null)
             thumb.gameObject.SetActive(false);
-    }
-
-    /// <summary>끝에서 살짝 넘쳤다가 제자리로 돌아오는 통통 튀는 이징(0~1 입력, 1 부근에서 1을 넘겼다 수렴).</summary>
-    private static float EaseOutBack(float x)
-    {
-        const float c1 = 1.70158f;
-        const float c3 = c1 + 1f;
-        float p = x - 1f;
-        return 1f + c3 * p * p * p + c1 * p * p;
     }
 
     /// <summary>이번 프레임에 눌림(마우스 좌클릭/터치 시작)이 있었으면 화면 좌표를 반환한다.</summary>

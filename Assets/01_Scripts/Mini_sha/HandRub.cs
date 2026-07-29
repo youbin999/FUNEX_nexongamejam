@@ -24,6 +24,7 @@ public class HandRub : MonoBehaviour
     private Quaternion restRotation;
     private Coroutine running;
 
+    /// <summary>기준 자세를 기억해 둔다. 모든 움직임은 이 기준에서 계산한다.</summary>
     private void Awake()
     {
         restPosition = transform.localPosition;
@@ -52,6 +53,7 @@ public class HandRub : MonoBehaviour
         transform.localRotation = restRotation;
     }
 
+    /// <summary>현재 자세에서 목표 자세까지 이징 곡선을 따라 옮긴다.</summary>
     private IEnumerator MoveRoutine(int direction)
     {
         Vector3 fromPos = transform.localPosition;

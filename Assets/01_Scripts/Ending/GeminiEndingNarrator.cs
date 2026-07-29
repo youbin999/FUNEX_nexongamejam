@@ -17,13 +17,6 @@ public class GeminiEndingNarrator : IEndingNarrator
     private readonly string model;
     private readonly int timeoutSeconds;
 
-    // gemini-2.5-flash 는 신규 사용자에게 더 이상 제공되지 않는다(404). 3.6-flash 로 실호출 검증 완료.
-    public GeminiEndingNarrator(string model = "gemini-3.6-flash", int timeoutSeconds = 20)
-    {
-        this.model = model;
-        this.timeoutSeconds = timeoutSeconds;
-    }
-
     /// <summary>
     /// 엔딩 대본 작성 규칙. 이 게임의 서사 톤이 여기에 집중돼 있으므로
     /// 문구를 고칠 일이 있으면 이 상수만 손보면 된다.
@@ -55,6 +48,26 @@ public class GeminiEndingNarrator : IEndingNarrator
 - 프롬프트 끝에 반드시 다음 스타일 지시를 그대로 덧붙인다:
   ""Photorealistic, cinematic wide shot, 16:9, single coherent location and time of day, consistent natural lighting, muted desaturated color grade, film grain. No text, no watermark, no collage, no split panels.""";
 
+
+    // ── 생성자 ──
+
+    /// <summary>
+    /// 사용할 모델과 타임아웃을 고정한다.
+    /// gemini-2.5-flash 는 신규 사용자에게 더 이상 제공되지 않는다(404). 3.6-flash 로 실호출 검증 완료.
+    /// </summary>
+    public GeminiEndingNarrator(string model = "gemini-3.6-flash", int timeoutSeconds = 20)
+    {
+        this.model = model;
+        this.timeoutSeconds = timeoutSeconds;
+    }
+
+
+    // ── 대본 생성 ──
+
+    /// <summary>
+    /// 결과 요약을 Gemini 에 넘겨 엔딩 대본을 받아온다.
+    /// 키가 없거나 HTTP·파싱에 실패하면 onFail 로 사유를 넘기고, 호출 측이 폴백으로 넘어간다.
+    /// </summary>
     public IEnumerator Generate(RunResult result, Action<EndingScript> onDone, Action<string> onFail)
     {
         string promptPayload = result.ToPromptPayload();
@@ -84,7 +97,7 @@ public class GeminiEndingNarrator : IEndingNarrator
             if (req.result != UnityWebRequest.Result.Success)
             {
                 // 응답 본문에 원인이 담겨 있는 경우가 많아 같이 남긴다.
-                onFail($"HTTP {req.responseCode} {req.error} / {Truncate(req.downloadHandler.text, 400)}");
+                onFail($"HTTP {req.responseCode} {req.error} / {JsonText.Truncate(req.downloadHandler.text, 400)}");
                 yield break;
             }
 
@@ -103,9 +116,12 @@ public class GeminiEndingNarrator : IEndingNarrator
             if (script != null && script.IsValid)
                 onDone(script);
             else
-                onFail($"응답 파싱 실패: {parseError ?? "내용이 비어 있음"} / {Truncate(req.downloadHandler.text, 400)}");
+                onFail($"응답 파싱 실패: {parseError ?? "내용이 비어 있음"} / {JsonText.Truncate(req.downloadHandler.text, 400)}");
         }
     }
+
+
+    // ── 요청 조립과 응답 파싱 ──
 
     /// <summary>
     /// generateContent 요청 본문을 만든다.
@@ -166,7 +182,4 @@ public class GeminiEndingNarrator : IEndingNarrator
 
         return null;
     }
-
-    private static string Truncate(string s, int max)
-        => string.IsNullOrEmpty(s) ? string.Empty : (s.Length <= max ? s : s.Substring(0, max) + "…");
 }

@@ -33,6 +33,10 @@ public sealed class GalleryScreen : MonoBehaviour
     /// <summary>이 씬에서 읽어 들인 텍스처들. 씬을 떠날 때 전부 해제한다.</summary>
     private readonly List<Texture2D> textures = new List<Texture2D>();
 
+
+    // ── 수명주기 ──
+
+    /// <summary>상세를 닫아둔 상태로 목록을 채운다.</summary>
     private void Start()
     {
         if (detail != null)
@@ -41,6 +45,7 @@ public sealed class GalleryScreen : MonoBehaviour
         Build();
     }
 
+    /// <summary>ESC 를 한 겹씩 벗긴다. 상세가 열려 있으면 상세만 닫고, 아니면 타이틀로 돌아간다.</summary>
     private void Update()
     {
         Keyboard keyboard = Keyboard.current;
@@ -58,6 +63,7 @@ public sealed class GalleryScreen : MonoBehaviour
             BackToTitle();
     }
 
+    /// <summary>씬을 떠나며 읽어 들인 텍스처를 한꺼번에 해제한다.</summary>
     private void OnDestroy()
     {
         foreach (Texture2D texture in textures)
@@ -69,7 +75,10 @@ public sealed class GalleryScreen : MonoBehaviour
         textures.Clear();
     }
 
-    /// <summary>Back 버튼이 부른다.</summary>
+
+    // ── 목록과 상세 ──
+
+    /// <summary>Back 버튼이 부른다. 타이틀 씬으로 돌아간다.</summary>
     public void BackToTitle()
     {
         SceneManager.LoadScene(titleSceneName);

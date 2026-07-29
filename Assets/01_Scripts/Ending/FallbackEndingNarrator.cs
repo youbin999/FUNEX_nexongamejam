@@ -11,13 +11,21 @@ using System.Text;
 /// </summary>
 public class FallbackEndingNarrator : IEndingNarrator
 {
+    /// <summary>즉시 폴백 대본을 만들어 넘긴다. 네트워크를 타지 않으므로 실패 경로가 없다.</summary>
     public IEnumerator Generate(RunResult result, Action<EndingScript> onDone, Action<string> onFail)
     {
         onDone(Build(result));
         yield break;
     }
 
-    /// <summary>코루틴 없이 즉시 대본을 만든다. LLM 실패 시 다른 생성기에서도 직접 호출한다.</summary>
+
+    // ── 대본 조립 ──
+
+    /// <summary>
+    /// 코루틴 없이 즉시 대본을 만든다. LLM 실패 시 다른 생성기에서도 직접 호출한다.
+    /// - 도입부 → 시대가 바뀔 때마다 구분선 → 각 사건의 meaning
+    /// - 중단으로 끝난 판과 완주한 판의 마무리 문구가 갈린다
+    /// </summary>
     public static EndingScript Build(RunResult result)
     {
         var lines = new List<string>();
