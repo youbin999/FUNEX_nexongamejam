@@ -142,6 +142,10 @@ public class MiniGamePlayer : MonoBehaviour
     /// <summary>이미 Preload() 가 실행됐는지 여부. 외부 주입 실패 여부를 판단하는 용도.</summary>
     public bool IsPreloaded => preloaded;
 
+
+    // ── 수명주기 ──
+
+    /// <summary>보더·시대 제목의 기준값을 캐시하고, 옵션이 켜져 있으면 프리로드한다.</summary>
     private void Awake()
     {
         if (failurePenaltyController == null)
@@ -165,17 +169,22 @@ public class MiniGamePlayer : MonoBehaviour
             Preload();
     }
 
+    /// <summary>중간에 꺼져도 시대 제목과 보더가 어긋난 채 남지 않도록 되돌린다.</summary>
     private void OnDisable()
     {
         HideEraTitleImmediate();
         RestoreBorderOpacityImmediate();
     }
 
+    /// <summary>테스트 옵션이 켜져 있으면 첫 번째 게임을 자동 재생한다.</summary>
     private void Start()
     {
         if (playFirstOnStart)
             PlayGame(0);
     }
+
+
+    // ── 프리로드 ──
 
     /// <summary>
     /// 모든 프리팹을 비활성 홀더의 자식으로 Instantiate 해 둔다. 멱등.
@@ -235,6 +244,9 @@ public class MiniGamePlayer : MonoBehaviour
         preloadHolder = holder.transform;
     }
 
+
+    // ── 재생 ──
+
     /// <summary>
     /// index 번째 게임을 재생한다. 성공 여부를 반환한다.
     /// 이미 재생 중이거나 인덱스 범위 밖이면 false.
@@ -262,6 +274,22 @@ public class MiniGamePlayer : MonoBehaviour
             TransitionThenPlayRoutine(instance, borderSprite, era));
         return true;
     }
+
+    /// <summary>
+    /// gamePrefabs 에 등록된 프리팹 에셋으로 게임을 재생한다. 내부적으로 인덱스를 찾아 PlayGame(int) 를 호출한다.
+    /// 등록되지 않은 프리팹이면 false.
+    /// </summary>
+    public bool PlayGame(MiniGame prefab, Sprite borderSprite = null, Era? era = null)
+    {
+        int index = gamePrefabs.IndexOf(prefab);
+        if (index < 0)
+            return false;
+
+        return PlayGame(index, borderSprite, era);
+    }
+
+
+    // ── 게임 사이 트랜지션 연출 ──
 
     /// <summary>
     /// 게임 종료 → 화면 페이드아웃 → 보더 축소(테두리 노출) → 대기 → 보더 재확대 →
@@ -405,6 +433,9 @@ public class MiniGamePlayer : MonoBehaviour
         gameBorderRect.sizeDelta = toSize;
     }
 
+
+    // ── 시대 제목 연출 ──
+
     /// <summary>시대에 대응하는 제목을 페이드와 스케일 팝 연출로 표시한다.</summary>
     private IEnumerator PresentEraTitle(Era? era)
     {
@@ -499,18 +530,8 @@ public class MiniGamePlayer : MonoBehaviour
         eraTitleImage.gameObject.SetActive(false);
     }
 
-    /// <summary>
-    /// gamePrefabs 에 등록된 프리팹 에셋으로 게임을 재생한다. 내부적으로 인덱스를 찾아 PlayGame(int) 를 호출한다.
-    /// 등록되지 않은 프리팹이면 false.
-    /// </summary>
-    public bool PlayGame(MiniGame prefab, Sprite borderSprite = null, Era? era = null)
-    {
-        int index = gamePrefabs.IndexOf(prefab);
-        if (index < 0)
-            return false;
 
-        return PlayGame(index, borderSprite, era);
-    }
+    // ── 종료와 정리 ──
 
     /// <summary>현재 게임을 강제로 중단·초기화하고 비활성화한다. (onGameFinished 는 발화하지 않는다)</summary>
     public void StopCurrent()
@@ -580,6 +601,7 @@ public class MiniGamePlayer : MonoBehaviour
         CompleteGameFinished(instance, success);
     }
 
+    /// <summary>실패 패널티 연출이 끝난 뒤의 종료 처리. 중단된 게임의 뒤늦은 콜백은 토큰으로 걸러낸다.</summary>
     private void CompletePenalizedFailure(MiniGame instance, int sequence)
     {
         if (sequence != finishSequence || finishingInstance != instance)
@@ -589,6 +611,7 @@ public class MiniGamePlayer : MonoBehaviour
         CompleteGameFinished(instance, false);
     }
 
+    /// <summary>Current 를 비우고 onGameFinished 를 발화한 뒤, 보류 지시가 없으면 인스턴스를 정리한다.</summary>
     private void CompleteGameFinished(MiniGame instance, bool success)
     {
         // Invoke 이전에 Current 를 먼저 비워서, 콜백 안에서 즉시 다음 게임을 재생해도(재진입)
@@ -629,6 +652,7 @@ public class MiniGamePlayer : MonoBehaviour
         pendingCleanup = null;
     }
 
+    /// <summary>진행 중인 패널티 완료 콜백을 무효화한다. 토큰을 올려 뒤늦은 통지를 버린다.</summary>
     private void CancelPendingFinish()
     {
         finishSequence++;

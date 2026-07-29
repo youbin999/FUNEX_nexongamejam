@@ -65,6 +65,9 @@ public abstract class MiniGame : MonoBehaviour
     /// </summary>
     protected virtual bool HasOwnFailureCameraImpact => false;
 
+
+    // ── 수명주기 (플레이어가 호출) ──
+
     /// <summary>
     /// 게임을 시작한다. 이미 플레이 중이면 무시한다.
     /// 내부적으로 상태를 초기화한 뒤 시작한다.
@@ -87,6 +90,9 @@ public abstract class MiniGame : MonoBehaviour
         IsPlaying = false;
         OnStopAndReset();
     }
+
+
+    // ── 파생 클래스 훅 ──
 
     /// <summary>파생 클래스에서 실제 게임 시작 처리를 구현한다.</summary>
     protected abstract void OnPlay();

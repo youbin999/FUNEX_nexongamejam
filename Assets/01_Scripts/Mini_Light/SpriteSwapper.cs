@@ -18,12 +18,17 @@ public class SpriteSwapper : MonoBehaviour
     [Tooltip("켜졌을 때 색도 같이 바꾼다. 꺼진 전구를 어둡게 깔아 뒀다면 켜고 흰색으로 되돌리는 식")]
     [SerializeField] private bool changeColor = true;
 
+    [Tooltip("켜졌을 때 적용할 색")]
     [SerializeField] private Color onColor = Color.white;
 
     private Sprite restSprite;
     private Color restColor;
     private bool cached;
 
+
+    // ── 수명주기 ──
+
+    /// <summary>원래 그림과 색을 기억해 둔다.</summary>
     private void Awake()
     {
         CacheRest();

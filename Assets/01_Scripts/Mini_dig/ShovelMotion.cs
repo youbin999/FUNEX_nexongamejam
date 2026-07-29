@@ -39,11 +39,18 @@ public class ShovelMotion : MonoBehaviour
     private Quaternion restRotation;
     private Coroutine running;
 
+
+    // ── 수명주기 ──
+
+    /// <summary>기본 자세를 기억해 둔다. 모든 자세는 이 기준에서 계산한다.</summary>
     private void Awake()
     {
         restPosition = transform.localPosition;
         restRotation = transform.localRotation;
     }
+
+
+    // ── 자세 전환 ──
 
     /// <summary>기본 자세(흙 위)로 돌아온다.</summary>
     public void MoveToIdle()
@@ -76,6 +83,7 @@ public class ShovelMotion : MonoBehaviour
         transform.localRotation = restRotation;
     }
 
+    /// <summary>기본 자세 기준 오프셋·각도로 옮긴다. 비활성 상태면 코루틴 없이 즉시 적용한다.</summary>
     private void Move(Vector2 offset, float angle, float duration)
     {
         if (running != null)
@@ -95,6 +103,7 @@ public class ShovelMotion : MonoBehaviour
         running = StartCoroutine(MoveRoutine(toPosition, toRotation, duration));
     }
 
+    /// <summary>현재 자세에서 목표 자세까지 이징 곡선을 따라 보간한다.</summary>
     private IEnumerator MoveRoutine(Vector3 toPosition, Quaternion toRotation, float duration)
     {
         Vector3 fromPosition = transform.localPosition;

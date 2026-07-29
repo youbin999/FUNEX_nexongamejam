@@ -26,6 +26,7 @@ public class BronzeGauge : MonoBehaviour
     private Vector2 markerSize;
     private bool cached;
 
+    /// <summary>게이지의 기준 크기를 기억해 둔다.</summary>
     private void Awake()
     {
         CacheMarkerSize();

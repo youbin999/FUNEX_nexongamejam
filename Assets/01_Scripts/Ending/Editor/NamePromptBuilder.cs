@@ -122,6 +122,7 @@ public static class NamePromptBuilder
         return tab;
     }
 
+    /// <summary>탭 상단의 안내 문구를 만든다.</summary>
     private static void BuildTitle(RectTransform tab)
     {
         TextMeshProUGUI title = AddText(
@@ -201,6 +202,7 @@ public static class NamePromptBuilder
         return input;
     }
 
+    /// <summary>이름을 확정하는 버튼을 만든다.</summary>
     private static Button BuildConfirmButton(RectTransform tab)
     {
         RectTransform rect = NewUI("Confirm Button", tab);
@@ -246,6 +248,7 @@ public static class NamePromptBuilder
         return font;
     }
 
+    /// <summary>씬에 EventSystem 이 없으면 하나 만든다. 없으면 UI 입력이 먹지 않는다.</summary>
     private static void EnsureEventSystem()
     {
         if (Object.FindFirstObjectByType<EventSystem>() != null)
@@ -264,6 +267,7 @@ public static class NamePromptBuilder
         return (RectTransform)go.transform;
     }
 
+    /// <summary>부모 영역에 맞춰 늘리고 사방 여백을 준다.</summary>
     private static RectTransform Stretch(RectTransform rect, float left, float top, float right, float bottom)
     {
         rect.anchorMin = Vector2.zero;
@@ -273,6 +277,7 @@ public static class NamePromptBuilder
         return rect;
     }
 
+    /// <summary>단색 Image 를 붙인다.</summary>
     private static Image AddImage(RectTransform rect, Color color, bool raycastTarget)
     {
         var image = rect.gameObject.AddComponent<Image>();
@@ -281,6 +286,7 @@ public static class NamePromptBuilder
         return image;
     }
 
+    /// <summary>기본 서식을 적용한 TMP 텍스트를 붙인다.</summary>
     private static TextMeshProUGUI AddText(
         string name, Transform parent, string content, float size, TextAlignmentOptions alignment)
     {

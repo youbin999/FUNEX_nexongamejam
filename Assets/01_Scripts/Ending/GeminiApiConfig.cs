@@ -31,6 +31,9 @@ public static class GeminiApiConfig
     /// <summary>사용 가능한 키가 있는지.</summary>
     public static bool HasKey => !string.IsNullOrWhiteSpace(cachedKey);
 
+
+    // ── 로드 ──
+
     /// <summary>
     /// 키를 로드한다. 멱등 — 이미 시도했으면 즉시 반환한다.
     /// StreamingAssets 는 플랫폼에 따라 직접 파일 접근이 안 되므로 UnityWebRequest 로 읽는다.
@@ -84,6 +87,9 @@ public static class GeminiApiConfig
         }
     }
 
+
+    // ── 파싱 ──
+
     /// <summary>키 파일에 주석/빈 줄이 섞여 있어도 첫 유효 줄을 키로 인정한다.</summary>
     private static string StripComments(string raw)
     {
@@ -104,8 +110,9 @@ public static class GeminiApiConfig
 }
 
 /// <summary>
-/// JsonUtility 로는 만들기 번거로운 요청 본문을 문자열로 조립하기 위한 최소 유틸.
-/// 응답 파싱은 JsonUtility 가 담당하고, 요청은 템플릿 + 이스케이프로 처리한다.
+/// JSON 문자열을 다루는 최소 유틸.
+/// 요청 본문은 JsonUtility 로 만들기 번거로워 템플릿 + 이스케이프로 조립하고,
+/// 응답 본문은 로그에 통째로 싣기엔 길어서 잘라 쓴다.
 /// </summary>
 public static class JsonText
 {
@@ -137,5 +144,14 @@ public static class JsonText
         }
 
         return sb.ToString();
+    }
+
+    /// <summary>실패 응답을 로그에 남길 때 쓰는 말줄임. 길면 잘라내고 …을 붙인다.</summary>
+    public static string Truncate(string value, int max)
+    {
+        if (string.IsNullOrEmpty(value))
+            return string.Empty;
+
+        return value.Length <= max ? value : value.Substring(0, max) + "…";
     }
 }

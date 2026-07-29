@@ -34,6 +34,7 @@ public class GlovePunch : MonoBehaviour
     private Vector3 restScale;
     private Coroutine running;
 
+    /// <summary>글러브의 기준 위치·회전·크기를 기억해 둔다.</summary>
     private void Awake()
     {
         restPosition = transform.localPosition;
@@ -64,6 +65,7 @@ public class GlovePunch : MonoBehaviour
         transform.localScale = restScale;
     }
 
+    /// <summary>외계인 쪽으로 슉 뻗었다가 제자리로 돌아온다.</summary>
     private IEnumerator PunchRoutine()
     {
         Vector3 targetPos = restPosition + (Vector3)(punchDirection.normalized * punchDistance);

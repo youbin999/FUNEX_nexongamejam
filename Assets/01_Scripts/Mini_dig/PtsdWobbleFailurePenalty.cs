@@ -59,6 +59,7 @@ public sealed class PtsdWobbleFailurePenalty : FailurePenalty
     private int burstWobbleId;
     private int lingerWobbleId;
 
+    /// <summary>강한 일렁임과 셰이크로 시작해 비네트를 덮은 뒤, 오래 남을 약한 일렁임으로 갈아 끼운다.</summary>
     public override IEnumerator Apply()
     {
         CameraEffectManager effects = CameraEffectManager.Instance;
@@ -93,6 +94,7 @@ public sealed class PtsdWobbleFailurePenalty : FailurePenalty
             lingerPositionAmplitude, lingerRotationAmplitude, lingerSizeAmplitude, lingerFrequency);
     }
 
+    /// <summary>남아 있던 일렁임을 걷어낸다. 안 지우면 다음 판까지 화면이 흔들린다.</summary>
     private void OnDestroy()
     {
         // 매니저가 이미 사라졌으면 정리할 것도 없다. 여기서 새로 만들지 않는다.
@@ -107,6 +109,7 @@ public sealed class PtsdWobbleFailurePenalty : FailurePenalty
             effects.StopWobble(lingerWobbleId);
     }
 
+    /// <summary>비네트를 투명한 상태로 켜 둔다. 연결된 것이 없으면 false.</summary>
     private bool PrepareVignette()
     {
         if (vignetteGroup == null)
@@ -123,6 +126,7 @@ public sealed class PtsdWobbleFailurePenalty : FailurePenalty
         return true;
     }
 
+    /// <summary>비네트를 서서히 드러낸다.</summary>
     private IEnumerator FadeInVignette()
     {
         float target = Mathf.Clamp01(vignetteTargetAlpha);

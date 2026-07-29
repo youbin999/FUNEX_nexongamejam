@@ -17,12 +17,16 @@ public sealed class GalleryDetailView : MonoBehaviour
     [SerializeField] private AspectRatioFitter imageFitter;
 
     [Header("텍스트")]
+    [Tooltip("그때 흘러갔던 크레딧 본문")]
     [SerializeField] private TMP_Text creditText;
+
+    [Tooltip("롤이 끝난 뒤 남았던 마무리 문장. 비어 있으면 자동으로 숨긴다")]
     [SerializeField] private TMP_Text epilogueText;
 
     [Tooltip("world 이름 전용 라벨. 비워두면 이름이 날짜 줄 앞에 붙는다")]
     [SerializeField] private TMP_Text nameText;
 
+    [Tooltip("저장 시각 라벨")]
     [SerializeField] private TMP_Text dateText;
 
     [Tooltip("크레딧이 길 때 위에서부터 보이도록 되감을 스크롤. 없어도 동작한다")]

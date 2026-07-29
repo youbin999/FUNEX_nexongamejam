@@ -50,6 +50,7 @@ public class BigBangMiniGame : MiniGame
     /// <summary>현재 온도(0~1).</summary>
     public float Heat => heat;
 
+    /// <summary>키를 누르면 열이 오르고 떼면 식는다. 가득 차면 클리어, 바닥나면 실패다.</summary>
     private void Update()
     {
         if (state != State.Playing)

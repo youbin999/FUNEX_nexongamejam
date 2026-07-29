@@ -25,6 +25,10 @@ public class ScrewRotator : MonoBehaviour
     private float targetAngle;
     private float currentAngle;
 
+
+    // ── 수명주기 ──
+
+    /// <summary>기준 자세를 기억해 둔다.</summary>
     private void Awake()
     {
         CacheRest();
@@ -44,6 +48,9 @@ public class ScrewRotator : MonoBehaviour
         restPosition = transform.position;
         restRotation = transform.rotation;
     }
+
+
+    // ── 회전 ──
 
     /// <summary>돌아간 각도(도)를 넘긴다. 누적값이라 720 처럼 한 바퀴가 넘는 값이 들어와도 된다.</summary>
     public void SetAngle(float degrees)
@@ -67,6 +74,7 @@ public class ScrewRotator : MonoBehaviour
         Apply();
     }
 
+    /// <summary>따라가기 속도가 잡혀 있으면 목표 각도로 부드럽게 수렴시킨다.</summary>
     private void Update()
     {
         if (followSpeed <= 0f)
@@ -76,6 +84,7 @@ public class ScrewRotator : MonoBehaviour
         Apply();
     }
 
+    /// <summary>현재 각도를 위치·회전에 반영한다. 축이 있으면 공전, 없으면 자전.</summary>
     private void Apply()
     {
         Quaternion spin = Quaternion.Euler(0f, 0f, currentAngle);

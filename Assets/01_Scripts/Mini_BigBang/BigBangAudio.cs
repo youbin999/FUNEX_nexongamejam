@@ -74,6 +74,7 @@ public class BigBangAudio : MonoBehaviour
     private AudioClip silenceClip;
     private bool ready;
 
+    /// <summary>AudioSource 와 원본 클립을 확인하고 PCM 을 읽을 수 있는지 검사한다.</summary>
     private void Awake()
     {
         if (output == null)
@@ -122,6 +123,7 @@ public class BigBangAudio : MonoBehaviour
         ready = true;
     }
 
+    /// <summary>런타임에 만든 무음 클립을 떼어내고 파괴한다.</summary>
     private void OnDestroy()
     {
         if (silenceClip == null)

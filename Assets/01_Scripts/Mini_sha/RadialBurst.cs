@@ -47,6 +47,10 @@ public class RadialBurst : MonoBehaviour
     private float elapsed;
     private bool playing;
 
+
+    // ── 수명주기 ──
+
+    /// <summary>원래 크기를 기억하고 꺼진 상태로 시작한다.</summary>
     private void Awake()
     {
         CacheRest();
@@ -67,6 +71,9 @@ public class RadialBurst : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
+
+    // ── 재생 ──
+
     /// <summary>빛을 터뜨린다. 이미 터지는 중이면 처음부터 다시 시작한다.</summary>
     public void Burst()
     {
@@ -85,6 +92,7 @@ public class RadialBurst : MonoBehaviour
         Hide();
     }
 
+    /// <summary>대기 시간을 소진한 뒤 퍼짐을 진행하고, 다 퍼지면 스스로 꺼진다.</summary>
     private void Update()
     {
         if (!playing)
@@ -115,6 +123,7 @@ public class RadialBurst : MonoBehaviour
         Apply(t);
     }
 
+    /// <summary>진행도에 맞춰 크기와 색을 적용한다.</summary>
     private void Apply(float t)
     {
         if (spriteRenderer == null)
@@ -130,6 +139,7 @@ public class RadialBurst : MonoBehaviour
         spriteRenderer.color = c;
     }
 
+    /// <summary>렌더러를 끄고 시작 크기로 되돌린다.</summary>
     private void Hide()
     {
         if (spriteRenderer != null)

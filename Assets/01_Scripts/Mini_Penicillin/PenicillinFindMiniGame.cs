@@ -116,6 +116,10 @@ public class PenicillinFindMiniGame : TimedMiniGame
     private Vector3[] boooBaseScales;
     private Vector3 feniFailBaseScale = Vector3.one;
 
+
+    // ── 수명주기 ──
+
+    /// <summary>페니·BOOO 가 배치된 자리와 크기를 기억해 둔다. 매 판 여기로 되돌린다.</summary>
     private void Awake()
     {
         if (feniRenderer != null)
@@ -145,6 +149,7 @@ public class PenicillinFindMiniGame : TimedMiniGame
     /// </summary>
     protected override bool IsSuccessPresentationDone => !clearPresentationPlaying;
 
+    /// <summary>매 프레임 입력과 진행을 처리한다. 결과가 확정된 뒤에는 불리지 않는다.</summary>
     protected override void OnTimedUpdate()
     {
         HandleInput();
@@ -233,6 +238,7 @@ public class PenicillinFindMiniGame : TimedMiniGame
         }
     }
 
+    /// <summary>index 번째 BOOO 의 배치 당시 크기. 범위를 벗어나면 1배.</summary>
     private Vector3 BaseScale(int index)
         => boooBaseScales != null && index < boooBaseScales.Length ? boooBaseScales[index] : Vector3.one;
 
@@ -267,6 +273,7 @@ public class PenicillinFindMiniGame : TimedMiniGame
         onProgressChanged.Invoke(0, moldIndices.Count);
     }
 
+    /// <summary>배열에서 스프라이트 하나를 무작위로 고른다. 비어 있으면 null.</summary>
     private Sprite PickSprite(Sprite[] sprites)
     {
         if (sprites == null || sprites.Length == 0)
@@ -275,6 +282,10 @@ public class PenicillinFindMiniGame : TimedMiniGame
         return sprites[UnityEngine.Random.Range(0, sprites.Length)];
     }
 
+
+    // ── 조작 ──
+
+    /// <summary>WASD 로 커서를 옮기고 스페이스로 현재 칸을 골라낸다.</summary>
     private void HandleInput()
     {
         Keyboard keyboard = Keyboard.current;
@@ -300,6 +311,7 @@ public class PenicillinFindMiniGame : TimedMiniGame
             MarkCurrent();
     }
 
+    /// <summary>커서를 그리드 범위 안에서 옮기고 표시를 갱신한다.</summary>
     private void MoveCursor(int dx, int dy)
     {
         cursorX = Mathf.Clamp(cursorX + dx, 0, GridWidth - 1);
@@ -307,6 +319,7 @@ public class PenicillinFindMiniGame : TimedMiniGame
         UpdateCursorVisual();
     }
 
+    /// <summary>커서가 놓인 칸만 선택 표시를 켠다.</summary>
     private void UpdateCursorVisual()
     {
         int selectedIndex = cursorY * GridWidth + cursorX;
@@ -318,6 +331,11 @@ public class PenicillinFindMiniGame : TimedMiniGame
         }
     }
 
+    /// <summary>
+    /// 커서가 놓인 접시를 골라낸다. 이미 고른 칸은 무시한다.
+    /// - 곰팡이면 진행도가 오르고, 전부 찾으면 클리어 연출을 재생
+    /// - 멀쩡한 접시면 실패 팝아웃을 띄우고 즉시 실패
+    /// </summary>
     private void MarkCurrent()
     {
         int index = cursorY * GridWidth + cursorX;
@@ -424,7 +442,7 @@ public class PenicillinFindMiniGame : TimedMiniGame
         while (time < duration)
         {
             time += Time.deltaTime;
-            t.localScale = feniFailBaseScale * EaseOutBack(Mathf.Clamp01(time / duration));
+            t.localScale = feniFailBaseScale * Ease.OutBack(Mathf.Clamp01(time / duration));
             yield return null;
         }
 
@@ -500,7 +518,7 @@ public class PenicillinFindMiniGame : TimedMiniGame
                 if (k <= 0f)
                     continue;
 
-                boooRenderers[i].transform.localScale = BaseScale(i) * EaseOutBack(k);
+                boooRenderers[i].transform.localScale = BaseScale(i) * Ease.OutBack(k);
             }
 
             yield return null;
@@ -513,13 +531,5 @@ public class PenicillinFindMiniGame : TimedMiniGame
 
             boooRenderers[i].transform.localScale = BaseScale(i);
         }
-    }
-
-    /// <summary>살짝 튀어나왔다가 정착하는 back-ease-out 곡선. 통통 튀는 팝아웃 느낌을 준다.</summary>
-    private static float EaseOutBack(float k)
-    {
-        const float overshoot = 1.70158f;
-        k -= 1f;
-        return k * k * ((overshoot + 1f) * k + overshoot) + 1f;
     }
 }

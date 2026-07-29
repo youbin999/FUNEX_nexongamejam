@@ -53,6 +53,7 @@ public class SpaceTrash : MonoBehaviour
     /// <summary>지금 잡혀 있는지 여부.</summary>
     public bool IsHeld => state == State.Held;
 
+    /// <summary>처음 자세와 렌더러를 잡아 두고 표류 방향을 무작위로 정한다.</summary>
     private void Awake()
     {
         startPosition = transform.position;
@@ -135,6 +136,7 @@ public class SpaceTrash : MonoBehaviour
         disposeRoutine = StartCoroutine(FlyAwayRoutine(direction, speed, duration));
     }
 
+    /// <summary>지정한 방향으로 날아가며 화면 밖으로 빠져나간다.</summary>
     private IEnumerator FlyAwayRoutine(Vector2 direction, float speed, float duration)
     {
         Vector2 dir = direction.sqrMagnitude > 0.0001f ? direction.normalized : Vector2.left;
@@ -168,6 +170,7 @@ public class SpaceTrash : MonoBehaviour
         disposeRoutine = StartCoroutine(DisposeRoutine(target, duration));
     }
 
+    /// <summary>목표 지점으로 빨려 들어가며 작아져 사라진다.</summary>
     private IEnumerator DisposeRoutine(Vector3 target, float duration)
     {
         Vector3 from = transform.position;

@@ -17,6 +17,12 @@ using UnityEngine;
 /// </summary>
 public static class GalleryStore
 {
+    /// <summary>이름 입력 칸의 글자 수 상한. UI 쪽 characterLimit 과 같은 값으로 맞춰둔다.</summary>
+    public const int MaxWorldNameLength = 20;
+
+
+    // ── 경로 ──
+
     /// <summary>갤러리 저장 폴더.</summary>
     public static string RootDirectory => Path.Combine(Application.persistentDataPath, "gallery");
 
@@ -30,14 +36,44 @@ public static class GalleryStore
     public static string ImagePathFor(GalleryEntry entry)
         => entry == null ? string.Empty : Path.Combine(ImageDirectory, entry.imageFile ?? string.Empty);
 
+
+    // ── 읽기 ──
+
     /// <summary>
     /// 저장된 엔트리를 시간 순서(오래된 것 → 최신)로 돌려준다.
     /// 저장본이 없거나 읽을 수 없으면 빈 목록이다 — 갤러리는 비어 있는 상태로 열리면 된다.
     /// </summary>
     public static IReadOnlyList<GalleryEntry> LoadAll() => LoadDatabase().entries;
 
-    /// <summary>이름 입력 칸의 글자 수 상한. UI 쪽 characterLimit 과 같은 값으로 맞춰둔다.</summary>
-    public const int MaxWorldNameLength = 20;
+    /// <summary>엔트리의 이미지를 읽어온다. 파일이 없거나 깨졌으면 null.</summary>
+    public static Texture2D LoadTexture(GalleryEntry entry)
+    {
+        string path = ImagePathFor(entry);
+        if (string.IsNullOrEmpty(path))
+            return null;
+
+        try
+        {
+            if (!File.Exists(path))
+                return null;
+
+            // LoadImage 가 크기를 알아서 맞춰주므로 초기 크기는 의미가 없다.
+            var tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+            if (tex.LoadImage(File.ReadAllBytes(path)))
+                return tex;
+
+            UnityEngine.Object.Destroy(tex);
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"GalleryStore: 이미지 로드 실패 — {e.Message}");
+        }
+
+        return null;
+    }
+
+
+    // ── 쓰기 ──
 
     /// <summary>
     /// 엔딩 한 편을 갤러리에 추가한다.
@@ -99,33 +135,10 @@ public static class GalleryStore
         return entry;
     }
 
-    /// <summary>엔트리의 이미지를 읽어온다. 파일이 없거나 깨졌으면 null.</summary>
-    public static Texture2D LoadTexture(GalleryEntry entry)
-    {
-        string path = ImagePathFor(entry);
-        if (string.IsNullOrEmpty(path))
-            return null;
 
-        try
-        {
-            if (!File.Exists(path))
-                return null;
+    // ── 인덱스 파일 ──
 
-            // LoadImage 가 크기를 알아서 맞춰주므로 초기 크기는 의미가 없다.
-            var tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
-            if (tex.LoadImage(File.ReadAllBytes(path)))
-                return tex;
-
-            UnityEngine.Object.Destroy(tex);
-        }
-        catch (Exception e)
-        {
-            Debug.LogWarning($"GalleryStore: 이미지 로드 실패 — {e.Message}");
-        }
-
-        return null;
-    }
-
+    /// <summary>인덱스를 읽어온다. 없거나 깨졌으면 빈 데이터베이스를 돌려주고 파일은 건드리지 않는다.</summary>
     private static GalleryDatabase LoadDatabase()
     {
         try
@@ -152,6 +165,7 @@ public static class GalleryStore
         }
     }
 
+    /// <summary>인덱스를 파일에 쓴다. 실패하면 false — 호출 측이 이미지까지 되돌린다.</summary>
     private static bool TryWriteDatabase(GalleryDatabase db)
     {
         try
@@ -166,6 +180,9 @@ public static class GalleryStore
             return false;
         }
     }
+
+
+    // ── 이름·식별자 ──
 
     /// <summary>
     /// 이름을 저장 가능한 형태로 다듬는다. 입력 UI 쪽 제한과 별개로 여기가 최종 방어선이다.
@@ -192,6 +209,7 @@ public static class GalleryStore
     private static string BuildId(string combinationKey)
         => $"{DateTime.Now:yyyyMMdd_HHmmss}_{StableHash.Of(combinationKey):X8}";
 
+    /// <summary>되돌리기용 파일 삭제. 실패해도 경고만 남긴다.</summary>
     private static void TryDelete(string path)
     {
         try

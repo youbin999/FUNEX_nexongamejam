@@ -41,6 +41,19 @@ public sealed class WorldNamePrompt : MonoBehaviour
     /// <summary>입력 칸·버튼 리스너를 한 번만 묶는다.</summary>
     private bool wired;
 
+    /// <summary>패널이 떠 있는지.</summary>
+    public bool IsOpen => Root.activeSelf;
+
+    /// <summary>실제로 켜고 끌 오브젝트. 지정이 없으면 자기 자신.</summary>
+    private GameObject Root => panelRoot != null ? panelRoot : gameObject;
+
+    /// <summary>공백만 남은 이름은 이름이 아니다. 입력 칸 연결이 빠졌으면 막지 않는다 — 확정할 길이 없어지면 안 된다.</summary>
+    private bool HasName => nameField == null || !string.IsNullOrWhiteSpace(nameField.text);
+
+
+    // ── 수명주기와 배선 ──
+
+    /// <summary>리스너를 묶고 탭을 닫아둔 상태로 시작한다.</summary>
     private void Awake()
     {
         EnsureWired();
@@ -50,6 +63,7 @@ public sealed class WorldNamePrompt : MonoBehaviour
             panelRoot.SetActive(false);
     }
 
+    /// <summary>입력 칸과 확정 버튼의 리스너를 한 번만 묶는다.</summary>
     private void EnsureWired()
     {
         if (wired)
@@ -75,10 +89,8 @@ public sealed class WorldNamePrompt : MonoBehaviour
             confirmButton.onClick.AddListener(Confirm);
     }
 
-    /// <summary>패널이 떠 있는지.</summary>
-    public bool IsOpen => Root.activeSelf;
 
-    private GameObject Root => panelRoot != null ? panelRoot : gameObject;
+    // ── 열기와 닫기 ──
 
     /// <summary>
     /// 탭을 띄운다. 이미지의 수명은 부른 쪽이 관리하므로 여기서는 참조만 건다.
@@ -127,6 +139,9 @@ public sealed class WorldNamePrompt : MonoBehaviour
         nameField.ActivateInputField();
     }
 
+
+    // ── 확정 ──
+
     /// <summary>
     /// 이름을 확정한다. 확정 버튼의 OnClick 과 입력 칸의 엔터가 모두 여기로 들어온다.
     /// 이름이 비어 있으면 아무 일도 하지 않는다 — 엔터로 빈 이름이 통과하는 길을 막는다.
@@ -159,12 +174,7 @@ public sealed class WorldNamePrompt : MonoBehaviour
         Root.SetActive(false);
     }
 
-    /// <summary>
-    /// 공백만 남은 이름은 이름이 아니다.
-    /// 입력 칸 연결이 빠졌으면 막지 않는다 — 확정할 길이 없어져 엔딩이 탭에 갇히면 안 된다.
-    /// </summary>
-    private bool HasName => nameField == null || !string.IsNullOrWhiteSpace(nameField.text);
-
+    /// <summary>이름이 비어 있는 동안에는 확정 버튼을 잠가 둔다.</summary>
     private void RefreshConfirmButton()
     {
         if (confirmButton != null)

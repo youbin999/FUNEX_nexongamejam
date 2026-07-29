@@ -63,6 +63,7 @@ public sealed class WantedPosterFailurePenalty : FailurePenalty
         SetFinalState(posterTransform, endPosition);
     }
 
+    /// <summary>수배 전단 오버레이를 초기 상태로 세워 둔다. 연결된 것이 없으면 false.</summary>
     private bool TryPreparePoster(out RectTransform posterTransform)
     {
         posterTransform = null;
@@ -77,6 +78,7 @@ public sealed class WantedPosterFailurePenalty : FailurePenalty
         return true;
     }
 
+    /// <summary>전단이 완전히 붙은 최종 상태로 고정한다.</summary>
     private void SetFinalState(RectTransform posterTransform, Vector2 endPosition)
     {
         posterTransform.anchoredPosition = endPosition;

@@ -50,6 +50,7 @@ public sealed class WitchGhostFailurePenalty : FailurePenalty
     private float wobblePhase;
     private bool floating;
 
+    /// <summary>잘못 고른 얼굴(없으면 폴백)로 귀신을 만들어 띄우고, 이후 둥둥 떠다니게 한다.</summary>
     public override IEnumerator Apply()
     {
         Sprite face = WitchGhostPenaltyRequest.ConsumeFace(out bool useTint);
@@ -64,6 +65,7 @@ public sealed class WitchGhostFailurePenalty : FailurePenalty
         floating = true;
     }
 
+    /// <summary>귀신이 제자리에서 둥둥 떠다니도록 매 프레임 흔든다.</summary>
     private void Update()
     {
         if (!floating || ghostRect == null || canvasRect == null)
@@ -112,6 +114,7 @@ public sealed class WitchGhostFailurePenalty : FailurePenalty
         return true;
     }
 
+    /// <summary>귀신이 서서히 나타난다.</summary>
     private IEnumerator FadeIn()
     {
         float targetAlpha = Mathf.Clamp01(ghostAlpha);
@@ -137,6 +140,7 @@ public sealed class WitchGhostFailurePenalty : FailurePenalty
         SetAlpha(targetAlpha);
     }
 
+    /// <summary>귀신 이미지의 투명도만 바꾼다.</summary>
     private void SetAlpha(float alpha)
     {
         if (ghostImage == null)

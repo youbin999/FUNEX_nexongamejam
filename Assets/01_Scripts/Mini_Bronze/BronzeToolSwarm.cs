@@ -29,6 +29,7 @@ public class BronzeToolSwarm : MonoBehaviour
     private Quaternion[] startRotations;
     private bool cached;
 
+    /// <summary>도구들이 배치된 자리와 크기를 기억해 둔다.</summary>
     private void Awake()
     {
         CacheStartPose();

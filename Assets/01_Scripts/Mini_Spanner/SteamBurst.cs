@@ -56,6 +56,7 @@ public class SteamBurst : MonoBehaviour
         }
     }
 
+    /// <summary>지정한 자리들에서 증기를 정해진 횟수만큼 번갈아 피워 올린다.</summary>
     private IEnumerator BurstRoutine()
     {
         for (int round = 0; round < puffsPerPoint; round++)

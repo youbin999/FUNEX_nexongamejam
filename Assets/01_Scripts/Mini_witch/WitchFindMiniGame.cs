@@ -56,6 +56,7 @@ public class WitchFindMiniGame : TimedMiniGame
     private int foundCount;
     private State state = State.Idle;
 
+    /// <summary>매 프레임 입력과 진행을 처리한다. 결과가 확정된 뒤에는 불리지 않는다.</summary>
     protected override void OnTimedUpdate()
     {
         HandleInput();
@@ -127,6 +128,7 @@ public class WitchFindMiniGame : TimedMiniGame
         onProgressChanged.Invoke(0, witchIndices.Count);
     }
 
+    /// <summary>배열에서 스프라이트 하나를 무작위로 고른다. 비어 있으면 null.</summary>
     private Sprite PickSprite(Sprite[] sprites)
     {
         if (sprites == null || sprites.Length == 0)
@@ -135,6 +137,10 @@ public class WitchFindMiniGame : TimedMiniGame
         return sprites[UnityEngine.Random.Range(0, sprites.Length)];
     }
 
+
+    // ── 조작 ──
+
+    /// <summary>WASD 로 커서를 옮기고 스페이스로 현재 칸을 골라낸다.</summary>
     private void HandleInput()
     {
         Keyboard keyboard = Keyboard.current;
@@ -160,6 +166,7 @@ public class WitchFindMiniGame : TimedMiniGame
             MarkCurrent();
     }
 
+    /// <summary>커서를 그리드 범위 안에서 옮기고 표시를 갱신한다.</summary>
     private void MoveCursor(int dx, int dy)
     {
         cursorX = Mathf.Clamp(cursorX + dx, 0, GridWidth - 1);
@@ -167,6 +174,7 @@ public class WitchFindMiniGame : TimedMiniGame
         UpdateCursorVisual();
     }
 
+    /// <summary>커서가 놓인 칸만 선택 표시를 켠다.</summary>
     private void UpdateCursorVisual()
     {
         int selectedIndex = cursorY * GridWidth + cursorX;
@@ -178,6 +186,11 @@ public class WitchFindMiniGame : TimedMiniGame
         }
     }
 
+    /// <summary>
+    /// 커서가 놓인 칸을 골라낸다. 이미 고른 칸은 무시한다.
+    /// - 마녀면 진행도가 오르고, 전부 찾으면 클리어
+    /// - 멀쩡한 얼굴이면 그 얼굴이 귀신 패널티로 넘어가며 즉시 실패
+    /// </summary>
     private void MarkCurrent()
     {
         int index = cursorY * GridWidth + cursorX;

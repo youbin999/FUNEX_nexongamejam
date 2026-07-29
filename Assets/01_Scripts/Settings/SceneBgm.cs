@@ -25,6 +25,7 @@ public class SceneBgm : MonoBehaviour
     [Tooltip("앞 씬에서 같은 곡이 흐르고 있어도 처음부터 다시 튼다")]
     [SerializeField] private bool restartIfSame;
 
+    /// <summary>씬이 열리면 곡을 튼다.</summary>
     private void Start()
     {
         Play();

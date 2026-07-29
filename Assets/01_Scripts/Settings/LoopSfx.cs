@@ -21,6 +21,7 @@ public class LoopSfx : MonoBehaviour
 
     private AudioSource source;
 
+    /// <summary>재생 시점을 이 스크립트가 정하도록 AudioSource 를 2D·루프로 맞춰 둔다.</summary>
     private void Awake()
     {
         source = GetComponent<AudioSource>();
@@ -36,12 +37,14 @@ public class LoopSfx : MonoBehaviour
             source.clip = clip;
     }
 
+    /// <summary>켜질 때 직접 재생을 시작한다. Play On Awake 로는 두 번째 판부터 안 울린다.</summary>
     private void OnEnable()
     {
         if (source.clip != null)
             source.Play();
     }
 
+    /// <summary>꺼질 때 소리를 멈춘다.</summary>
     private void OnDisable()
     {
         source.Stop();

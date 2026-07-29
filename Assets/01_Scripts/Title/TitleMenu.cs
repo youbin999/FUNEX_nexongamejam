@@ -14,6 +14,9 @@ public class TitleMenu : MonoBehaviour
     [Tooltip("GALLERY 를 눌렀을 때 넘어갈 씬 이름. Build Settings 에 등록돼 있어야 한다")]
     [SerializeField] private string gallerySceneName = "00000_Gallery";
 
+
+    // ── 버튼 동작 ──
+
     /// <summary>NEW WORLD — 게임 씬으로 넘어간다.</summary>
     public void NewWorld()
     {
@@ -26,17 +29,6 @@ public class TitleMenu : MonoBehaviour
         LoadScene(gallerySceneName);
     }
 
-    private void LoadScene(string sceneName)
-    {
-        if (string.IsNullOrEmpty(sceneName))
-        {
-            Debug.LogWarning($"[{name}] 넘어갈 씬 이름이 비어 있다.", this);
-            return;
-        }
-
-        SceneManager.LoadScene(sceneName);
-    }
-
     /// <summary>EXIT — 게임을 종료한다.</summary>
     public void QuitGame()
     {
@@ -46,5 +38,17 @@ public class TitleMenu : MonoBehaviour
 #else
         Application.Quit();
 #endif
+    }
+
+    /// <summary>씬 이름이 비어 있지 않을 때만 전환한다.</summary>
+    private void LoadScene(string sceneName)
+    {
+        if (string.IsNullOrEmpty(sceneName))
+        {
+            Debug.LogWarning($"[{name}] 넘어갈 씬 이름이 비어 있다.", this);
+            return;
+        }
+
+        SceneManager.LoadScene(sceneName);
     }
 }

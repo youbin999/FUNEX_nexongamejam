@@ -70,6 +70,7 @@ public class FireMiniGame : MiniGame
     /// <summary>0에서 1로 차오르는 타이머 값.</summary>
     public override float TimerRatio => timeLimit > 0f ? Mathf.Clamp01(elapsed / timeLimit) : 0f;
 
+    /// <summary>스페이스 입력 액션을 만들어 두고 게이지를 0으로 비운다. 입력은 재생할 때 열린다.</summary>
     private void Awake()
     {
         hitAction = new InputAction("Hit", InputActionType.Button, "<Keyboard>/space");
@@ -80,17 +81,20 @@ public class FireMiniGame : MiniGame
         onTimerChanged.Invoke(0f);
     }
 
+    /// <summary>입력 액션을 닫는다.</summary>
     private void OnDisable()
     {
         hitAction.Disable();
     }
 
+    /// <summary>입력 액션 구독을 풀고 폐기한다.</summary>
     private void OnDestroy()
     {
         hitAction.performed -= OnHitPerformed;
         hitAction.Dispose();
     }
 
+    /// <summary>재생 중일 때만 제한 시간을 흘린다.</summary>
     private void Update()
     {
         if (state != State.Playing)
@@ -169,6 +173,7 @@ public class FireMiniGame : MiniGame
             target.ResetPose();
     }
 
+    /// <summary>제한 시간을 흘리고 게이지를 갱신한다. 다 쓰면 실패로 끝낸다.</summary>
     private void TickTimer()
     {
         elapsed += Time.deltaTime;

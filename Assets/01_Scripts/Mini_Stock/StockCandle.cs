@@ -49,6 +49,7 @@ public class StockCandle : MonoBehaviour
         set => growFrom = value;
     }
 
+    /// <summary>봉의 기준 자세와 색을 기억해 둔다.</summary>
     private void Awake()
     {
         Cache();

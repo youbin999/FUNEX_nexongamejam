@@ -39,6 +39,7 @@ public class LightMiniGame : TimedMiniGame
 
     public UnityEvent onFail;
 
+    /// <summary>카메라를 지정받지 못했으면 Camera.main 을 쓴다.</summary>
     private void Awake()
     {
         if (targetCamera == null)
@@ -77,6 +78,7 @@ public class LightMiniGame : TimedMiniGame
         base.OnTimeUp();
     }
 
+    /// <summary>빛을 포인터 쪽으로 옮기고, 누른 지점이 스위치 위인지 판정한다.</summary>
     private void HandlePointer()
     {
         if (targetCamera == null)

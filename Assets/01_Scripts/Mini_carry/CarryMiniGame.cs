@@ -118,6 +118,7 @@ public class CarryMiniGame : TimedMiniGame
     /// <summary>0에서 1로 차오르는 진행도.</summary>
     public float Progress => clearCount > 0 ? Mathf.Clamp01((float)mashCount / clearCount) : 0f;
 
+    /// <summary>연타 입력 액션을 만들고 카메라·인물의 처음 자세를 기억해 둔다.</summary>
     private void Awake()
     {
         mashAction = new InputAction("Mash", InputActionType.Button, "<Keyboard>/space");
@@ -145,11 +146,13 @@ public class CarryMiniGame : TimedMiniGame
         ResetVisuals();
     }
 
+    /// <summary>연타 입력 액션을 닫는다.</summary>
     private void OnDisable()
     {
         mashAction.Disable();
     }
 
+    /// <summary>입력 액션 구독을 풀고 폐기한다. Awake 가 안 돌았을 수도 있어 먼저 확인한다.</summary>
     private void OnDestroy()
     {
         // 프리로드 풀에서 한 번도 활성화되지 않은 채 파괴되면 Awake 가 안 돌았을 수 있다.
@@ -358,6 +361,7 @@ public class CarryMiniGame : TimedMiniGame
         onProgressChanged.Invoke(0f);
     }
 
+    /// <summary>클리어 연출용 오브젝트들을 한꺼번에 켜거나 끈다.</summary>
     private void SetClearObjectsActive(bool value)
     {
         if (clearObjects == null)

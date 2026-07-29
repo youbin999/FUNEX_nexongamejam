@@ -103,11 +103,21 @@ public class EndingCreditController : MonoBehaviour
 
     private bool isWaitingForEpilogueContinue;
 
+
+    // ── 전체 진행 ──
+
+    /// <summary>엔딩 연출 전체를 굴리는 코루틴을 띄운다.</summary>
     private void Start()
     {
         StartCoroutine(RunEndingRoutine());
     }
 
+    /// <summary>
+    /// 엔딩 한 판의 전체 순서를 지휘한다.
+    /// - 암전 여운과 대본 생성을 병렬로 굴려 생성 지연을 감춘다
+    /// - 롤이 도는 동안 이미지를 병렬 생성하고, 저장 직전에 합류시킨다
+    /// - 이름은 이미지를 보고 짓는 것이라 이미지 합류 뒤에 물어본다
+    /// </summary>
     private IEnumerator RunEndingRoutine()
     {
         PrepareInitialState();
@@ -151,35 +161,7 @@ public class EndingCreditController : MonoBehaviour
         GoToGallery();
     }
 
-    /// <summary>
-    /// 이름 입력 탭을 띄우고 확정될 때까지 기다린다.
-    /// 탭이 없거나 저장 자체를 하지 않는 판이면 묻지 않고 그냥 통과한다 —
-    /// 저장되지 않을 이름을 받아봐야 갈 곳이 없다.
-    /// </summary>
-    private IEnumerator PromptForNameRoutine(Action<string> onResolved)
-    {
-        if (namePrompt == null || !saveToGallery || endingImage == null)
-            yield break;
-
-        bool done = false;
-        namePrompt.Show(endingImage, n =>
-        {
-            onResolved(n);
-            done = true;
-        });
-
-        yield return new WaitUntil(() => done);
-    }
-
-    /// <summary>이름을 확정하고 나면 갤러리로 넘어간다.</summary>
-    private void GoToGallery()
-    {
-        if (string.IsNullOrEmpty(gallerySceneName))
-            return;
-
-        SceneManager.LoadScene(gallerySceneName);
-    }
-
+    /// <summary>크레딧·에필로그·배경을 모두 감춘 암전 상태로 초기화한다.</summary>
     private void PrepareInitialState()
     {
         if (creditText != null)
@@ -202,6 +184,9 @@ public class EndingCreditController : MonoBehaviour
         if (backgroundImage != null)
             backgroundImage.enabled = false;
     }
+
+
+    // ── 대본·이미지 생성 ──
 
     /// <summary>Gemini → 실패 시 폴백 순서로 대본을 확보한다. 반드시 유효한 대본을 넘긴다.</summary>
     private IEnumerator ResolveScriptRoutine(RunResult result, Action<EndingScript> onResolved)
@@ -250,12 +235,11 @@ public class EndingCreditController : MonoBehaviour
         yield return FadeBackgroundRoutine(0f, 1f, imageFadeDuration);
     }
 
+    /// <summary>배경 이미지의 투명도를 보간한다. CanvasGroup 이 없으면 즉시 반환.</summary>
     private IEnumerator FadeBackgroundRoutine(float from, float to, float duration)
     {
         if (backgroundGroup == null)
-        {
             yield break;
-        }
 
         if (duration <= 0f)
         {
@@ -273,6 +257,9 @@ public class EndingCreditController : MonoBehaviour
 
         backgroundGroup.alpha = to;
     }
+
+
+    // ── 크레딧 롤 ──
 
     /// <summary>크레딧 본문을 화면 아래에서 위로 흘려보낸다.</summary>
     private IEnumerator ScrollCreditsRoutine(EndingScript script)
@@ -316,6 +303,7 @@ public class EndingCreditController : MonoBehaviour
     private float CurrentScrollMultiplier =>
         fastForwardMultiplier > 1f && IsFastForwardHeld() ? fastForwardMultiplier : 1f;
 
+    /// <summary>빨리감기 입력이 눌려 있는지. 스페이스바 또는 마우스 좌클릭.</summary>
     private static bool IsFastForwardHeld()
     {
         Keyboard keyboard = Keyboard.current;
@@ -345,24 +333,10 @@ public class EndingCreditController : MonoBehaviour
         return height > 1f ? height : Screen.height;
     }
 
-    /// <summary>
-    /// 이번 엔딩을 갤러리에 남긴다. 이미지가 없으면(생성 실패·폴백 모드) 저장하지 않는다 —
-    /// 갤러리는 크레딧 텍스트와 이미지가 한 쌍일 때만 의미가 있다.
-    /// </summary>
-    private void SaveToGallery(EndingScript script, RunResult result, string worldName)
-    {
-        if (!saveToGallery)
-            return;
 
-        if (endingImage == null)
-        {
-            Debug.LogWarning("EndingCreditController: 엔딩 이미지가 없어 갤러리에 남기지 않습니다.");
-            return;
-        }
+    // ── 에필로그 ──
 
-        GalleryStore.Save(script, endingImage, result, worldName);
-    }
-
+    /// <summary>크레딧을 감추고 마무리 한 문장을 화면 중앙에 띄운다.</summary>
     private void ShowEpilogue(string epilogue)
     {
         if (epilogueText == null || string.IsNullOrWhiteSpace(epilogue))
@@ -404,5 +378,55 @@ public class EndingCreditController : MonoBehaviour
 
         if (epilogueText != null)
             epilogueText.gameObject.SetActive(false);
+    }
+
+
+    // ── 저장과 종료 ──
+
+    /// <summary>
+    /// 이름 입력 탭을 띄우고 확정될 때까지 기다린다.
+    /// 탭이 없거나 저장 자체를 하지 않는 판이면 묻지 않고 그냥 통과한다 —
+    /// 저장되지 않을 이름을 받아봐야 갈 곳이 없다.
+    /// </summary>
+    private IEnumerator PromptForNameRoutine(Action<string> onResolved)
+    {
+        if (namePrompt == null || !saveToGallery || endingImage == null)
+            yield break;
+
+        bool done = false;
+        namePrompt.Show(endingImage, n =>
+        {
+            onResolved(n);
+            done = true;
+        });
+
+        yield return new WaitUntil(() => done);
+    }
+
+    /// <summary>
+    /// 이번 엔딩을 갤러리에 남긴다. 이미지가 없으면(생성 실패·폴백 모드) 저장하지 않는다 —
+    /// 갤러리는 크레딧 텍스트와 이미지가 한 쌍일 때만 의미가 있다.
+    /// </summary>
+    private void SaveToGallery(EndingScript script, RunResult result, string worldName)
+    {
+        if (!saveToGallery)
+            return;
+
+        if (endingImage == null)
+        {
+            Debug.LogWarning("EndingCreditController: 엔딩 이미지가 없어 갤러리에 남기지 않습니다.");
+            return;
+        }
+
+        GalleryStore.Save(script, endingImage, result, worldName);
+    }
+
+    /// <summary>이름을 확정하고 나면 갤러리로 넘어간다.</summary>
+    private void GoToGallery()
+    {
+        if (string.IsNullOrEmpty(gallerySceneName))
+            return;
+
+        SceneManager.LoadScene(gallerySceneName);
     }
 }

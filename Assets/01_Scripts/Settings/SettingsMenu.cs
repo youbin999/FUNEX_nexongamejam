@@ -50,20 +50,27 @@ public class SettingsMenu : MonoBehaviour
     [SerializeField] private int canvasSortingOrder = 1000;
 
     [Header("소리")]
+    [Tooltip("BGM 볼륨 게이지")]
     [SerializeField] private Slider bgmSlider;
+
+    [Tooltip("효과음 볼륨 게이지")]
     [SerializeField] private Slider sfxSlider;
 
-    [Tooltip("게이지 옆에 퍼센트를 보여줄 텍스트 (없어도 된다)")]
+    [Tooltip("BGM 게이지 옆에 퍼센트를 보여줄 텍스트 (없어도 된다)")]
     [SerializeField] private TMP_Text bgmValueLabel;
+
+    [Tooltip("효과음 게이지 옆에 퍼센트를 보여줄 텍스트 (없어도 된다)")]
     [SerializeField] private TMP_Text sfxValueLabel;
 
     [Header("화면")]
     [Tooltip("켜면 창모드, 끄면 전체화면")]
     [SerializeField] private Toggle windowedToggle;
 
+    [Tooltip("모니터가 지원하는 해상도 목록")]
     [SerializeField] private TMP_Dropdown resolutionDropdown;
 
     [Header("버튼")]
+    [Tooltip("창을 닫는 버튼")]
     [SerializeField] private Button closeButton;
 
     [Tooltip("기본값으로 되돌리는 버튼 (없어도 된다)")]
@@ -98,6 +105,13 @@ public class SettingsMenu : MonoBehaviour
     public static bool EscapeConsumedThisFrame =>
         instance != null && instance.escapeFrame == Time.frameCount;
 
+
+    // ── 수명주기 ──
+
+    /// <summary>
+    /// 싱글턴 자리를 잡고 컨트롤을 배선한다.
+    /// 이미 따라온 창이 있으면 이쪽은 중계기(<see cref="proxyTarget"/>)로만 남는다.
+    /// </summary>
     private void Awake()
     {
         if (instance != null && instance != this)
@@ -126,16 +140,19 @@ public class SettingsMenu : MonoBehaviour
         SetOpen(false, notify: false);
     }
 
+    /// <summary>씬 로드 통지를 구독한다.</summary>
     private void OnEnable()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
+    /// <summary>씬 로드 통지 구독을 해제한다.</summary>
     private void OnDisable()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
+    /// <summary>싱글턴 자리를 비우고, 멈춰둔 게임 속도를 되돌린다.</summary>
     private void OnDestroy()
     {
         if (instance != this)
@@ -160,6 +177,7 @@ public class SettingsMenu : MonoBehaviour
         Close();
     }
 
+    /// <summary>ESC 를 살펴 창을 여닫는다. 글자 입력 중이거나 중계기이면 넘긴다.</summary>
     private void Update()
     {
         // 중계기는 입력을 보지 않는다. 두 쪽이 다 ESC 를 먹으면 열자마자 다시 닫힌다.
@@ -237,6 +255,9 @@ public class SettingsMenu : MonoBehaviour
         canvas.sortingOrder = canvasSortingOrder;
     }
 
+
+    // ── 여닫기 ──
+
     /// <summary>설정 창을 연다.</summary>
     public void Open()
     {
@@ -312,6 +333,11 @@ public class SettingsMenu : MonoBehaviour
         RefreshControls();
     }
 
+    /// <summary>
+    /// 창 표시 상태를 바꾼다.
+    /// - 창 루트가 이 오브젝트면 자식만 껐다 켠다 (자신을 끄면 Update 가 멈춰 ESC 를 못 받는다)
+    /// - 상태가 실제로 바뀔 때만 timeScale 을 건드린다
+    /// </summary>
     private void SetOpen(bool value, bool notify)
     {
         // 처음 창을 숨길 때는 상태가 안 바뀐 것이므로 timeScale 을 건드리면 안 된다.
@@ -353,6 +379,10 @@ public class SettingsMenu : MonoBehaviour
             onClosed.Invoke();
     }
 
+
+    // ── 컨트롤 배선과 갱신 ──
+
+    /// <summary>게이지·토글·드롭다운·버튼의 리스너를 한 번 묶는다.</summary>
     private void BindControls()
     {
         if (bgmSlider != null)
@@ -405,23 +435,27 @@ public class SettingsMenu : MonoBehaviour
         }
     }
 
+    /// <summary>BGM 게이지를 움직였을 때 설정값과 퍼센트 라벨을 갱신한다.</summary>
     private void OnBgmSliderChanged(float value)
     {
         GameSettings.BgmVolume = value;
         UpdateLabel(bgmValueLabel, value);
     }
 
+    /// <summary>효과음 게이지를 움직였을 때 설정값과 퍼센트 라벨을 갱신한다.</summary>
     private void OnSfxSliderChanged(float value)
     {
         GameSettings.SfxVolume = value;
         UpdateLabel(sfxValueLabel, value);
     }
 
+    /// <summary>창모드 토글을 눌렀을 때. 토글이 켜지면 전체화면이 꺼진다.</summary>
     private void OnWindowedToggled(bool windowed)
     {
         GameSettings.Fullscreen = !windowed;
     }
 
+    /// <summary>드롭다운에서 해상도를 골랐을 때.</summary>
     private void OnResolutionSelected(int index)
     {
         if (index < 0 || index >= resolutions.Count)
@@ -430,6 +464,7 @@ public class SettingsMenu : MonoBehaviour
         GameSettings.Resolution = resolutions[index];
     }
 
+    /// <summary>0~1 값을 퍼센트 문자열로 라벨에 표시한다.</summary>
     private static void UpdateLabel(TMP_Text label, float value)
     {
         if (label != null)

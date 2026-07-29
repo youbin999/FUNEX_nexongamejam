@@ -77,6 +77,10 @@ public class HangingSpriteBoard : MonoBehaviour
     /// <summary>생성된 그림들. 순서는 Entries 와 같다.</summary>
     public IReadOnlyList<HangingSprite> Spawned => spawned;
 
+
+    // ── 수명주기 ──
+
+    /// <summary>카메라를 확보하고 그림 오브젝트를 만든다.</summary>
     private void Awake()
     {
         if (targetCamera == null)
@@ -85,17 +89,22 @@ public class HangingSpriteBoard : MonoBehaviour
         Build();
     }
 
+    /// <summary>옵션이 켜져 있으면 씬이 열리자마자 떨어뜨린다.</summary>
     private void Start()
     {
         if (playOnStart)
             Play();
     }
 
+    /// <summary>런타임에 만든 줄 재질을 정리한다.</summary>
     private void OnDestroy()
     {
         if (runtimeRopeMaterial != null)
             Destroy(runtimeRopeMaterial);
     }
+
+
+    // ── 재생 ──
 
     /// <summary>매달린 그림들을 순서대로 떨어뜨린다.</summary>
     public void Play()
@@ -110,6 +119,9 @@ public class HangingSpriteBoard : MonoBehaviour
         foreach (HangingSprite hanging in spawned)
             hanging.ResetPose();
     }
+
+
+    // ── 생성 ──
 
     /// <summary>Entries 를 보고 그림 오브젝트를 만든다.</summary>
     private void Build()
@@ -126,6 +138,10 @@ public class HangingSpriteBoard : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 항목 하나를 실제 오브젝트로 만든다.
+    /// 스프라이트 렌더러 → 클릭 판정 콜라이더 → 줄 길이만큼 내린 위치 → HangingSprite 설정 순서.
+    /// </summary>
     private HangingSprite Create(Entry entry, int index)
     {
         if (targetCamera == null)
@@ -160,7 +176,7 @@ public class HangingSpriteBoard : MonoBehaviour
         hanging.SetCamera(targetCamera);
 
         if (drawRope)
-            hanging.SetRopeRenderer(CreateRope(go.transform, entry.sortingOrder));
+            hanging.SetRopeRenderer(CreateRope(entry.sortingOrder));
 
         return hanging;
     }
@@ -174,7 +190,8 @@ public class HangingSpriteBoard : MonoBehaviour
         return point;
     }
 
-    private LineRenderer CreateRope(Transform owner, int sortingOrder)
+    /// <summary>그림보다 한 칸 뒤에 그려지는 줄을 만든다.</summary>
+    private LineRenderer CreateRope(int sortingOrder)
     {
         var go = new GameObject("Rope");
         // 그림에 딸려 움직이면 안 되므로 보드 밑에 그대로 둔다.
@@ -197,6 +214,7 @@ public class HangingSpriteBoard : MonoBehaviour
         return line;
     }
 
+    /// <summary>줄 재질을 얻는다. 지정이 없으면 Sprites/Default 로 하나 만들어 돌려 쓴다.</summary>
     private Material ResolveRopeMaterial()
     {
         if (ropeMaterial != null)

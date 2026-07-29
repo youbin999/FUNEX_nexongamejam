@@ -42,6 +42,7 @@ public sealed class RatRunFailurePenalty : FailurePenalty
     private RectTransform canvasRect;
     private Vector3 ratBaseScale = Vector3.one;
 
+    /// <summary>쥐가 화면을 한 번 가로지르는 것을 보여준다. 이후 반복 질주는 판이 끝날 때까지 알아서 돈다.</summary>
     public override IEnumerator Apply()
     {
         if (!Prepare())
@@ -91,6 +92,7 @@ public sealed class RatRunFailurePenalty : FailurePenalty
         return true;
     }
 
+    /// <summary>판이 끝날 때까지 쥐가 화면을 가로지르는 것을 되풀이한다.</summary>
     private IEnumerator LoopRoutine()
     {
         while (true)

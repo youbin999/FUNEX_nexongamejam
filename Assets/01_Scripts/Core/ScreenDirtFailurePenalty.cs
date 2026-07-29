@@ -30,6 +30,10 @@ public sealed class ScreenDirtFailurePenalty : FailurePenalty
 
     private bool dustWindDetached;
 
+
+    // ── 패널티 연출 ──
+
+    /// <summary>먼지 바람을 재생하고, 지정 시간이 지나면 렌즈 먼지를 서서히 덮어씌운다.</summary>
     public override IEnumerator Apply()
     {
         bool hasLensDirtVisual = PrepareLensDirt();
@@ -51,11 +55,15 @@ public sealed class ScreenDirtFailurePenalty : FailurePenalty
             yield return FadeInLensDirt();
     }
 
+    /// <summary>월드로 분리해 둔 먼지 파티클은 부모와 함께 사라지지 않으므로 직접 정리한다.</summary>
     private void OnDestroy()
     {
         if (dustWindDetached && dustWindParticles != null)
             Destroy(dustWindParticles.gameObject);
     }
+
+
+    // ── 준비 ──
 
     /// <summary>
     /// Screen Space Overlay Canvas 아래에서는 일반 ParticleSystemRenderer가 표시되지 않으므로
@@ -74,6 +82,7 @@ public sealed class ScreenDirtFailurePenalty : FailurePenalty
         dustWindDetached = true;
     }
 
+    /// <summary>렌즈 먼지를 투명한 상태로 켜 둔다. 스프라이트가 없는 빈 슬롯이면 false.</summary>
     private bool PrepareLensDirt()
     {
         if (lensDirtCanvasGroup == null)
@@ -94,6 +103,7 @@ public sealed class ScreenDirtFailurePenalty : FailurePenalty
         return true;
     }
 
+    /// <summary>렌즈 먼지를 서서히 드러낸다. 이후 새 판이 시작될 때까지 그대로 남는다.</summary>
     private IEnumerator FadeInLensDirt()
     {
         if (lensDirtCanvasGroup == null)

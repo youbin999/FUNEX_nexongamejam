@@ -67,6 +67,7 @@ public class RubMiniGame : TimedMiniGame
     /// <summary>지금까지 비빈 횟수.</summary>
     public int RubCount => rubCount;
 
+    /// <summary>매 프레임 입력과 진행을 처리한다. 결과가 확정된 뒤에는 불리지 않는다.</summary>
     protected override void OnTimedUpdate()
     {
         HandleKeys();

@@ -123,18 +123,24 @@ public class GameFlowController : MonoBehaviour
     /// <summary>현재 흐름이 진행 중인지 여부.</summary>
     public bool IsRunning => currentIndex >= 0 && currentIndex < games.Count && !ended;
 
+
+    // ── 수명주기 ──
+
+    /// <summary>게임 종료 통지 구독을 건다.</summary>
     private void OnEnable()
     {
         if (player != null)
             player.onGameFinished.AddListener(OnGameFinished);
     }
 
+    /// <summary>게임 종료 통지 구독을 해제한다.</summary>
     private void OnDisable()
     {
         if (player != null)
             player.onGameFinished.RemoveListener(OnGameFinished);
     }
 
+    /// <summary>프리팹을 주입해 프리로드하고, 옵션이 켜져 있으면 흐름을 시작한다.</summary>
     private void Start()
     {
         InjectGamePrefabs();
@@ -170,6 +176,9 @@ public class GameFlowController : MonoBehaviour
         player.Preload();
     }
 
+
+    // ── 게임 흐름 ──
+
     /// <summary>처음부터 등록된 순서대로 게임 흐름을 시작한다.</summary>
     public void StartFlow()
     {
@@ -188,6 +197,7 @@ public class GameFlowController : MonoBehaviour
         PlayNext();
     }
 
+    /// <summary>다음 순서의 게임을 재생한다. 목록이 끝나면 전체 클리어로 처리한다.</summary>
     private void PlayNext()
     {
         currentIndex++;
@@ -221,6 +231,12 @@ public class GameFlowController : MonoBehaviour
             director.Play(era);
     }
 
+    /// <summary>
+    /// 한 판이 끝났을 때의 분기 처리.
+    /// - Change: 성공/실패 모두 엔딩 재료로 기록하고 다음으로 진행
+    /// - Critical 실패: 재료를 기록하고 흐름을 중단해 엔딩으로 이동
+    /// - 그 외: 그대로 다음으로 진행
+    /// </summary>
     private void OnGameFinished(MiniGame instance, bool success)
     {
         if (ended)
@@ -249,6 +265,9 @@ public class GameFlowController : MonoBehaviour
 
         PlayNext();
     }
+
+
+    // ── 엔딩 전환 ──
 
     /// <summary>현재 판의 <see cref="RunResult"/>를 유지한 채 엔딩 씬으로 전환한다.</summary>
     private void BeginEndingTransition()
@@ -317,10 +336,10 @@ public class GameFlowController : MonoBehaviour
 
         // 완전히 덮인 뒤에 정리한다 — 화면이 검을 때 치워야 전환 티가 안 난다.
         if (player != null)
+        {
             player.ReleaseFinishedInstance();
-
-        if (player != null)
             player.ClearFailurePenalties();
+        }
 
         if (CameraEffectManager.TryGetInstance != null)
             CameraEffectManager.TryGetInstance.StopAll();
@@ -331,6 +350,7 @@ public class GameFlowController : MonoBehaviour
         LoadEndingScene();
     }
 
+    /// <summary>엔딩 씬을 로드한다. 이름이 비었거나 빌드 설정에 없으면 에러만 남기고 중단한다.</summary>
     private void LoadEndingScene()
     {
         if (string.IsNullOrWhiteSpace(endingSceneName))

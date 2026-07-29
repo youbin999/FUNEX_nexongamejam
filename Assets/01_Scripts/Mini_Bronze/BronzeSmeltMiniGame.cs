@@ -110,6 +110,7 @@ public class BronzeSmeltMiniGame : TimedMiniGame
     /// <summary>지금 눈금 위치(0~1).</summary>
     public float Marker => marker;
 
+    /// <summary>검이 놓인 처음 자세를 기억해 둔다.</summary>
     private void Awake()
     {
         if (sword != null)
@@ -119,6 +120,7 @@ public class BronzeSmeltMiniGame : TimedMiniGame
         }
     }
 
+    /// <summary>초기 표시만 한다. 이미 재생 중이면 건드리지 않는다.</summary>
     private void Start()
     {
         // MiniGamePlayer 는 프리팹을 활성화한 그 프레임에 Play() 를 부를 수 있고,
@@ -130,6 +132,7 @@ public class BronzeSmeltMiniGame : TimedMiniGame
         ResetInternal();
     }
 
+    /// <summary>게임을 시작한다. 호출 시점에 타이머는 이미 0으로 초기화돼 있다.</summary>
     protected override void OnTimedPlay()
     {
         ResetInternal();
@@ -140,12 +143,14 @@ public class BronzeSmeltMiniGame : TimedMiniGame
             toolSwarm.Begin();
     }
 
+    /// <summary>게임을 중단하고 초기 상태로 되돌린다. 멱등하다.</summary>
     protected override void OnTimedStopAndReset()
     {
         StopSequence();
         ResetInternal();
     }
 
+    /// <summary>매 프레임 입력과 진행을 처리한다. 결과가 확정된 뒤에는 불리지 않는다.</summary>
     protected override void OnTimedUpdate()
     {
         if (state != State.Rising)
@@ -164,6 +169,7 @@ public class BronzeSmeltMiniGame : TimedMiniGame
             Fail();
     }
 
+    /// <summary>제한 시간을 다 써서 실패로 확정될 때 호출된다.</summary>
     protected override void OnTimeUp()
     {
         // 아직 아무 판정도 나지 않은 채 시간이 다 됐으면(왕복 모드에서 안 누른 경우 등) 여기서 실패 연출을 낸다.
@@ -195,6 +201,7 @@ public class BronzeSmeltMiniGame : TimedMiniGame
             Fail();
     }
 
+    /// <summary>클리어 처리. 입력만 잠근 채 화로를 켜고 검·결과 연출을 재생한다.</summary>
     private void Clear()
     {
         state = State.Cleared;
@@ -214,6 +221,7 @@ public class BronzeSmeltMiniGame : TimedMiniGame
         sequenceRoutine = StartCoroutine(ClearRoutine());
     }
 
+    /// <summary>실패 처리. 진행 중인 연출을 끊고 실패 연출로 갈아탄다.</summary>
     private void Fail()
     {
         state = State.Failed;
@@ -260,6 +268,7 @@ public class BronzeSmeltMiniGame : TimedMiniGame
         onClear.Invoke();
     }
 
+    /// <summary>검이 화로에서 솟아올랐다가 자리를 잡는다.</summary>
     private IEnumerator SwordPopRoutine()
     {
         if (sword == null)
@@ -290,6 +299,7 @@ public class BronzeSmeltMiniGame : TimedMiniGame
         sword.rotation = swordStartRotation * Quaternion.Euler(0f, 0f, swordSpinDegrees);
     }
 
+    /// <summary>결과 문구가 작게 시작해 통통 튀며 제 크기까지 커진다.</summary>
     private IEnumerator ResultPopRoutine()
     {
         if (resultCanvasGroup == null)
@@ -302,7 +312,7 @@ public class BronzeSmeltMiniGame : TimedMiniGame
         {
             time += Time.deltaTime;
             float k = resultAppearDuration > 0f ? Mathf.Clamp01(time / resultAppearDuration) : 1f;
-            float scale = Mathf.LerpUnclamped(resultStartScale, 1f, EaseOutBack(k));
+            float scale = Mathf.LerpUnclamped(resultStartScale, 1f, Ease.OutBack(k));
 
             t.localScale = new Vector3(scale, scale, 1f);
             resultCanvasGroup.alpha = k;
@@ -328,6 +338,7 @@ public class BronzeSmeltMiniGame : TimedMiniGame
         resultCanvasGroup.transform.localScale = Vector3.one;
     }
 
+    /// <summary>결과 문구를 감추고 팝인 시작 상태로 되돌린다.</summary>
     private void HideResult()
     {
         if (resultCanvasGroup == null)
@@ -370,6 +381,7 @@ public class BronzeSmeltMiniGame : TimedMiniGame
         HideResult();
     }
 
+    /// <summary>진행 중인 연출 코루틴을 끊는다.</summary>
     private void StopSequence()
     {
         if (sequenceRoutine == null)
@@ -379,6 +391,7 @@ public class BronzeSmeltMiniGame : TimedMiniGame
         sequenceRoutine = null;
     }
 
+    /// <summary>AudioManager 를 거쳐 효과음을 한 번 낸다. 매니저가 없으면 조용히 넘어간다.</summary>
     private void PlaySfx(AudioClip clip)
     {
         if (clip == null || AudioManager.Instance == null)
@@ -387,14 +400,7 @@ public class BronzeSmeltMiniGame : TimedMiniGame
         AudioManager.Instance.PlaySfx(clip);
     }
 
-    /// <summary>살짝 튀어나왔다가 정착하는 back-ease-out 곡선. 문구가 통통 튀며 나타난다.</summary>
-    private static float EaseOutBack(float k)
-    {
-        const float overshoot = 1.70158f;
-        k -= 1f;
-        return k * k * ((overshoot + 1f) * k + overshoot) + 1f;
-    }
-
+    /// <summary>판정 구간을 정리하고, 에디터에서 은백색 띠가 즉시 따라오도록 갱신한다.</summary>
     private void OnValidate()
     {
         bandMax = Mathf.Max(bandMin, bandMax);

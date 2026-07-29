@@ -117,6 +117,7 @@ public class BoxingMiniGame : TimedMiniGame
     /// <summary>실패 이미지가 나타나는 순간 자체 임팩트를 재생하므로 공통 종료 셰이크는 생략한다.</summary>
     protected override bool HasOwnFailureCameraImpact => true;
 
+    /// <summary>외계인의 평소 얼굴·방향과 클리어 이미지 자리를 기억해 둔다.</summary>
     private void Awake()
     {
         if (alienRenderer != null)
@@ -132,6 +133,7 @@ public class BoxingMiniGame : TimedMiniGame
             clearImageRestorePos = clearImage.transform.localPosition;
     }
 
+    /// <summary>게임을 시작한다. 호출 시점에 타이머는 이미 0으로 초기화돼 있다.</summary>
     protected override void OnTimedPlay()
     {
         ResetInternal();
@@ -142,6 +144,7 @@ public class BoxingMiniGame : TimedMiniGame
         state = State.Playing;
     }
 
+    /// <summary>게임을 중단하고 초기 상태로 되돌린다. 멱등하다.</summary>
     protected override void OnTimedStopAndReset()
     {
         ResetInternal();
@@ -200,6 +203,7 @@ public class BoxingMiniGame : TimedMiniGame
         ShowNormalFace();
     }
 
+    /// <summary>매 프레임 입력과 진행을 처리한다. 결과가 확정된 뒤에는 불리지 않는다.</summary>
     protected override void OnTimedUpdate()
     {
         HandleKeys();
@@ -261,6 +265,7 @@ public class BoxingMiniGame : TimedMiniGame
         ouchRoutine = StartCoroutine(OuchRoutine());
     }
 
+    /// <summary>맞은 얼굴을 잠깐 보여준 뒤 평소 얼굴로 되돌린다.</summary>
     private IEnumerator OuchRoutine()
     {
         yield return new WaitForSeconds(ouchDuration);

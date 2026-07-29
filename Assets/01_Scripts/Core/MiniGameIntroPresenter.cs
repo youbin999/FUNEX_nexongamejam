@@ -50,10 +50,19 @@ public sealed class MiniGameIntroPresenter : MonoBehaviour
 
     private readonly List<KeyboardGuideRowView> spawnedRows = new List<KeyboardGuideRowView>();
 
+    // ── 수명주기 ──
+
+    /// <summary>UI를 감춘 상태로 시작하고 설명 글자 테두리를 적용한다.</summary>
     private void Awake()
     {
         HideImmediate();
         ApplyDescriptionOutline();
+    }
+
+    /// <summary>중간에 꺼져도 UI가 남지 않도록 즉시 되돌린다.</summary>
+    private void OnDisable()
+    {
+        HideImmediate();
     }
 
     /// <summary>
@@ -77,10 +86,8 @@ public sealed class MiniGameIntroPresenter : MonoBehaviour
         material.SetColor(OutlineColorId, descriptionOutlineColor);
     }
 
-    private void OnDisable()
-    {
-        HideImmediate();
-    }
+
+    // ── 표시와 숨김 ──
 
     /// <summary>미니게임 정보를 표시하고 퇴장 연출까지 마칠 때까지 기다린다.</summary>
     public IEnumerator Present(MiniGame game)
@@ -100,9 +107,7 @@ public sealed class MiniGameIntroPresenter : MonoBehaviour
         if (!hasDescription && !hasGuides)
             yield break;
 
-        RectTransform rect = animatedRect != null
-            ? animatedRect
-            : canvasGroup.GetComponent<RectTransform>();
+        RectTransform rect = ResolveAnimatedRect();
 
         canvasGroup.gameObject.SetActive(true);
         yield return Animate(rect, 0f, 1f, startScale, 1f);
@@ -126,15 +131,27 @@ public sealed class MiniGameIntroPresenter : MonoBehaviour
             return;
 
         canvasGroup.alpha = 0f;
-        RectTransform rect = animatedRect != null
-            ? animatedRect
-            : canvasGroup.GetComponent<RectTransform>();
+
+        RectTransform rect = ResolveAnimatedRect();
         if (rect != null)
             rect.localScale = Vector3.one * startScale;
 
         canvasGroup.gameObject.SetActive(false);
     }
 
+    /// <summary>스케일 연출 대상 RectTransform. 지정이 없으면 CanvasGroup 의 것을 쓴다.</summary>
+    private RectTransform ResolveAnimatedRect()
+    {
+        if (animatedRect != null)
+            return animatedRect;
+
+        return canvasGroup != null ? canvasGroup.GetComponent<RectTransform>() : null;
+    }
+
+
+    // ── 키 가이드 행 ──
+
+    /// <summary>유효한 키가 하나라도 있는 가이드마다 행을 만들어 컨테이너에 붙인다.</summary>
     private void BuildGuideRows(IReadOnlyList<KeyboardGuideEntry> guides)
     {
         if (guideContainer == null || guideRowPrefab == null || guides == null)
@@ -154,6 +171,7 @@ public sealed class MiniGameIntroPresenter : MonoBehaviour
         guideContainer.gameObject.SetActive(spawnedRows.Count > 0);
     }
 
+    /// <summary>표시할 만한 키가 하나라도 있는지. 전부 None 이면 행을 만들지 않는다.</summary>
     private static bool HasValidKey(KeyboardGuideEntry guide)
     {
         if (guide == null)
@@ -168,6 +186,7 @@ public sealed class MiniGameIntroPresenter : MonoBehaviour
         return false;
     }
 
+    /// <summary>생성해 둔 가이드 행을 전부 파괴하고 목록을 비운다.</summary>
     private void ClearGuideRows()
     {
         foreach (KeyboardGuideRowView row in spawnedRows)
@@ -182,6 +201,10 @@ public sealed class MiniGameIntroPresenter : MonoBehaviour
         spawnedRows.Clear();
     }
 
+
+    // ── 등장·퇴장 연출 ──
+
+    /// <summary>투명도와 크기를 동시에 보간한다. 연출 시간이 0이면 목표값을 즉시 적용한다.</summary>
     private IEnumerator Animate(RectTransform rect, float fromAlpha, float toAlpha, float fromScale, float toScale)
     {
         if (transitionDuration <= 0f)

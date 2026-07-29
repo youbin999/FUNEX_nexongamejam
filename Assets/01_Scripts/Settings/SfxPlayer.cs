@@ -58,6 +58,10 @@ public class SfxPlayer : MonoBehaviour
     private float lastPlayTime = float.NegativeInfinity;
     private int lastIndex = -1;
 
+
+    // ── 수명주기 ──
+
+    /// <summary>풀에서 다시 꺼내질 때 지난 판의 재생 기록을 지운다.</summary>
     private void OnEnable()
     {
         // 프리팹이 풀에서 다시 꺼내질 때 지난 판의 간격 제한과 직전 클립 기록이 남지 않게 한다.
@@ -65,6 +69,7 @@ public class SfxPlayer : MonoBehaviour
         lastIndex = -1;
     }
 
+    /// <summary>옵션이 켜져 있으면 재생 중이던 소리를 끊고, 채널 참조를 놓는다.</summary>
     private void OnDisable()
     {
         if (stopOnDisable)
@@ -73,6 +78,9 @@ public class SfxPlayer : MonoBehaviour
         activeSource = null;
         activeClip = null;
     }
+
+
+    // ── 재생과 정지 ──
 
     /// <summary>
     /// 이 컴포넌트가 마지막으로 재생시킨 소리를 멈춘다.
@@ -118,6 +126,10 @@ public class SfxPlayer : MonoBehaviour
         PlayInternal(PickIndex(), pitch + rise);
     }
 
+    /// <summary>
+    /// 실제 재생 경로. 연타 간격 제한을 통과하면 음 높이를 흔들어 AudioManager 로 넘긴다.
+    /// AudioManager 가 없는 씬에서는 자기 AudioSource 로 떨어진다.
+    /// </summary>
     private void PlayInternal(int index, float basePitch)
     {
         if (clips == null || clips.Length == 0)

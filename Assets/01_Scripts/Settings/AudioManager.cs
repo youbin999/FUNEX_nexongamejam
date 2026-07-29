@@ -98,6 +98,10 @@ public class AudioManager : MonoBehaviour
         return go.AddComponent<AudioManager>();
     }
 
+
+    // ── 수명주기 ──
+
+    /// <summary>싱글턴 자리를 잡고 채널을 만든 뒤 현재 설정 볼륨을 적용한다.</summary>
     private void Awake()
     {
         if (instance != null && instance != this)
@@ -128,29 +132,84 @@ public class AudioManager : MonoBehaviour
         ApplySfxVolume(GameSettings.SfxVolume);
     }
 
+    /// <summary>설정 볼륨 변경 통지를 구독한다.</summary>
     private void OnEnable()
     {
         GameSettings.BgmVolumeChanged += ApplyBgmVolume;
         GameSettings.SfxVolumeChanged += ApplySfxVolume;
     }
 
+    /// <summary>설정 볼륨 변경 통지 구독을 해제한다.</summary>
     private void OnDisable()
     {
         GameSettings.BgmVolumeChanged -= ApplyBgmVolume;
         GameSettings.SfxVolumeChanged -= ApplySfxVolume;
     }
 
+    /// <summary>지정된 시작 곡이 있으면 페이드 없이 바로 튼다.</summary>
     private void Start()
     {
         if (startupBgm != null)
             PlayBgm(startupBgm, startupBgmVolume, fadeDuration: 0f);
     }
 
+    /// <summary>싱글턴 자리를 비운다.</summary>
     private void OnDestroy()
     {
         if (instance == this)
             instance = null;
     }
+
+    /// <summary>BGM·효과음 채널을 만들어 둔다. BGM 은 크로스페이드를 위해 두 채널을 쓴다.</summary>
+    private void BuildSources()
+    {
+        if (bgmSource == null)
+        {
+            var go = new GameObject("BGM");
+            go.transform.SetParent(transform, false);
+            bgmSource = go.AddComponent<AudioSource>();
+        }
+        else if (dontDestroyOnLoad && !bgmSource.transform.IsChildOf(transform))
+        {
+            // 씬에 따로 놓인 AudioSource 를 참조하면 이 매니저만 살아남고 소스는 씬과 함께
+            // 사라져서 다음 씬에서 BGM 이 끊긴다. 계층 밖에 있으면 이쪽으로 데려온다.
+            bgmSource.transform.SetParent(transform, worldPositionStays: false);
+        }
+
+        bgmSource.playOnAwake = false;
+        bgmSource.loop = true;
+        bgmSource.spatialBlend = 0f;
+
+        // 곡을 겹쳐 넘기려면 채널이 둘 필요하다. 두 번째는 항상 여기서 만든다.
+        var altGo = new GameObject("BGM_Alt");
+        altGo.transform.SetParent(transform, false);
+
+        bgmAltSource = altGo.AddComponent<AudioSource>();
+        bgmAltSource.playOnAwake = false;
+        bgmAltSource.loop = true;
+        bgmAltSource.spatialBlend = 0f;
+        bgmAltSource.volume = 0f;
+        bgmAltSource.outputAudioMixerGroup = bgmSource.outputAudioMixerGroup;
+
+        activeBgm = bgmSource;
+
+        int count = Mathf.Max(sfxChannels, 1);
+        for (int i = 0; i < count; i++)
+        {
+            var go = new GameObject($"SFX_{i}");
+            go.transform.SetParent(transform, false);
+
+            var source = go.AddComponent<AudioSource>();
+            source.playOnAwake = false;
+            source.loop = false;
+
+            sfxSources.Add(source);
+            sfxScales.Add(1f);
+        }
+    }
+
+
+    // ── BGM 재생 ──
 
     /// <summary>
     /// BGM 을 튼다. 이미 같은 곡이 돌고 있으면 크기만 맞추고 넘어간다.
@@ -199,6 +258,9 @@ public class AudioManager : MonoBehaviour
         StartBgmFade(duration);
     }
 
+
+    // ── BGM 일시 감쇠 ──
+
     /// <summary>
     /// BGM 을 끊지 않고 볼륨만 잠시 낮춘다. 미니게임이 자체 배경음을 까는 동안 쓴다.
     /// 곡을 멈췄다 다시 트는 방식과 달리 재생 위치가 유지되므로, 판이 바뀔 때마다
@@ -215,6 +277,7 @@ public class AudioManager : MonoBehaviour
     public void RestoreBgm(float fadeDuration = 0.25f)
         => SetDuck(1f, fadeDuration);
 
+    /// <summary>감쇠 계수를 목표값으로 옮긴다. 시간이 0이거나 비활성이면 즉시 적용한다.</summary>
     private void SetDuck(float target, float fadeDuration)
     {
         if (duckRoutine != null)
@@ -260,6 +323,9 @@ public class AudioManager : MonoBehaviour
         duckRoutine = null;
     }
 
+
+    // ── BGM 크로스페이드 ──
+
     /// <summary>
     /// 새 곡을 받을 준비를 한다. 지금 곡이 있으면 물러나는 쪽으로 밀고 빈 채널을 앞에 세운다.
     /// 처음 트는 곡이면 채널을 바꾸지 않는다 — 인스펙터에서 잡아둔 AudioSource 를 그대로 쓴다.
@@ -285,6 +351,7 @@ public class AudioManager : MonoBehaviour
         activeBgm = fadingBgm == bgmSource ? bgmAltSource : bgmSource;
     }
 
+    /// <summary>겹쳐 넘기기를 시작한다. 시간이 0이면 물러나는 곡을 즉시 잘라내고 새 곡을 제 크기로 세운다.</summary>
     private void StartBgmFade(float duration)
     {
         if (duration <= 0f)
@@ -319,7 +386,7 @@ public class AudioManager : MonoBehaviour
                 activeBgm.volume = TargetBgmVolume() * t;
 
             if (fadingBgm != null)
-                fadingBgm.volume = GameSettings.BgmVolume * bgmBaseVolume * fadingTrackVolume * bgmDuck * (1f - t);
+                fadingBgm.volume = BgmVolumeFor(GameSettings.BgmVolume, fadingTrackVolume) * (1f - t);
 
             yield return null;
         }
@@ -333,6 +400,7 @@ public class AudioManager : MonoBehaviour
         bgmFadeRoutine = null;
     }
 
+    /// <summary>채널을 완전히 비운다. 물러난 곡이 다음 재생에 섞이지 않게 한다.</summary>
     private static void StopChannel(AudioSource source)
     {
         if (source == null)
@@ -343,8 +411,18 @@ public class AudioManager : MonoBehaviour
         source.volume = 0f;
     }
 
+    /// <summary>
+    /// BGM 한 채널의 최종 볼륨. 설정 게이지 × 전체 크기 × 곡별 크기 × 일시 감쇠.
+    /// 지금 곡과 물러나는 곡이 같은 식을 쓰므로 한 곳에 모아 둔다.
+    /// </summary>
+    private float BgmVolumeFor(float settingsVolume, float trackVolume)
+        => settingsVolume * bgmBaseVolume * trackVolume * bgmDuck;
+
     /// <summary>지금 곡이 최종적으로 가져야 할 볼륨. 일시 감쇠(<see cref="DuckBgm"/>)까지 반영한다.</summary>
-    private float TargetBgmVolume() => GameSettings.BgmVolume * bgmBaseVolume * bgmTrackVolume * bgmDuck;
+    private float TargetBgmVolume() => BgmVolumeFor(GameSettings.BgmVolume, bgmTrackVolume);
+
+
+    // ── 효과음 ──
 
     /// <summary>효과음을 한 번 재생한다. volumeScale 로 이 소리만 크게/작게 낼 수 있다.</summary>
     public AudioSource PlaySfx(AudioClip clip, float volumeScale = 1f, float pitch = 1f)
@@ -392,6 +470,7 @@ public class AudioManager : MonoBehaviour
         StartCoroutine(FadeOutRoutine(source, fadeDuration));
     }
 
+    /// <summary>채널 볼륨을 줄이며 끈다. 도중에 다른 소리가 채널을 가져갔으면 손대지 않고 물러난다.</summary>
     private IEnumerator FadeOutRoutine(AudioSource source, float duration)
     {
         AudioClip clip = source.clip;
@@ -428,52 +507,8 @@ public class AudioManager : MonoBehaviour
         return source;
     }
 
-    private void BuildSources()
-    {
-        if (bgmSource == null)
-        {
-            var go = new GameObject("BGM");
-            go.transform.SetParent(transform, false);
-            bgmSource = go.AddComponent<AudioSource>();
-        }
-        else if (dontDestroyOnLoad && !bgmSource.transform.IsChildOf(transform))
-        {
-            // 씬에 따로 놓인 AudioSource 를 참조하면 이 매니저만 살아남고 소스는 씬과 함께
-            // 사라져서 다음 씬에서 BGM 이 끊긴다. 계층 밖에 있으면 이쪽으로 데려온다.
-            bgmSource.transform.SetParent(transform, worldPositionStays: false);
-        }
 
-        bgmSource.playOnAwake = false;
-        bgmSource.loop = true;
-        bgmSource.spatialBlend = 0f;
-
-        // 곡을 겹쳐 넘기려면 채널이 둘 필요하다. 두 번째는 항상 여기서 만든다.
-        var altGo = new GameObject("BGM_Alt");
-        altGo.transform.SetParent(transform, false);
-
-        bgmAltSource = altGo.AddComponent<AudioSource>();
-        bgmAltSource.playOnAwake = false;
-        bgmAltSource.loop = true;
-        bgmAltSource.spatialBlend = 0f;
-        bgmAltSource.volume = 0f;
-        bgmAltSource.outputAudioMixerGroup = bgmSource.outputAudioMixerGroup;
-
-        activeBgm = bgmSource;
-
-        int count = Mathf.Max(sfxChannels, 1);
-        for (int i = 0; i < count; i++)
-        {
-            var go = new GameObject($"SFX_{i}");
-            go.transform.SetParent(transform, false);
-
-            var source = go.AddComponent<AudioSource>();
-            source.playOnAwake = false;
-            source.loop = false;
-
-            sfxSources.Add(source);
-            sfxScales.Add(1f);
-        }
-    }
+    // ── 볼륨 반영 ──
 
     /// <summary>설정 창의 BGM 게이지를 움직였을 때 지금 곡에 바로 반영한다.</summary>
     private void ApplyBgmVolume(float volume)
@@ -483,9 +518,10 @@ public class AudioManager : MonoBehaviour
             return;
 
         if (activeBgm != null)
-            activeBgm.volume = volume * bgmBaseVolume * bgmTrackVolume * bgmDuck;
+            activeBgm.volume = BgmVolumeFor(volume, bgmTrackVolume);
     }
 
+    /// <summary>설정 창의 효과음 게이지를 움직였을 때 모든 채널에 바로 반영한다.</summary>
     private void ApplySfxVolume(float volume)
     {
         for (int i = 0; i < sfxSources.Count; i++)

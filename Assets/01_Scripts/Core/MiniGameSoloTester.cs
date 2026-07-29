@@ -34,24 +34,31 @@ public class MiniGameSoloTester : MonoBehaviour
     private float countdown;
     private bool waiting;
 
+
+    // ── 수명주기 ──
+
+    /// <summary>대상 미니게임을 지정받지 못했으면 자식에서 찾는다.</summary>
     private void Awake()
     {
         if (target == null)
             target = GetComponentInChildren<MiniGame>(true);
     }
 
+    /// <summary>종료 통지 구독을 건다.</summary>
     private void OnEnable()
     {
         if (target != null)
             target.Finished += OnFinished;
     }
 
+    /// <summary>종료 통지 구독을 해제한다.</summary>
     private void OnDisable()
     {
         if (target != null)
             target.Finished -= OnFinished;
     }
 
+    /// <summary>옵션이 켜져 있으면 지정한 지연 뒤에 첫 판을 시작한다.</summary>
     private void Start()
     {
         if (target == null)
@@ -64,6 +71,7 @@ public class MiniGameSoloTester : MonoBehaviour
             Schedule(startDelay);
     }
 
+    /// <summary>재시작 키를 살피고, 예약된 시작 시각이 되면 판을 띄운다.</summary>
     private void Update()
     {
         if (target == null)
@@ -84,6 +92,9 @@ public class MiniGameSoloTester : MonoBehaviour
         PlayNow();
     }
 
+
+    // ── 재생 제어 ──
+
     /// <summary>지금 즉시 다시 시작한다. 버튼 OnClick 에 연결해도 된다.</summary>
     public void PlayNow()
     {
@@ -99,6 +110,7 @@ public class MiniGameSoloTester : MonoBehaviour
             Debug.Log($"[SoloTester] {target.name} 시작", target);
     }
 
+    /// <summary>지정 시간 뒤에 시작하도록 예약한다. 0이면 곧바로 시작한다.</summary>
     private void Schedule(float delay)
     {
         if (delay <= 0f)
@@ -112,6 +124,7 @@ public class MiniGameSoloTester : MonoBehaviour
         waiting = true;
     }
 
+    /// <summary>결과를 콘솔에 남기고, 자동 재시작이 켜져 있으면 다음 판을 예약한다.</summary>
     private void OnFinished(MiniGame game, bool success)
     {
         if (logResult)
