@@ -86,9 +86,6 @@
 ✍️ 세계 이름 짓기 → 🖼️ 갤러리에 영구 보관<img width="1536" height="153" alt="rand" src="https://github.com/user-attachments/assets/9b97812e-dd9b-470c-b260-ac69b175d975" />
 
 ```
-<img width="1536" height="153" alt="rand" src="https://github.com/user-attachments/assets/66e9c04a-ffbd-4a00-8c1d-c5a128fadbf9" />
-
-  ⚔️ 중세 → 🏭 근대 → 🌆 현대 → 🚀 미래
 ### 미니게임 3종
 
 | 종류 | 실패하면 | 예시 |
@@ -104,7 +101,7 @@
 - 📝 **크레딧 텍스트** — Gemini가 당신의 판을 읽고 대체 역사를 서술합니다
 - 🖼️ **엔딩 이미지** — 겪은 사건들을 하나의 장면으로 융합해 생성합니다
 - ✍️ **세계 이름 짓기** — 방금 만든 역사에 직접 이름을 붙입니다
-- 🏛️ **갤러리** — 이미지 + 크레딧 + 세계 이름이 한 덩어리로 **영구 저장됩니다**
+- 🏛️ **갤러리** — 이미지 + 크레딧 + 세계 이름이 한 덩어리로 로**저장됩니다**
 
 > 🔌 API 없이도 완주됩니다 — 생성에 대신 폴백 생성기가 대신 대본을 만듭니다.
 
@@ -114,25 +111,14 @@
 
 | 키 | 동작 |
 |:---:|:---|
-| `W` `A` `S` `D` / `↑` `↓` `←` `→` | 이동 · 커서 |
+| `W` `A` `S` `D`| 이동 · 커서 |
 | `Space` | 결정 · 연타 · 타이밍 |
 | `마우스` | 드래그 · 클릭 (일부 미니게임) |
 | `ESC` | ⚙️ 설정 (BGM · 효과음 · 해상도) |
 
-> ⌨️ 게임 시작 전 **키 가이드**가 자동으로 표시됩니다.
+> ⌨️ 미니게임마다 **키**가  표시됩니다.
 
 ---
-
-## 🧰 사용한 에셋 · 도구
-
-<div align="center">
-
-![Unity](https://img.shields.io/badge/unity-%23000000.svg?style=for-the-badge&logo=unity&logoColor=white)
-![C#](https://img.shields.io/badge/c%23-%23239120.svg?style=for-the-badge&logo=csharp&logoColor=white)
-![Rider](https://img.shields.io/badge/Rider-000000.svg?style=for-the-badge&logo=Rider&logoColor=white&color=black)
-![Visual Studio](https://img.shields.io/badge/Visual%20Studio-5C2D91.svg?style=for-the-badge&logo=visual-studio&logoColor=white)
-![Google Gemini](https://img.shields.io/badge/google%20gemini-8E75B2?style=for-the-badge&logo=google%20gemini&logoColor=white)
-![Git](https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white)
 
 </div>
 
