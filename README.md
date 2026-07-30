@@ -1,8 +1,8 @@
 <div align="center">
 
-# 🌌 FUNEX
+<img src="https://dszw1qtcnsa5e.cloudfront.net/community/20260622/be46a364-7b9a-4fe6-80e5-5f009b95701c/%EB%84%A5%EC%8A%A82026%EB%84%A5%EC%8A%A8%EB%8C%80%ED%95%99%EC%83%9D%EA%B2%8C%EC%9E%84%EC%9E%BC%EC%9E%AC%EB%B0%8C%EB%84%A5.jpg" width="400" alt="게임 에셋">
 
-### 빅뱅부터 미래까지 — 당신이 만드는 인류사
+### 빅뱅부터 미래까지 — 당신이 만드는 세계
 
 *넥슨 게임잼 출품작 · 주제 「맥락(Context)」*
 
@@ -10,13 +10,11 @@
 
 ![C#](https://img.shields.io/badge/c%23-%23239120.svg?style=for-the-badge&logo=csharp&logoColor=white)
 ![Unity](https://img.shields.io/badge/unity-%23000000.svg?style=for-the-badge&logo=unity&logoColor=white)
-![2D](https://img.shields.io/badge/2D-%23FF6B9D.svg?style=for-the-badge&logo=aseprite&logoColor=white)
-![WARE](https://img.shields.io/badge/genre-WARE-%23FFB300.svg?style=for-the-badge&logo=nintendoswitch&logoColor=white)
+![2D](https://img.shields.io/badge/2D-%23CAAE72.svg?style=for-the-badge&logo=aseprite&logoColor=201C18)
+![WARE](https://img.shields.io/badge/genre-WARE-%23A83B2A.svg?style=for-the-badge&logo=nintendoswitch&logoColor=white)
 
-![Windows](https://img.shields.io/badge/Windows-0078D4?style=for-the-badge&logo=windows&logoColor=white)
+![Pollinations](https://img.shields.io/badge/Pollinations-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)
 ![Google Gemini](https://img.shields.io/badge/google%20gemini-8E75B2?style=for-the-badge&logo=google%20gemini&logoColor=white)
-![Git](https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white)
-![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)
 
 </div>
 
@@ -28,12 +26,10 @@
   - [✨ 엔딩은 정해져 있지 않습니다](#-엔딩은-정해져-있지-않습니다)
   - [핵심 재미](#핵심-재미)
   - [게임 흐름](#게임-흐름)
-  - [미니게임 3종](#미니게임-3종)
   - [엔딩 & 갤러리](#엔딩--갤러리)
 - [🕹️ 조작법](#️-조작법)
 - [🧰 사용한 에셋 · 도구](#-사용한-에셋--도구)
 - [📁 프로젝트 구조](#-프로젝트-구조)
-- [🚀 실행 방법](#-실행-방법)
 - [👥 제작자](#-제작자)
 
 ---
@@ -73,7 +69,7 @@
 |:---|:---|
 | 🔥 **시대별 맞춤 미니게임** | 석기시대엔 불 붙이기, 중세엔 마녀 찾기, 근대엔 페니실린 골라내기 |
 | 🔗 **역사의 인과관계 체험** | "그때 그게 안 됐다면?"을 손으로 겪는다 |
-| 🪞 **의도된 데자뷔** | 중세의 *마녀 색출*과 근대의 *페니실린 선별*은 **같은 화면·같은 조작**이다. 손이 먼저 알아챈다 |
+| 🪞 **게임 실패 패널티** | 미니게임을 실패할 경우 실시간으로 플레이에 영향이 생긴다. |
 | 🎲 **매번 다른 엔딩** | 성공/실패 조합이 2ⁿ가지 → 엔딩 텍스트·이미지를 **런타임 생성** |
 
 ### 게임 흐름
@@ -87,9 +83,12 @@
     ▼
 📜 엔딩 크레딧 (스타워즈풍 롤)
     ▼
-✍️ 세계 이름 짓기 → 🖼️ 갤러리에 영구 보관
-```
+✍️ 세계 이름 짓기 → 🖼️ 갤러리에 영구 보관<img width="1536" height="153" alt="rand" src="https://github.com/user-attachments/assets/9b97812e-dd9b-470c-b260-ac69b175d975" />
 
+```
+<img width="1536" height="153" alt="rand" src="https://github.com/user-attachments/assets/66e9c04a-ffbd-4a00-8c1d-c5a128fadbf9" />
+
+  ⚔️ 중세 → 🏭 근대 → 🌆 현대 → 🚀 미래
 ### 미니게임 3종
 
 | 종류 | 실패하면 | 예시 |
@@ -107,7 +106,7 @@
 - ✍️ **세계 이름 짓기** — 방금 만든 역사에 직접 이름을 붙입니다
 - 🏛️ **갤러리** — 이미지 + 크레딧 + 세계 이름이 한 덩어리로 **영구 저장됩니다**
 
-> 🔌 API 없이도 완주됩니다 — 생성에 실패하면 폴백 생성기가 대신 대본을 만듭니다.
+> 🔌 API 없이도 완주됩니다 — 생성에 대신 폴백 생성기가 대신 대본을 만듭니다.
 
 ---
 
@@ -155,8 +154,7 @@
 | 크레딧 텍스트 | **Gemini** `gemini-3.6-flash` | 필요 |
 | 엔딩 이미지 | **Pollinations** (flux) | 불필요 |
 
-> ⚠️ Gemini 이미지 모델은 무료 티어 일일 한도가 0이라 사용할 수 없습니다 → Pollinations를 기본값으로 사용합니다.
-> 🔑 키는 소스에 넣지 않습니다 → 환경변수 `GEMINI_API_KEY` 또는 `StreamingAssets/gemini_api_key.txt` 로 주입됩니다.
+> 🔑 키는 소스에 넣지 않았습니다. → 의도한 엔딩 크래딧 생성 불가능 
 
 ### 🎨 에셋 제작
 
@@ -184,45 +182,26 @@ Assets/
 
 docs/                 📚 설계 문서 (미니게임 계약 · 엔딩 · 갤러리 등)
 ```
-
-> 📦 미니게임은 **프리팹 단위**로 제작하며 씬에 직접 배치하지 않습니다.
-> 📄 새 미니게임을 만들기 전 [`docs/MiniGame_Contract.md`](docs/MiniGame_Contract.md)를 먼저 읽어 주세요.
-
----
-
-## 🚀 실행 방법
-
-```bash
-git clone <repository-url>
-```
-
-1. **Unity `6000.3.7f1`** 로 프로젝트 열기
-2. *(선택)* 엔딩 텍스트 생성을 쓰려면 API 키 설정
-   - 환경변수 `GEMINI_API_KEY` 설정, **또는**
-   - `Assets/StreamingAssets/gemini_api_key.txt` 에 키 저장
-3. `Assets/00_Scenes/00000_Title.unity` 열고 ▶️ Play
-
-> 🔧 키가 없어도 폴백 텍스트로 정상 플레이됩니다.
-
 ---
 
 ## 👥 제작자
 
 > 🏆 **4인 팀 / 2박 3일 게임잼** — AI를 적극 활용해 완성했습니다.
 
-| 담당 | 이름 | GitHub |
+| 담당 | 닉네임 | GitHub |
 |:---:|:---|:---|
-| *역할 추가 작성 필요* | **youbin999** | [@youbin999](https://github.com/youbin999) |
+| *역할 추가 작성 필요* | **최유빈** | [@youbin999](https://github.com/youbin999) |
 | *역할 추가 작성 필요* | **이동규** | [@Dong-kyu-Lee](https://github.com/Dong-kyu-Lee) |
-| *역할 추가 작성 필요* | **Digital** | [@digital8150](https://github.com/digital8150) |
-| *역할 추가 작성 필요* | **uglynerd1234** | [@uglynerd1234](https://github.com/uglynerd1234) |
+| *역할 추가 작성 필요* | **제세형** | [@digital8150](https://github.com/digital8150) |
+| *역할 추가 작성 필요* | **김정현** | [@uglynerd1234](https://github.com/uglynerd1234) |
 
 ---
 
 <div align="center">
 
-**🌌 당신의 역사는 어떤 모습입니까? 🌌**
+**🌌 당신의 세계는 어떤 모습입니까? 🌌**
 
+<img width="1536" height="153" alt="rand" src="https://github.com/user-attachments/assets/0acf0116-9435-47f4-869b-630fca90080b" />
 <sub>Made with ☕ and 😴 in 3 days · NEXON Game Jam</sub>
 
 </div>
