@@ -252,7 +252,13 @@ EndingController [EndingCreditController]
 | LLM | [GeminiEndingNarrator.cs](../Assets/01_Scripts/Ending/GeminiEndingNarrator.cs) | `EraVoices` — 시대별 규칙 + **예문** |
 | 폴백 | [FallbackEndingNarrator.cs](../Assets/01_Scripts/Ending/FallbackEndingNarrator.cs) | `Voices` — 도입부·머리글·줄 변환·마무리·에필로그 |
 
-**시대마다 화자가 여러 명이고, 판마다 하나가 무작위로 걸린다.** 현재 시대당 2명씩:
+**중세·근대·현대·미래는 화자가 60% 확률로만 등장한다.** 나머지 40% 는 화자 없이
+담담한 서사체(`NeutralVoice`)로 간다 — 강한 화자가 매번 나오면 특별함이 닳기 때문이다.
+**석기·청동기는 항상 등장한다**: 그 둘은 문체(단어+마침표 / 장부체) 자체가 시대의 정체성이라,
+담담한 서술로 바뀌면 무엇으로 끝난 판인지 알 수 없어진다.
+확률은 `GeminiEndingNarrator.EraVoiceChance`, 대상 시대는 `ChanceBasedEras` 에서 바꾼다.
+
+**시대마다 화자가 여러 명이고, 등장할 때 하나가 무작위로 걸린다.** 현재 시대당 2명씩:
 
 | 시대 | 화자 |
 |---|---|
@@ -269,7 +275,7 @@ EndingController [EndingCreditController]
 > ⚠️ **같은 시대 키를 두 번 적지 말 것.** `[Era.Prehistoric] = ...` 은 인덱서 대입이라
 > 키가 겹치면 **컴파일 에러 없이 뒤엣것이 앞엣것을 조용히 덮어쓴다.** 반드시 배열 안에 넣어야 한다.
 
-콘솔에 `화자 변형 2/2` 가 찍히므로 어느 쪽이 걸렸는지 확인할 수 있다.
+콘솔에 `화자 변형 2/2` 또는 `화자 없음 — 담담한 서술로 진행` 이 찍히므로 무엇이 걸렸는지 확인할 수 있다.
 
 LLM 쪽은 **예문이 핵심이다.** 규칙만 주면 모델이 두세 줄 만에 평범한 문어체로 돌아간다.
 프롬프트 조립 순서는 `SystemInstructionIntro` + `EraVoices[해당 시대]` + `SystemInstructionRules` 이고,

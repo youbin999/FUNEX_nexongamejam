@@ -30,8 +30,10 @@ public class GeminiEndingNarrator : IEndingNarrator
 
 이 크레딧은 '살아남은 세계가 자기 역사를 직접 기록한 문서'다.
 따라서 인류가 어디까지 도달했는지에 따라 기록자와 문체가 달라진다.
-아래에 지정된 화자로 완전히 빙의해서 써라. 이건 장식이 아니라 이 엔딩의 핵심 장치다.
-중간에 평범한 문어체로 돌아가지 마라 — 마지막 줄까지 그 시대의 말로 써야 한다.";
+아래에 지정된 문체를 그대로 따라라. 이건 장식이 아니라 이 엔딩의 핵심 장치다.
+화자가 지정돼 있으면 그 인물에 완전히 빙의해서 쓰고, 첫 줄부터 마지막 줄까지 그 말투를 유지해라.
+화자가 없다고 되어 있으면 반대로 어떤 인물의 말투도 흉내내지 마라.
+어느 쪽이든 중간에 문체가 흔들리면 안 된다.";
 
     /// <summary>
     /// 시대별 화자와 문체. 이 판이 어느 시대에서 끝났는지에 따라 그 시대의 화자 중
@@ -218,7 +220,7 @@ public class GeminiEndingNarrator : IEndingNarrator
 - 사건 이름과 연도를 중얼거리다 딴소리를 한다. 그러다 다시 돌아온다.
 - 가끔 틀리게 외우고, 혼자 고치거나 그냥 넘어간다.
 - 시험에 나올지 안 나올지로 사건의 가치를 판단한다. 그게 유일한 기준이다.
-- 문장을 '~야', '~냐', '~하네', '~겠지', '~더라' 로 끝낸다.
+- 문     장을 '~야', '~냐', '~하네', '~겠지', '~더라' 로 끝낸다.
 - 이모지와 특수문자는 절대 쓰지 않는다. 글꼴에 없어서 깨진다.
 예문:
 아 무슨 범위가 선사부터야..
@@ -468,12 +470,60 @@ public class GeminiEndingNarrator : IEndingNarrator
     // ── 화자 결정 ──
 
     /// <summary>
-    /// 해당 시대의 문체 블록. 그 시대에 화자가 여럿이면 판마다 하나를 무작위로 고른다 —
+    /// <see cref="ChanceBasedEras"/> 에 속한 시대에서 화자가 등장할 확률.
+    /// 나머지 확률로는 화자 없이 담담하게 서술한다 — 매번 나오면 특별함이 닳는다.
+    /// </summary>
+    private const float EraVoiceChance = 0.6f;
+
+    /// <summary>
+    /// 화자 등장 여부를 확률로 굴리는 시대들.
+    ///
+    /// 석기와 청동기는 빠져 있다 — 그 둘은 문체(단어+마침표 / 장부체) 자체가 시대의 정체성이라
+    /// 담담한 서술로 바뀌면 무엇으로 끝난 판인지 알 수 없어진다. 항상 등장시킨다.
+    /// </summary>
+    private static readonly HashSet<Era> ChanceBasedEras = new HashSet<Era>
+    {
+        Era.Medieval,
+        Era.Modern,
+        Era.Contemporary,
+        Era.Future,
+    };
+
+    /// <summary>
+    /// 화자가 등장하지 않는 판에 쓰는 기본 문체.
+    /// 특정 인물이 아니라 역사 그 자체가 서술하는 톤이다.
+    /// </summary>
+    private const string NeutralVoice =
+@"[이 판의 화자와 문체 — 기록자 없음]
+이번 판에는 특정 화자가 등장하지 않는다. 역사 그 자체가 서술한다.
+- 스타워즈 인트로처럼 위로 흘러가는, 담담하고 서사적인 문체를 쓴다.
+- 있었던 사건들을 원인과 결과를 꾸며 이야기한다. 
+- 나중에 무엇이 달라졌는가 최소 한 줄 뒤에 붙여라.
+- 사건과 다른 사건 사이에 줄바꿈을 하여라
+- 감정을 앞세우지 않는다. 일어난 일을 적고 판단은 읽는 사람에게 맡긴다.
+- 문장은 '~했다', '~였다', '~되었다' 로 담담하게 끝낸다.
+예문:
+불은 인류의 것이 되었다.
+그 온기 위에서 마을이 생겼고, 마을은 도시가 되었다.
+누구도 그것이 시작이었다는 것을 알지 못했다.
+";
+
+    /// <summary>
+    /// 이번 판에 쓸 문체 블록을 고른다.
+    ///
+    /// <see cref="ChanceBasedEras"/> 의 시대라면 먼저 화자가 등장할지를 굴리고,
+    /// 등장한다면 그 시대의 화자 중 하나를 무작위로 뽑는다 —
     /// 같은 시대에서 끝나도 크레딧이 매번 똑같이 나오지 않게 하는 장치다.
     /// 표에 없는 시대(빅뱅 등)는 미래 문체로 떨어진다.
     /// </summary>
     private static string VoiceFor(Era era)
     {
+        if (ChanceBasedEras.Contains(era) && UnityEngine.Random.value >= EraVoiceChance)
+        {
+            Debug.Log($"GeminiEndingNarrator: 화자 없음 — 담담한 서술로 진행 ({era.ToKorean()})");
+            return NeutralVoice;
+        }
+
         if (!EraVoices.TryGetValue(era, out string[] voices) || voices == null || voices.Length == 0)
             voices = EraVoices[Era.Future];
 
