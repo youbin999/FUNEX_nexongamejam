@@ -1045,7 +1045,7 @@ MonoBehaviour:
   fallbackNoticeHeadline: "Ai\uAC00 \uBA38\uB9AC\uB97C \uAD74\uB824\uBD24\uC9C0\uB9CC\n\uD798\uC774
     \uBD80\uC871\uD55C\uAC83\uAC19\uC544\uC694"
   fallbackNoticeQuestion: "\uC774 \uC138\uACC4\uB97C \uAE30\uB85D\uD558\uC2DC\uACA0\uC2B5\uB2C8\uAE4C?"
-  fallbackNoticeConfirmLabel: "\uC138\uACC4 \uAE30\uB85D\uD558"
+  fallbackNoticeConfirmLabel: "\uAE30\uB85D\uD558\uAE30"
   fallbackNoticeCancelLabel: "\uADF8\uB9CC\uB450\uAE30"
   quitSceneName: 00000_Title
   gallerySceneName: 00000_Gallery
