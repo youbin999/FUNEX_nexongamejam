@@ -7,7 +7,9 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 /// <summary>
-/// MiniGamePlayer 를 제어하여 인스펙터에 등록된 미니게임들을 순서대로 재생하는 게임 흐름 컨트롤러.
+/// MiniGamePlayer 를 제어하여 인스펙터에 등록된 미니게임들을 재생하는 게임 흐름 컨트롤러.
+/// 시대 순서는 등록된 대로 지키되, <see cref="shuffleWithinEra"/> 가 켜져 있으면
+/// 같은 시대에 속한 게임들의 순서를 판마다 섞는다(핵심 게임은 그 시대의 마지막에 유지).
 /// 크리티컬로 표시된 게임에서 실패하면 흐름을 멈추고 게임 엔딩으로 진행한다(onGameEnding 발화).
 /// 크리티컬이 아닌 게임은 실패해도 다음 게임으로 계속 진행한다.
 /// </summary>
@@ -57,8 +59,12 @@ public class GameFlowController : MonoBehaviour
         /// <summary>실패 시 즉시 엔딩으로 가야 하는 게임인지.</summary>
         public bool IsCritical => kind == MiniGameKind.Critical;
 
-        /// <summary>결과에 따라 이 항목을 엔딩 재료(<see cref="MiniGameOutcome"/>)로 변환한다.</summary>
-        public MiniGameOutcome ToOutcome(bool success) => new MiniGameOutcome
+        /// <summary>
+        /// 결과에 따라 이 항목을 엔딩 재료(<see cref="MiniGameOutcome"/>)로 변환한다.
+        /// <paramref name="sortIndex"/> 에는 이 항목의 <c>games</c> 상 원본 등록 인덱스를 넘긴다 —
+        /// 재생 순서가 섞여도 조합 키가 흔들리지 않게 하는 정규 정렬 기준이다.
+        /// </summary>
+        public MiniGameOutcome ToOutcome(bool success, int sortIndex) => new MiniGameOutcome
         {
             eventLabel = string.IsNullOrWhiteSpace(eventLabel) && prefab != null ? prefab.name : eventLabel,
             era = era.ToKorean(),
@@ -66,6 +72,7 @@ public class GameFlowController : MonoBehaviour
             meaning = success ? successMeaning : failureMeaning,
             visual = success ? successVisual : failureVisual,
             visualWeight = visualWeight,
+            sortIndex = sortIndex,
         };
     }
 
@@ -82,6 +89,20 @@ public class GameFlowController : MonoBehaviour
     [Header("옵션")]
     [Tooltip("Start 에서 자동으로 흐름을 시작한다")]
     [SerializeField] private bool playOnStart = true;
+
+    [Tooltip("같은 시대에 속한 미니게임들의 순서를 판마다 섞는다.\n" +
+        "시대 순서(석기 → 청동기 → … → 미래)와 각 시대 안에서 핵심(Critical) 게임이 마지막에 온다는 점은 유지된다.\n" +
+        "끄면 인스펙터에 등록한 순서 그대로 재생한다")]
+    [SerializeField] private bool shuffleWithinEra = true;
+
+    [Header("게임 오버 선택")]
+    [Tooltip("핵심 미니게임 실패 시 '세계 만들기 / 다시 시작'을 묻는 선택창.\n" +
+        "비워두면 코드로 만들어 쓴다(SimpleUiBuilder)")]
+    [SerializeField] private GameOverPrompt gameOverPrompt;
+
+    [Tooltip("선택창을 띄우기 전에 실패 연출과 카메라 셰이크를 보여 줄 시간(초)")]
+    [Min(0f)]
+    [SerializeField] private float gameOverPromptDelay = 0.8f;
 
     [Header("엔딩")]
     [Tooltip("크리티컬 실패 또는 모든 미니게임 완료 시 전환할 엔딩 씬 이름")]
@@ -116,12 +137,26 @@ public class GameFlowController : MonoBehaviour
     [Tooltip("등록된 모든 게임을 클리어(또는 통과)하면 발화")]
     public UnityEvent onAllGamesCleared;
 
+    /// <summary>
+    /// 이번 판의 실제 재생 순서. 담긴 값은 <see cref="games"/> 의 인덱스다.
+    /// <see cref="StartFlow"/> 마다 새로 만들어지며, prefab 이 비어 있는 항목은 애초에 제외된다.
+    /// </summary>
+    private readonly List<int> playOrder = new List<int>();
+
+    /// <summary>
+    /// 이번 판에서 각 항목을 재생할 때 실제로 넘길 보더 스프라이트. 인덱스는 <see cref="games"/> 기준.
+    /// 시대 테마와 시대 타이틀 연출은 보더 스프라이트가 있을 때만 재생되므로(MiniGamePlayer),
+    /// 셔플 결과 그 시대에서 <b>첫 번째로 재생되는</b> 항목에만 스프라이트를 몰아준다.
+    /// </summary>
+    private Sprite[] borderSprites = new Sprite[0];
+
+    /// <summary><see cref="playOrder"/> 상의 커서. games 의 인덱스가 아니다.</summary>
     private int currentIndex = -1;
     private bool ended;
     private Coroutine endingTransitionRoutine;
 
     /// <summary>현재 흐름이 진행 중인지 여부.</summary>
-    public bool IsRunning => currentIndex >= 0 && currentIndex < games.Count && !ended;
+    public bool IsRunning => currentIndex >= 0 && currentIndex < playOrder.Count && !ended;
 
 
     // ── 수명주기 ──
@@ -179,7 +214,7 @@ public class GameFlowController : MonoBehaviour
 
     // ── 게임 흐름 ──
 
-    /// <summary>처음부터 등록된 순서대로 게임 흐름을 시작한다.</summary>
+    /// <summary>이번 판의 재생 순서를 새로 뽑고 처음부터 게임 흐름을 시작한다.</summary>
     public void StartFlow()
     {
         if (player != null)
@@ -191,10 +226,89 @@ public class GameFlowController : MonoBehaviour
         ended = false;
         currentIndex = -1;
 
+        // 재시작할 때마다 새로 섞는다 — 판이 바뀌면 시대 안의 순서도 바뀌어야 한다.
+        BuildPlayOrder();
+
         // 재시작 시 이전 판의 엔딩 재료가 섞이지 않도록 비운다.
         RunResult.Instance.Clear();
 
         PlayNext();
+    }
+
+    /// <summary>
+    /// 이번 판의 <see cref="playOrder"/> 와 <see cref="borderSprites"/> 를 만든다.
+    ///
+    /// games 를 훑으며 era 가 같은 <b>연속 구간</b>을 한 시대 묶음으로 자르고, 묶음 단위로만 순서를 섞는다.
+    /// 묶음 자체의 순서는 건드리지 않으므로 시대 진행(석기 → 청동기 → … → 미래)은 그대로 지켜진다.
+    /// 묶음 안에서는 핵심(Critical) 게임을 뒤로 몰아 시대의 클라이맥스 구조를 유지한다 —
+    /// 핵심 실패로 조기 엔딩이 났을 때 "그 시대를 거의 다 겪고 끊겼다"는 서사가 성립해야 하기 때문이다.
+    /// </summary>
+    private void BuildPlayOrder()
+    {
+        playOrder.Clear();
+        borderSprites = new Sprite[games.Count];
+
+        var normals = new List<int>();
+        var criticals = new List<int>();
+
+        int groupStart = 0;
+        while (groupStart < games.Count)
+        {
+            // 같은 시대가 이어지는 동안 한 묶음으로 본다.
+            int groupEnd = groupStart;
+            while (groupEnd + 1 < games.Count && games[groupEnd + 1].era == games[groupStart].era)
+                groupEnd++;
+
+            normals.Clear();
+            criticals.Clear();
+
+            // 이 시대의 테마 스프라이트. 등록 순서상 처음 등장하는 것을 시대 대표로 쓴다.
+            Sprite eraBorder = null;
+
+            for (int i = groupStart; i <= groupEnd; i++)
+            {
+                GameEntry entry = games[i];
+
+                if (eraBorder == null && entry.borderSprite != null)
+                    eraBorder = entry.borderSprite;
+
+                // prefab 이 비면 재생할 수 없다. 여기서 걸러야 시대 첫 판이 빈 항목이어도
+                // 시대 타이틀이 실제로 재생되는 첫 판에 정확히 붙는다.
+                if (entry.prefab == null)
+                    continue;
+
+                if (entry.IsCritical)
+                    criticals.Add(i);
+                else
+                    normals.Add(i);
+            }
+
+            if (shuffleWithinEra)
+            {
+                Shuffle(normals);
+                Shuffle(criticals);
+            }
+
+            int groupFirst = playOrder.Count;
+            playOrder.AddRange(normals);
+            playOrder.AddRange(criticals);
+
+            // 시대 테마·타이틀은 이 시대에서 처음 재생되는 판에서만 연출한다.
+            if (eraBorder != null && playOrder.Count > groupFirst)
+                borderSprites[playOrder[groupFirst]] = eraBorder;
+
+            groupStart = groupEnd + 1;
+        }
+    }
+
+    /// <summary>리스트를 제자리에서 섞는다(Fisher–Yates).</summary>
+    private static void Shuffle(List<int> indices)
+    {
+        for (int i = indices.Count - 1; i > 0; i--)
+        {
+            int j = UnityEngine.Random.Range(0, i + 1);
+            (indices[i], indices[j]) = (indices[j], indices[i]);
+        }
     }
 
     /// <summary>다음 순서의 게임을 재생한다. 목록이 끝나면 전체 클리어로 처리한다.</summary>
@@ -202,7 +316,7 @@ public class GameFlowController : MonoBehaviour
     {
         currentIndex++;
 
-        if (currentIndex >= games.Count)
+        if (currentIndex >= playOrder.Count)
         {
             ended = true;
             onAllGamesCleared.Invoke();
@@ -210,16 +324,43 @@ public class GameFlowController : MonoBehaviour
             return;
         }
 
-        GameEntry entry = games[currentIndex];
+        int gameIndex = playOrder[currentIndex];
+        GameEntry entry = games[gameIndex];
 
         // 시대가 바뀌면 BGM 도 같이 넘긴다. 같은 시대가 이어지면 디렉터가 알아서 곡을 유지한다.
         PlayEraBgm(entry.era);
 
-        if (entry.prefab == null || player == null ||
-            !player.PlayGame(entry.prefab, entry.borderSprite, entry.era))
+        if (player == null || !player.PlayGame(entry.prefab, borderSprites[gameIndex], entry.era))
         {
-            Debug.LogWarning($"GameFlowController: index {currentIndex} 게임을 재생할 수 없습니다.", this);
+            Debug.LogWarning($"GameFlowController: games[{gameIndex}] 게임을 재생할 수 없습니다.", this);
+
+            // 시대 타이틀을 들고 있던 판이 재생에 실패하면, 같은 시대의 다음 판에 넘겨준다.
+            // 그러지 않으면 그 시대의 테마 교체와 시대 타이틀이 통째로 사라진다.
+            CarryBorderToNextInEra(gameIndex, entry.era);
             PlayNext();
+        }
+    }
+
+    /// <summary>재생하지 못한 판이 들고 있던 시대 보더를 같은 시대의 다음 판으로 넘긴다.</summary>
+    private void CarryBorderToNextInEra(int gameIndex, Era era)
+    {
+        Sprite border = borderSprites[gameIndex];
+        if (border == null)
+            return;
+
+        borderSprites[gameIndex] = null;
+
+        for (int i = currentIndex + 1; i < playOrder.Count; i++)
+        {
+            int nextIndex = playOrder[i];
+            if (games[nextIndex].era != era)
+                return;
+
+            if (borderSprites[nextIndex] == null)
+            {
+                borderSprites[nextIndex] = border;
+                return;
+            }
         }
     }
 
@@ -242,28 +383,72 @@ public class GameFlowController : MonoBehaviour
         if (ended)
             return;
 
-        if (currentIndex < 0 || currentIndex >= games.Count)
+        if (currentIndex < 0 || currentIndex >= playOrder.Count)
             return;
 
-        GameEntry entry = games[currentIndex];
+        int gameIndex = playOrder[currentIndex];
+        GameEntry entry = games[gameIndex];
 
         // 변화 미니게임은 성공/실패 모두 엔딩 재료가 된다 — 실패만 기록하는 게 아니다.
         if (entry.kind == MiniGameKind.Change)
-            RunResult.Instance.Record(entry.ToOutcome(success));
+            RunResult.Instance.Record(entry.ToOutcome(success, gameIndex));
 
         if (!success && entry.IsCritical)
         {
             ended = true;
-            // 조기 엔딩을 일으킨 Critical 실패도 엔딩 재료로 기록해야
-            // failureVisual 이 대본 생성과 이미지 생성 프롬프트까지 전달된다.
-            RunResult.Instance.Record(entry.ToOutcome(false));
-            RunResult.Instance.MarkEarlyEnding(entry.era.ToKorean(), entry.eventLabel, entry.failureMeaning);
-            onGameEnding.Invoke();
-            BeginEndingTransition();
+
+            // 선택창이 떠 있는 동안 마지막 실패 화면이 그대로 보여야 한다.
+            // 이 보류 지시는 반드시 onGameFinished 콜백 안에서(=지금) 걸어야 한다 —
+            // 콜백이 끝나는 즉시 MiniGamePlayer 가 인스턴스를 정리해 버리기 때문이다.
+            if (player != null)
+                player.HoldFinishedInstance();
+
+            StartCoroutine(GameOverChoiceRoutine(entry, gameIndex));
             return;
         }
 
         PlayNext();
+    }
+
+    /// <summary>
+    /// 핵심 미니게임 실패 후의 갈림길. 이 판을 엔딩으로 남길지, 그냥 다시 굴릴지 묻고 그대로 따른다.
+    ///
+    /// 실패 결과를 <see cref="RunResult"/> 에 기록하는 것은 "세계 만들기"를 고른 뒤로 미룬다 —
+    /// 재시작을 고른 판은 애초에 없던 역사로 취급해야 갤러리가 지저분해지지 않는다.
+    /// </summary>
+    private IEnumerator GameOverChoiceRoutine(GameEntry entry, int gameIndex)
+    {
+        // 실패 연출과 셰이크를 잠깐 보여 준 뒤에 묻는다. 곧바로 창이 뜨면 뭘 틀렸는지 안 보인다.
+        if (gameOverPromptDelay > 0f)
+            yield return new WaitForSecondsRealtime(gameOverPromptDelay);
+
+        if (gameOverPrompt == null)
+            gameOverPrompt = gameObject.AddComponent<GameOverPrompt>();
+
+        bool? createWorld = null;
+        gameOverPrompt.Show(entry.era.ToKorean(), entry.eventLabel, choice => createWorld = choice);
+
+        yield return new WaitUntil(() => createWorld.HasValue);
+
+        if (createWorld.Value)
+        {
+            // 조기 엔딩을 일으킨 Critical 실패도 엔딩 재료로 기록해야
+            // failureVisual 이 대본 생성과 이미지 생성 프롬프트까지 전달된다.
+            RunResult.Instance.Record(entry.ToOutcome(false, gameIndex));
+            RunResult.Instance.MarkEarlyEnding(entry.era.ToKorean(), entry.eventLabel, entry.failureMeaning);
+            onGameEnding.Invoke();
+            BeginEndingTransition();
+            yield break;
+        }
+
+        // 재시작 — 붙들고 있던 마지막 판 화면과 실패 연출을 걷어내고 처음부터 다시 굴린다.
+        if (player != null)
+            player.ReleaseFinishedInstance();
+
+        if (CameraEffectManager.TryGetInstance != null)
+            CameraEffectManager.TryGetInstance.StopAll();
+
+        StartFlow();
     }
 
 
