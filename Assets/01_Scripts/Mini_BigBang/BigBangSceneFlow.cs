@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 /// <summary>
 /// 빅뱅 씬(00_BigBang)의 흐름 처리기.
 /// <see cref="MiniGamePlayer"/> 의 종료 통지를 받아 성공이면 메인 씬으로 넘어가고,
-/// 실패면 실패 UI 를 띄운 뒤 애플리케이션을 종료한다.
+/// 실패면 실패 UI 를 띄운 뒤 게임을 정리한다(Web 은 씬 재시작, 그 외는 애플리케이션 종료).
 /// 씬 전환·종료 같은 바깥 일은 미니게임이 아니라 여기서 처리해야 미니게임을 재사용할 수 있다.
 /// </summary>
 public class BigBangSceneFlow : MonoBehaviour
@@ -84,11 +84,18 @@ public class BigBangSceneFlow : MonoBehaviour
         Quit();
     }
 
-    /// <summary>게임을 종료한다. 에디터에서는 플레이 모드를 끈다.</summary>
+    /// <summary>
+    /// 실패 처리를 끝낸다. 에디터에서는 플레이 모드를 끄고, Web 에서는 씬을 다시 로드하며,
+    /// 그 외 플랫폼에서는 애플리케이션을 종료한다.
+    /// </summary>
     private void Quit()
     {
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
+#elif UNITY_WEBGL
+        // Web 에서 Application.Quit() 은 캔버스를 정지시켜 새로고침 말고는 복구할 방법이 없다.
+        // 기획상 빅뱅 실패는 "다시 빅뱅부터 시작" 이므로 현재 씬을 다시 로드한다.
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 #else
         Application.Quit();
 #endif
