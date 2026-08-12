@@ -82,6 +82,13 @@ public class MiniGameOutcome
 
     /// <summary>서사 비중(0~10). 높을수록 이미지 전경에 배치하도록 유도한다.</summary>
     public int visualWeight;
+
+    /// <summary>
+    /// <c>GameFlowController.games</c> 상의 원본 등록 인덱스.
+    /// 재생 순서는 시대 안에서 판마다 섞이지만, 조합 키(<see cref="RunResult.CombinationKey"/>)는
+    /// 이 값 순으로 정규화해서 계산한다 — 순서만 다른 같은 판이 다른 세계로 갈리지 않게 하기 위함이다.
+    /// </summary>
+    public int sortIndex;
 }
 
 /// <summary>

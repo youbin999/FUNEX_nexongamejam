@@ -1047,7 +1047,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: EXIT
+  m_text: GITHUB
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 2ffcc6a664dbc7946bcc2c6e3f509000, type: 2}
   m_sharedMaterial: {fileID: 3280642254698710165, guid: 2ffcc6a664dbc7946bcc2c6e3f509000, type: 2}
@@ -4087,7 +4087,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 7710000012}
         m_TargetAssemblyTypeName: TitleMenu, Assembly-CSharp
-        m_MethodName: QuitGame
+        m_MethodName: OpenGitHub
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
