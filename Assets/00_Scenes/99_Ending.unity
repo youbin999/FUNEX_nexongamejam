@@ -1018,6 +1018,9 @@ MonoBehaviour:
   creditRect: {fileID: 7720000021}
   epilogueText: {fileID: 33741980}
   epilogueContinueButton: {fileID: 1116189771}
+  skipButton: {fileID: 0}
+  skipButtonLabel: "\uAC74\uB108\uB6F0\uAE30"
+  skipButtonMargin: {x: 48, y: 48}
   backgroundImage: {fileID: 261446160}
   backgroundGroup: {fileID: 459776364}
   namePrompt: {fileID: 2072262255}
@@ -1027,13 +1030,24 @@ MonoBehaviour:
   epilogueDelay: 1
   imageFadeDuration: 2
   narratorModel: gemini-3.6-flash
-  narratorTimeout: 20
+  narratorTimeout: 40
+  narratorTemperature: 1.1
   imageProvider: 0
   imageModel: gemini-3.1-flash-image
   imageTimeout: 60
   useImageCache: 0
   forceFallback: 0
   saveToGallery: 1
+  generatingText: {fileID: 0}
+  generatingLabel: "\uC138\uACC4 \uAE30\uB85D\uC911"
+  generatingDotInterval: 0.5
+  fallbackNotice: {fileID: 0}
+  fallbackNoticeHeadline: "Ai\uAC00 \uBA38\uB9AC\uB97C \uAD74\uB824\uBD24\uC9C0\uB9CC\n\uD798\uC774
+    \uBD80\uC871\uD55C\uAC83\uAC19\uC544\uC694"
+  fallbackNoticeQuestion: "\uC774 \uC138\uACC4\uB97C \uAE30\uB85D\uD558\uC2DC\uACA0\uC2B5\uB2C8\uAE4C?"
+  fallbackNoticeConfirmLabel: "\uAE30\uB85D\uD558\uAE30"
+  fallbackNoticeCancelLabel: "\uADF8\uB9CC\uB450\uAE30"
+  quitSceneName: 00000_Title
   gallerySceneName: 00000_Gallery
   onCreditsFinished:
     m_PersistentCalls:

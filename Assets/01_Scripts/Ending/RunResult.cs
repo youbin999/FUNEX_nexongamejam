@@ -29,7 +29,11 @@ public class RunResult : MonoBehaviour
         }
     }
 
-    /// <summary>이번 판의 엔딩에 반영할 Change 결과와 Critical 실패 결과. 등록 순서 = 시대 순서.</summary>
+    /// <summary>
+    /// 이번 판의 엔딩에 반영할 Change 결과와 Critical 실패 결과. <b>플레이어가 실제로 겪은 재생 순서</b>다.
+    /// 시대 순서는 항상 지켜지지만, 같은 시대 안의 순서는 판마다 섞인다(<c>GameFlowController.shuffleWithinEra</c>).
+    /// 크레딧 본문과 LLM 프롬프트는 이 순서를 그대로 읽는다. 조합 키는 <see cref="CanonicalOutcomes"/> 를 쓴다.
+    /// </summary>
     public IReadOnlyList<MiniGameOutcome> Outcomes => outcomes;
 
     /// <summary>핵심 미니게임 실패로 흐름이 중단됐는지 여부.</summary>
@@ -96,17 +100,37 @@ public class RunResult : MonoBehaviour
     // ── 조합 키 ──
 
     /// <summary>
-    /// 변화 미니게임 성공/실패 조합을 비트마스크로 만든다(i번째 비트 = i번째 결과의 성공 여부).
+    /// 결과들을 <see cref="MiniGameOutcome.sortIndex"/>(= 원본 등록 인덱스) 오름차순으로 정렬한 사본.
+    ///
+    /// 재생 순서는 시대 안에서 판마다 섞이므로, 조합 키를 재생 순서로 계산하면
+    /// 성패가 완전히 같은 판인데도 순서만 달라 다른 세계로 갈린다 — 엔딩 이미지가 매번 다시 생성되고
+    /// 갤러리에 같은 세계가 중복으로 쌓인다. 그래서 키 계산만큼은 항상 이 정규 순서를 쓴다.
+    /// (완주 판 기준으로 이 순서는 셔플 이전의 고정 순서와 동일하므로, 예전에 쌓인 캐시·갤러리와도 키가 맞는다.)
+    /// </summary>
+    private List<MiniGameOutcome> CanonicalOutcomes
+    {
+        get
+        {
+            var sorted = new List<MiniGameOutcome>(outcomes);
+            sorted.Sort((a, b) => a.sortIndex.CompareTo(b.sortIndex));
+            return sorted;
+        }
+    }
+
+    /// <summary>
+    /// 변화 미니게임 성공/실패 조합을 비트마스크로 만든다(i번째 비트 = 정규 순서상 i번째 결과의 성공 여부).
     /// 엔딩 이미지 캐시 키이자 갤러리 식별자로 쓴다.
     /// </summary>
     public int CombinationMask
     {
         get
         {
+            List<MiniGameOutcome> canonical = CanonicalOutcomes;
+
             int mask = 0;
-            for (int i = 0; i < outcomes.Count && i < 31; i++)
+            for (int i = 0; i < canonical.Count && i < 31; i++)
             {
-                if (outcomes[i].success)
+                if (canonical[i].success)
                     mask |= 1 << i;
             }
 
@@ -118,7 +142,8 @@ public class RunResult : MonoBehaviour
     /// 캐시 파일명 등에 쓸 조합 키. 결과 개수까지 포함해야
     /// "3개 중 전부 실패(0)"와 "5개 중 전부 실패(0)"가 충돌하지 않는다.
     ///
-    /// 미니게임 순서는 고정이므로(<see cref="GameFlowController"/> 등록 순서), 완주한 판끼리는
+    /// 재생 순서가 아니라 <see cref="CanonicalOutcomes"/>(원본 등록 순서) 기준으로 계산하므로,
+    /// 시대 내 순서가 섞여도 같은 성패 조합이면 같은 키가 나온다. 덕분에 완주한 판끼리는
     /// 개수와 사건 목록이 같고 성패 패턴만 다르다 — 사실상 <see cref="CombinationMask"/> 가 판을 가른다.
     /// 그래도 사건 목록(<see cref="EventsSignature"/>)을 키에 넣어 두는 이유는,
     /// 핵심 미니게임 실패로 중단된 판들이 서로 다른 시대에서 끊겼는데도
@@ -129,7 +154,8 @@ public class RunResult : MonoBehaviour
 
     /// <summary>
     /// 이번 판에 어떤 사건을 겪었는지를 나타내는 문자열. 조합 키의 재료다.
-    /// 등록 순서(= 시대 순서)가 달라지면 다른 판으로 본다.
+    /// 재생 순서가 아니라 정규 순서(원본 등록 순서)로 이어 붙이므로, 시대 내 셔플에 흔들리지 않는다.
+    /// 겪은 사건 <b>집합</b>이 달라지면 다른 판으로 본다.
     /// 중단으로 끝난 판은 중단을 유발한 사건까지 포함해야 마지막 시대가 구분된다.
     /// </summary>
     private string EventsSignature
@@ -137,7 +163,7 @@ public class RunResult : MonoBehaviour
         get
         {
             var sb = new StringBuilder();
-            foreach (MiniGameOutcome o in outcomes)
+            foreach (MiniGameOutcome o in CanonicalOutcomes)
                 sb.Append(o.era).Append(':').Append(o.eventLabel).Append('|');
 
             if (EndedEarly)

@@ -1,6 +1,6 @@
-using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 /// <summary>
 /// 빅뱅 씬(00_BigBang)의 흐름 처리기.
@@ -21,8 +21,14 @@ public class BigBangSceneFlow : MonoBehaviour
     [SerializeField] private string mainSceneName = "00000_Player";
 
     [Header("실패")]
-    [Tooltip("실패 UI 를 보여준 뒤 종료하기까지의 시간(초). 0 이면 즉시 종료한다")]
-    [SerializeField] private float quitDelay = 1.5f;
+    [Tooltip("실패 시 띄울 다시하기 버튼. 비워두면 화면 가운데 약간 아래에 코드로 만들어 붙인다")]
+    [SerializeField] private Button retryButton;
+
+    [Tooltip("자동 생성되는 다시하기 버튼의 문구")]
+    [SerializeField] private string retryButtonLabel = "다시하기";
+
+    [Tooltip("자동 생성되는 다시하기 버튼을 화면 중앙에서 아래로 내리는 거리(px, 1920x1080 기준)")]
+    [SerializeField] private float retryButtonOffsetY = 140f;
 
     private bool handled;
 
@@ -43,20 +49,22 @@ public class BigBangSceneFlow : MonoBehaviour
             player.onGameFinished.RemoveListener(OnGameFinished);
     }
 
-    /// <summary>실패 UI 를 감춘 상태로 시작한다.</summary>
+    /// <summary>실패 UI 와 다시하기 버튼을 감춘 상태로 시작한다.</summary>
     private void Start()
     {
         if (failUI != null)
             failUI.SetActive(false);
+
+        EnsureRetryButton();
     }
 
 
     // ── 결과 분기 ──
 
-    /// <summary>성공이면 타이틀로 넘어가고, 실패면 실패 UI 를 띄운 뒤 게임을 종료한다.</summary>
+    /// <summary>성공이면 다음 씬으로 넘어가고, 실패면 실패 UI 와 다시하기 버튼을 띄운다.</summary>
     private void OnGameFinished(MiniGame instance, bool success)
     {
-        // 종료 통지는 한 번뿐이지만, 씬 전환/종료는 되돌릴 수 없으니 한 번만 타도록 막아 둔다.
+        // 종료 통지는 한 번뿐이지만, 씬 전환은 되돌릴 수 없으니 한 번만 타도록 막아 둔다.
         if (handled)
             return;
 
@@ -71,20 +79,49 @@ public class BigBangSceneFlow : MonoBehaviour
         if (failUI != null)
             failUI.SetActive(true);
 
-        if (quitDelay > 0f)
-            StartCoroutine(QuitAfterDelay());
-        else
-            Quit();
+        if (retryButton != null)
+            retryButton.gameObject.SetActive(true);
     }
 
-    /// <summary>실패 UI 를 잠깐 보여준 뒤 종료한다.</summary>
-    private IEnumerator QuitAfterDelay()
+
+    // ── 다시하기 ──
+
+    /// <summary>
+    /// 다시하기 버튼을 확보하고 리스너를 묶은 뒤 감춰 둔다.
+    /// 인스펙터 배선이 있으면 그걸 쓰고, 없으면 화면 가운데 약간 아래에 만들어 붙인다 —
+    /// 버튼이 없으면 실패 후 아무것도 할 수 없게 되므로 배선 누락으로 막히면 안 된다.
+    /// </summary>
+    private void EnsureRetryButton()
     {
-        yield return new WaitForSecondsRealtime(quitDelay);
-        Quit();
+        if (retryButton == null)
+            retryButton = BuildRetryButton();
+
+        if (retryButton == null)
+            return;
+
+        retryButton.onClick.AddListener(Retry);
+        retryButton.gameObject.SetActive(false);
+    }
+
+    /// <summary>화면 가운데에서 약간 아래에 놓인 다시하기 버튼을 만든다.</summary>
+    private Button BuildRetryButton()
+    {
+        SimpleUiBuilder.EnsureEventSystem();
+
+        // 실패 UI 위에 확실히 뜨도록 별도 오버레이 캔버스에 올린다.
+        Canvas canvas = SimpleUiBuilder.CreateOverlayCanvas("[BigBang Retry Canvas]", 300);
+        canvas.transform.SetParent(transform, false);
+
+        Button button = SimpleUiBuilder.CreateButton(
+            canvas.transform, "RetryButton", retryButtonLabel, new Vector2(320f, 90f), 34f);
+
+        SimpleUiBuilder.AnchorToCenter((RectTransform)button.transform, new Vector2(0f, -retryButtonOffsetY));
+
+        return button;
     }
 
     /// <summary>
+
     /// 실패 처리를 끝낸다. 에디터에서는 플레이 모드를 끄고, Web 에서는 씬을 다시 로드하며,
     /// 그 외 플랫폼에서는 애플리케이션을 종료한다.
     /// </summary>
