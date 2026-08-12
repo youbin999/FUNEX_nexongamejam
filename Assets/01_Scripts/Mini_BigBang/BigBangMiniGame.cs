@@ -29,10 +29,10 @@ public class BigBangMiniGame : MiniGame
 
     [Header("규칙")]
     [Tooltip("게임 시작 시의 온도(0~1). 여기서부터 오르내린다")]
-    [SerializeField, Range(0f, 1f)] private float startHeat = 0.3f;
+    [SerializeField, Range(0f, 1f)] private float startHeat = 0.5f;
 
     [Tooltip("누르고 있는 동안 초당 오르는 온도")]
-    [SerializeField] private float heatRisePerSecond = 0.5f;
+    [SerializeField] private float heatRisePerSecond = 0.3f;
 
     [Tooltip("떼고 있는 동안 초당 내려가는 온도")]
     [SerializeField] private float heatFallPerSecond = 0.15f;

@@ -8,7 +8,8 @@
 - 검은 화면에서 시작한다. 화면 오른쪽에 세로 온도계가 있다.
 - **W(또는 위 방향키)를 꾹 누르고 있으면** 온도가 오른다. 떼면 천천히 내려간다.
 - 온도가 **끝까지 차오르면 클리어** → 메인 씬으로 이동.
-- 온도가 **0까지 식으면 실패** → 실패 UI를 띄우고 애플리케이션 종료.
+- 온도가 **0까지 식으면 실패** → 실패 UI를 띄운 뒤 정리. 데스크톱은 애플리케이션 종료,
+  **Web 은 씬 재로드(다시 빅뱅부터)**, 에디터는 플레이 모드 종료.
 
 | 값 | 기본값 | 의미 |
 | :--- | :--- | :--- |
@@ -22,18 +23,82 @@
 ## 2. 우주 팽창 연출 — 영상 스크럽
 
 핵심은 **온도(heat)가 마스터, 영상은 종속**이라는 것이다. 빅뱅 영상은 스스로 재생되지 않는다.
-`VideoPlayer`를 `Pause()` 상태로 두고, 온도 값(0~1)을 프레임 인덱스로 환산해 대입한다.
+`VideoPlayer`를 `Pause()` 상태로 두고, 온도 값(0~1)을 재생 시각(초)으로 환산해 대입한다.
 
 ```
 보정 진행도 = progressCurve.Evaluate(heat)
 영상 위치   = lerp(startRatio, endRatio, 보정 진행도)
-목표 프레임 = round(영상 위치 * (frameCount - 1))
+목표 시각   = 영상 위치 * videoPlayer.length
 ```
 
 - W를 안 누르면 온도가 내려가면서 영상도 **되감겨** 어둠으로 돌아간다.
 - W를 누르면 온도가 오르면서 빛이 커진다. 온도계와 영상이 항상 같은 값을 본다.
-- 목표 프레임이 **바뀔 때만** `videoPlayer.frame`에 대입한다. 매 프레임 무조건 대입하면 탐색
-  요청이 쌓여 버벅인다.
+- 목표 시각이 **한 프레임(1/30초) 이상 움직였을 때만** `videoPlayer.time`에 대입한다. 매 프레임
+  무조건 대입하면 탐색 요청이 쌓여 버벅인다.
+- 끝에 정확히 닿으면 재생 종료로 처리돼 그림이 날아갈 수 있어, 상한을 `length - 1/30`로 물려 둔다.
+
+### 왜 프레임(`frame`)이 아니라 시각(`time`)인가 — Web 제약
+
+원래는 `videoPlayer.frame`에 프레임 번호를 대입했다. 데스크톱에서는 잘 돌았지만 **Web(WebGL)
+빌드에서 영상이 아예 뜨지 않는다.** Unity 매뉴얼이 명시하는 두 가지 제약 때문이다.
+
+- **"VideoClips aren't supported on Web."** Web 의 `VideoPlayer`는 브라우저 `<video>` 엘리먼트로
+  구현돼 있어 VideoClip 에셋을 받지 못한다. 반드시 URL 소스를 써야 한다.
+- **"Web doesn't support frame accuracy."** `frameCount`가 0을 돌려주고 `frame` 대입은 무시된다.
+  `frameCount <= 0` 가드에 걸려 탐색 요청이 **한 번도 나가지 않으므로**, 온도계는 정상인데
+  화면만 검은 채로 멈춘다.
+
+그래서 두 가지를 바꿨다.
+
+- 원본을 `Assets/StreamingAssets/BigBang.mp4`로 옮기고, `BigBangVisual.Awake`에서
+  `source = VideoSource.Url` / `url = $"{Application.streamingAssetsPath}/{videoFileName}"` 로 지정한다.
+  URL 소스는 데스크톱에서도 그대로 동작하므로 플랫폼 분기를 두지 않는다.
+- 탐색을 `frame`(프레임) 대신 `time`(초)으로 한다. `length`는 Web 에서도 읽을 수 있다.
+
+`MapProgress()`가 여전히 0~1 미디어 위치를 돌려주므로 `startRatio`·`progressCurve` 튜닝값은
+그대로 살아 있다. 바뀐 것은 그 결과를 프레임이 아니라 초로 환산한다는 것뿐이다.
+
+### Web 에서 검은 화면이 나왔던 진짜 이유 — 탐색 인터록과 첫 프레임
+
+위까지 고치고도 **Web 빌드는 여전히 검은 화면이었다.** 온도계는 정상이고, DevTools Network 에는
+`/StreamingAssets/BigBang.mp4` 가 304 로 2.7MB 전부(byte-range 5조각) 도착해 있었으며 콘솔에
+비디오 에러도 0건이었다. 즉 **로딩이 아니라 텍스처 업로드가 막힌 것**이다.
+
+원인은 Unity 의 Web 비디오 구현체를 직접 읽어 확인했다
+(`<Unity 설치경로>/Editor/Data/PlaybackEngines/WebGLSupport/BuildTools/lib/Video.js`).
+Web 의 `VideoPlayer` 는 브라우저 `<video>` 엘리먼트이고, 매 프레임 `JS_Video_UpdateToTexture`
+가 그 그림을 텍스처로 올리는데 그 함수 앞에 가드가 둘 있다.
+
+```js
+if (!v.isLoaded) return false;   // 프레임이 한 번도 "표시"된 적 없으면 거부
+...
+if (v.seeking) return false;     // 탐색이 끝나지 않았으면 거부
+```
+
+**두 번째 가드가 결정타였다.** 기존 코드는 목표가 한 프레임만 움직여도 매번 `videoPlayer.time`
+에 대입했는데, 실제 요청 빈도를 §2-2 배속 표로 환산하면 이렇다.
+
+| 상황 | 영상 배속 | 초당 탐색 요청 |
+| :--- | :--- | :--- |
+| W 누름 (heat 0.3) | 1.37x | 약 41회 (24ms 간격) |
+| 뗌 (heat 0.3) | 0.41x | 약 12회 (81ms 간격) |
+
+1080p all-intra 프레임 하나를 디코드하는 데 24ms 보다 오래 걸리므로, 이전 탐색이 끝나기 전에
+다음 `currentTime` 대입이 들어가 `v.seeking` 이 **영구히 참**으로 유지된다 → 텍스처가 한 번도
+갱신되지 않는다. 데스크톱 백엔드에는 이 인터록이 없어서 에디터에서만 멀쩡했던 것이다.
+
+→ **탐색은 한 번에 하나만 띄운다.** `seekCompleted` 를 구독해, 탐색이 떠 있는 동안에는 요청을
+보내지 않고 최신 진행도만 `pendingProgress` 에 남겼다가 완료 시 그 값으로 한 번에 따라잡는다
+(중간 값은 버린다). 통지가 유실될 경우를 대비해 `SeekTimeout = 0.5초` 안전장치를 뒀다.
+
+첫 번째 가드 때문에 `OnPrepared` 의 "한 번 재생했다 멈춰 첫 프레임을 올리는" 트릭도 **Web 에서
+빼면 안 된다 — 오히려 Web 에서 가장 필요하다.** `isLoaded` 를 세우는 유일한 방법이 재생이기
+때문이다. Video.js 주석도 못박아 두었다: *"or else the first frame never shows up after calling
+Pause()"*. 예전에 이걸 `#if !UNITY_WEBGL` 로 빼 둔 근거("브라우저가 제스처 전 `play()`를 거부한다")는
+**틀렸다.** Video.js 는 엘리먼트를 만들 때 무조건 `video.muted = true` 로 두고(자동재생 정책은
+뮤트 미디어를 막지 않는다), 설령 거부되더라도 `jsVideoAddPendingBlockedVideo` 가 첫 클릭에
+자동 재시도한다. 다만 같은 프레임에 바로 `Pause()` 하면 프레임이 표시되기 전에 멈출 수 있어,
+코루틴으로 한 프레임 준 뒤 멈춘다.
 
 ### 왜 보정 곡선(`progressCurve`)이 필요한가
 
@@ -75,10 +140,13 @@
 그 탓에 되감기가 최대 9프레임까지 밀렸다 한 번에 따라잡는 현상이 있었다. 아래 명령으로
 모든 프레임을 키프레임으로 재인코딩해 해결했다.
 
+브라우저의 `currentTime` 탐색도 똑같이 키프레임에 의존하므로, 이 인코딩은 Web 빌드에서도
+그대로 필요하다.
+
 ```bash
 ffmpeg -y -i 원본.mp4 -c:v libx264 -preset slow -crf 18 \
   -g 1 -x264-params keyint=1:min-keyint=1:scenecut=0 \
-  -pix_fmt yuv420p -an Assets/04_Video/BigBang.mp4
+  -pix_fmt yuv420p -an Assets/StreamingAssets/BigBang.mp4
 ```
 
 용량은 1.9MB → 2.7MB 로 거의 늘지 않았다(내용이 대부분 검정이라 그렇다). 영상을 교체할 때는
@@ -88,8 +156,9 @@ ffmpeg -y -i 원본.mp4 -c:v libx264 -preset slow -crf 18 \
 ffprobe -v error -select_streams v:0 -show_entries frame=key_frame -of csv=p=0 파일.mp4
 ```
 
-> 파일을 교체할 때는 `Assets/04_Video/BigBang.mp4`를 **덮어쓰기**한다. `.meta`가 유지되어
-> GUID가 그대로이므로 프리팹의 참조가 깨지지 않는다.
+> 파일을 교체할 때는 `Assets/StreamingAssets/BigBang.mp4`를 **덮어쓰기**한다. 프리팹은 이제
+> 에셋 GUID가 아니라 **파일 이름**(`BigBangVisual.videoFileName`)으로 참조하므로, 이름만 같으면
+> 참조가 깨지지 않는다. 이름을 바꾸려면 인스펙터의 `Video File Name` 도 같이 고친다.
 
 ## 2-2. 효과음도 같이 왔다갔다 — PCM 스크럽
 
@@ -203,7 +272,7 @@ heat 가 1에 닿을 때 위치도 클립 끝에 닿으므로, 클리어 순간�
 | 파일 | 역할 |
 | :--- | :--- |
 | `BigBangMiniGame.cs` | `MiniGame` 상속. 온도 상태머신 + W 입력 + 클리어/실패 판정 |
-| `BigBangVisual.cs` | 진행도(0~1)를 미디어 위치로 변환해 영상을 스크럽. 같은 값을 `BigBangAudio` 에도 넘긴다 |
+| `BigBangVisual.cs` | 진행도(0~1)를 미디어 위치로 변환해 영상을 시각(초) 단위로 스크럽. 같은 값을 `BigBangAudio` 에도 넘긴다 |
 | `BigBangAudio.cs` | 미디어 위치를 받아 효과음을 스크럽하는 PCM 재생기 |
 | `BigBangSceneFlow.cs` | 씬 레벨 처리. 성공 시 씬 전환, 실패 시 실패 UI + 종료 |
 
@@ -215,7 +284,7 @@ heat 가 1에 닿을 때 위치도 클립 끝에 닿으므로, 클리어 순간�
 
 | 경로 | 내용 |
 | :--- | :--- |
-| `Assets/04_Video/BigBang.mp4` | 빅뱅 영상 (1920x1080, 30fps, 113프레임 = 3.767초, all-intra) |
+| `Assets/StreamingAssets/BigBang.mp4` | 빅뱅 영상 (1920x1080, 30fps, 113프레임 = 3.767초, all-intra). **VideoClip 에셋이 아니라 URL 로 읽는다** — Web 이 VideoClip 을 지원하지 않는다 |
 | `Assets/04_Video/(Audio) BigBang.wav` | 위 영상에서 추출한 효과음 (48kHz 스테레오 PCM, 3.755초) |
 | `Assets/04_Video/BigBangRT.renderTexture` | 영상 출력용 RenderTexture (1280x720) |
 | `Assets/03_Prefabs/BigBangGame.prefab` | 미니게임 프리팹 |
@@ -310,6 +379,49 @@ Unity CLI로 에디터에 직접 붙어 플레이 모드에서 실측한 값이�
 
 **콘솔 로그 0건** (에러/경고 없음).
 
+### URL 소스 + 시각(`time`) 스크럽 전환 후 재측정
+
+에디터 플레이 모드에 붙어 실제 인스턴스를 읽은 값이다.
+
+| 항목 | 값 |
+| :--- | :--- |
+| `source` | `Url` |
+| `url` | `D:/.../Assets/StreamingAssets/BigBang.mp4` |
+| `isPrepared` | `True` |
+| `length` | `3.7667` 초 |
+| `heat` | `0.2374` |
+| `time` | `2.1333` 초 |
+| RT 평균 밝기 | `0.0350` (준비 전 `0.0007` → 그림이 올라옴) |
+| `isPlaying` | `False` — 재생이 아니라 **스크럽** |
+
+`heat = 0.2374` 를 매핑식에 넣으면
+`0.2374^0.6 = 0.4220` → `lerp(0.25, 1, 0.4220) = 0.5665` → `× 3.7667 = 2.1335` 초로,
+측정된 `time = 2.1333` 과 일치한다. 즉 `startRatio`·`progressCurve` 보정이 전환 후에도
+그대로 살아 있다. 밝기 `0.0350` 도 §2 의 실측표(heat 0.2 → 0.020, 0.3 → 0.047) 사이에 들어맞는다.
+
+**콘솔 로그 0건.** 스크립트 재컴파일도 에러 0건.
+
+### Web 빌드 실측 (127.0.0.1:5500)
+
+위 표는 전부 에디터(데스크톱 백엔드) 값이고, Web 은 별도로 갈렸다. 첫 Web 빌드는 **검은 화면**이
+나왔으며 DevTools 로 확인한 상태는 다음과 같다.
+
+| 항목 | 관측값 | 판정 |
+| :--- | :--- | :--- |
+| `BigBang.mp4` 요청 URL | `/StreamingAssets/BigBang.mp4` | 경로 정상 |
+| 상태 / 크기 | 304 × 5 조각, 합 ≈ 2.67MB | 파일 전체 도착 |
+| Type / Initiator | `media` / `Other` | `<video>` 엘리먼트가 직접 요청 = 소스 연결 성공 |
+| 비디오 에러 로그 | 0건 | 코덱·CORS 정상 |
+| 게임 로직 | `Quitting...` 까지 도달 | 온도/입력/실패 판정 정상 |
+
+즉 **로딩 단계는 전부 통과했고 영상만 검었다.** 원인과 수정은 §2 의 "Web 에서 검은 화면이
+나왔던 진짜 이유" 참고. `Application.streamingAssetsPath` 는 Web 에서
+`new URL("StreamingAssets", document.URL).href` 로 풀리므로(`UnityLoader.js`), 페이지 주소가
+슬래시 없이 끝나는 디렉터리 형태면 한 단계 위로 풀려 404 가 난다는 점만 주의한다.
+
+> **수정 후 브라우저 재측정은 아직이다.** 탐색 합치기와 첫 프레임 재생은 위 Video.js 분석에
+> 근거한 수정이고, 컴파일까지만 확인했다. 그래도 검으면 §6 의 이미지 시퀀스 대안으로 간다.
+
 > **효과음 스크럽은 계측 검증 전이다.** 첫 구현은 플레이 모드에서 "소리가 뚝뚝 끊긴다"는
 > 문제가 나왔고, 원인(배속을 콜백 간 목표 변화량에서 뽑은 것)은 위 2-2 절에 적어 두었다.
 > 수정본은 컴파일과 프리팹 참조 해소까지만 확인했으며, 위 배속 표도 `progressCurve`(h^0.6)로
@@ -323,8 +435,22 @@ Unity CLI로 에디터에 직접 붙어 플레이 모드에서 실측한 값이�
 - **실패 UI 문구가 영어("GAME OVER")**다. TMP 기본 폰트(LiberationSans SDF)에 한글 글리프가
   없어서다. 한글로 바꾸려면 한글 폰트 애셋을 만들어 `FailCanvas/Label`에 지정한다.
 - **"실패 즉시 종료"는 `quitDelay = 1.5초`로 완충**해 두었다. 0으로 두면 UI가 보이기 전에
-  꺼진다. 에디터 플레이 중에는 `Application.Quit()`이 동작하지 않으므로 플레이 모드 종료로
-  대체된다(`BigBangSceneFlow.Quit()`의 `#if UNITY_EDITOR` 분기).
+  꺼진다. 마무리 동작은 `BigBangSceneFlow.Quit()` 이 플랫폼별로 나눈다 — 에디터는 플레이 모드
+  종료, **Web 은 현재 씬 재로드**, 그 외는 `Application.Quit()`. Web 에서 `Application.Quit()` 은
+  캔버스를 정지시켜 새로고침 말고는 복구가 안 되고, 기획상 빅뱅 실패는 "다시 빅뱅부터"이므로
+  재로드가 맞다.
 - **스크럽 성능**은 현재 113프레임 720p에서 문제없다. 더 길거나 큰 영상으로 교체해 버벅이면
   `BigBangVisual`만 이미지 시퀀스(`Sprite[]` 인덱싱) 방식으로 갈아끼우면 된다.
   게임 로직은 `SetProgress(float)` 인터페이스만 보므로 수정할 필요가 없다.
+- **Web 에서 효과음이 나지 않는다.** `BigBangAudio` 의 PCM 스크럽은 `OnAudioFilterRead` 기반인데,
+  Unity 매뉴얼상 Web 은 "scriptable audio pipeline"을 지원하지 않아 이 콜백이 호출되지 않는다
+  (경고만 뜨고 크래시는 없다). 우회로가 없으므로 Web 전용 폴백 — 역재생을 포기하고 위치가
+  크게 벌어졌을 때만 `AudioSource.time` 을 보정하는 단순 재생/정지 — 이 필요하다. **미구현.**
+- **Web 에서 영상이 그래도 안 뜨면 이미지 시퀀스로 간다.** 3.7초 113프레임짜리라 이쪽이 오히려
+  정공법에 가깝다. 브라우저 탐색 지연·자동재생 정책·all-intra 재인코딩이 전부 무의미해지고
+  역방향 스크럽이 공짜가 된다. 2프레임당 1장(57장) × 640×360 DXT1 이면 VRAM 6.4MB 로
+  Web 에서도 감당할 수 있다.
+
+  ```bash
+  ffmpeg -i BigBang.mp4 -vf "select='not(mod(n,2))',scale=640:360" -vsync 0 bb_%03d.png
+  ```

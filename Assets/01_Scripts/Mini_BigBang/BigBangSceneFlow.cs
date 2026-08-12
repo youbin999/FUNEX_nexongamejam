@@ -4,9 +4,9 @@ using UnityEngine.UI;
 
 /// <summary>
 /// 빅뱅 씬(00_BigBang)의 흐름 처리기.
-/// <see cref="MiniGamePlayer"/> 의 종료 통지를 받아 성공이면 다음 씬으로 넘어가고,
-/// 실패면 실패 UI 와 다시하기 버튼을 띄운다.
-/// 씬 전환 같은 바깥 일은 미니게임이 아니라 여기서 처리해야 미니게임을 재사용할 수 있다.
+/// <see cref="MiniGamePlayer"/> 의 종료 통지를 받아 성공이면 메인 씬으로 넘어가고,
+/// 실패면 실패 UI 를 띄운 뒤 게임을 정리한다(Web 은 씬 재시작, 그 외는 애플리케이션 종료).
+/// 씬 전환·종료 같은 바깥 일은 미니게임이 아니라 여기서 처리해야 미니게임을 재사용할 수 있다.
 /// </summary>
 public class BigBangSceneFlow : MonoBehaviour
 {
@@ -121,14 +121,20 @@ public class BigBangSceneFlow : MonoBehaviour
     }
 
     /// <summary>
-    /// 빅뱅을 처음부터 다시 한다. 버튼 OnClick 에 연결하며, 인스펙터 배선용으로 public 이다.
-    ///
-    /// 씬을 통째로 다시 로드한다 — 이 씬의 <see cref="MiniGamePlayer"/> 는 Play First On Start 가 켜져 있어
-    /// 로드되는 순간 빅뱅이 다시 시작되고, 영상·온도·오디오 상태도 한꺼번에 초기값으로 돌아간다.
-    /// (영상 스크럽 상태를 손으로 되돌리는 것보다 확실하다.)
+
+    /// 실패 처리를 끝낸다. 에디터에서는 플레이 모드를 끄고, Web 에서는 씬을 다시 로드하며,
+    /// 그 외 플랫폼에서는 애플리케이션을 종료한다.
     /// </summary>
-    public void Retry()
+    private void Quit()
     {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#elif UNITY_WEBGL
+        // Web 에서 Application.Quit() 은 캔버스를 정지시켜 새로고침 말고는 복구할 방법이 없다.
+        // 기획상 빅뱅 실패는 "다시 빅뱅부터 시작" 이므로 현재 씬을 다시 로드한다.
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+#else
+        Application.Quit();
+#endif
     }
 }
